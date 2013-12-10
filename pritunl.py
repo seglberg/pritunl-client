@@ -29,7 +29,8 @@ class Pritunl:
         self.profiles_table.show()
 
 
-        self.button_box = gtk.HBox(False, 5)
+        self.button_box = gtk.HBox(True, 5)
+        self.button_box.set_size_request(-1, 50)
         self.window_vbox.pack_start(self.button_box, False, False, 0)
 
         add_button = gtk.Button('Add')

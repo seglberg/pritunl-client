@@ -23,10 +23,25 @@ class Pritunl:
         self.profiles_window.show()
 
         self.profiles_table = gtk.Table(100, 1, False)
-        self.profiles_table.set_row_spacings(10)
-        self.profiles_table.set_col_spacings(10)
+        self.profiles_table.set_row_spacings(5)
+        self.profiles_table.set_col_spacings(5)
         self.profiles_window.add_with_viewport(self.profiles_table)
         self.profiles_table.show()
+
+        for i in range(100):
+            profile_box = gtk.HBox(False, 0)
+            self.profiles_table.attach(profile_box, 0, 1, i, i+1)
+
+            profile_label = gtk.Label('Status: Connected\n'
+                'Uptime: 1d 6h 30m 16s\n'
+                'Interface: tun0\n'
+                'Client IP: 10.139.17.102\n'
+                'Server IP: 8.8.8.8\n'
+                'Port: 16070/udp')
+            profile_box.pack_start(profile_label, False, False, 5)
+            profile_label.show()
+
+            profile_box.show()
 
 
         self.button_box = gtk.HBox(True, 5)

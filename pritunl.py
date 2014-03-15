@@ -4,74 +4,55 @@ import gtk
 
 class Pritunl:
     def __init__(self):
-        self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        self.window.set_title('Pritunl Client')
-        self.window.set_border_width(10)
-        self.window.set_size_request(375, 400)
-        self.window.connect('delete_event', self.delete_event)
-        self.window.connect('destroy', self.destroy)
+        icon = gtk.status_icon_new_from_stock(gtk.STOCK_ABOUT)
+        icon.connect('activate', self.on_click_left)
+        icon.connect('popup_menu', self.on_click_right)
 
-        self.window_vbox = gtk.VBox(False, 0)
-        self.window.add(self.window_vbox)
+    def on_click_left(self, widget):
+        self.show_menu(0, 0)
 
+    def on_click_right(self, widget, button, activate_time):
+        self.show_menu(button, gtk.gdk.CURRENT_TIME)
 
-        self.profiles_window = gtk.ScrolledWindow()
-        self.profiles_window.set_border_width(10)
-        self.profiles_window.set_policy(
-            gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
-        self.window_vbox.pack_start(self.profiles_window, True, True, 0)
-        self.profiles_window.show()
+    def show_menu(self, event_button, activate_time, data=None):
+        menu = gtk.Menu()
 
-        self.profiles_table = gtk.Table(100, 1, False)
-        self.profiles_table.set_row_spacings(5)
-        self.profiles_table.set_col_spacings(5)
-        self.profiles_window.add_with_viewport(self.profiles_table)
-        self.profiles_table.show()
+        no_profiles_item = gtk.MenuItem('No Profiles Available')
+        no_profiles_item.set_sensitive(False)
+        menu.append(no_profiles_item)
+        no_profiles_item.show()
 
-        for i in range(100):
-            profile_box = gtk.HBox(False, 0)
-            self.profiles_table.attach(profile_box, 0, 1, i, i+1)
+        # for i in xrange(4):
+        #     profile_item = gtk.CheckMenuItem('Example Profile %s' % i)
+        #     # profile_item.set_active(True)
+        #     menu.append(profile_item)
+        #     profile_item.show()
 
-            profile_label = gtk.Label('Status: Connected\n'
-                'Uptime: 1d 6h 30m 16s\n'
-                'Interface: tun0\n'
-                'Client IP: 10.139.17.102\n'
-                'Server IP: 8.8.8.8\n'
-                'Port: 16070/udp')
-            profile_box.pack_start(profile_label, False, False, 5)
-            profile_label.show()
+        seperator_item = gtk.SeparatorMenuItem()
+        menu.append(seperator_item)
+        seperator_item.show()
 
-            profile_box.show()
+        add_profile_item = gtk.MenuItem('Add Profile')
+        menu.append(add_profile_item)
+        add_profile_item.show()
 
+        about_item = gtk.MenuItem('About')
+        about_item.connect('activate', self.show_about)
+        menu.append(about_item)
+        about_item.show()
 
-        self.button_box = gtk.HBox(True, 5)
-        self.button_box.set_size_request(-1, 50)
-        self.window_vbox.pack_start(self.button_box, False, False, 0)
+        exit_item = gtk.MenuItem('Exit')
+        exit_item.connect('activate', self.destroy)
+        menu.append(exit_item)
+        exit_item.show()
 
-        add_button = gtk.Button('Add')
-        add_button.connect('clicked', self.add, None)
-        self.button_box.pack_start(add_button, True, True, 0)
-        add_button.show()
+        menu.popup(None, None, None, event_button, activate_time)
 
-        remove_button = gtk.Button('Remove')
-        remove_button.connect('clicked', self.remove, None)
-        self.button_box.pack_start(remove_button, True, True, 0)
-        remove_button.show()
-
-        self.button_box.show()
-
-
-        self.window_vbox.show()
-        self.window.show()
-
-    def add(self, widget, data=None):
-        print 'add'
-
-    def remove(self, widget, data=None):
-        print 'remove'
-
-    def delete_event(self, widget, event, data=None):
-        return False
+    def show_about(self, widget, data=None):
+        msg_dialog = gtk.MessageDialog(buttons=gtk.BUTTONS_OK,
+            message_format='Pritunl Client')
+        msg_dialog.run()
+        msg_dialog.destroy()
 
     def destroy(self, widget, data=None):
         gtk.main_quit()

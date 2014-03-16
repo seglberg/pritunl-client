@@ -97,9 +97,13 @@ class Interface:
         else:
             self.show_connect_error(profile)
 
+    def on_disconnect_all(self, widget):
+        pass
+
     def show_menu(self, event_button, activate_time):
         menu = gtk.Menu()
         profiles_menu = gtk.Menu()
+        conn_active = True
 
         for profile in Profile.iter_profiles():
             title = '%s@%s (%s)' % (profile.user_name, profile.org_name,
@@ -117,6 +121,7 @@ class Interface:
             menu_item.show()
 
         if not len(menu):
+            conn_active = False
             menu_item = gtk.MenuItem('No Active Connections')
             menu_item.set_sensitive(False)
             menu.append(menu_item)
@@ -125,6 +130,16 @@ class Interface:
         if not len(profiles_menu):
             menu_item = gtk.MenuItem('No Profiles Available')
             menu_item.set_sensitive(False)
+            profiles_menu.append(menu_item)
+            menu_item.show()
+
+        if conn_active:
+            menu_item = gtk.SeparatorMenuItem()
+            profiles_menu.append(menu_item)
+            menu_item.show()
+
+            menu_item = gtk.MenuItem('Disconnect All Profiles')
+            menu_item.connect('activate', self.on_disconnect_all)
             profiles_menu.append(menu_item)
             menu_item.show()
 

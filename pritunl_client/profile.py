@@ -5,6 +5,8 @@ import json
 import time
 import subprocess
 import threading
+import signal
+import gtk
 import gobject
 
 _connections = {}
@@ -64,7 +66,8 @@ class Profile:
             profile_file.write(data)
 
     def start(self, status_callback, dialog_callback):
-        process = subprocess.Popen(['gksudo', 'openvpn %s' % self.path],
+        process = subprocess.Popen(['gksudo', '--description',
+            'Pritunl Connect', 'openvpn %s' % self.path],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         data = {
             'status': False,
@@ -85,18 +88,19 @@ class Profile:
         def poll_thread():
             while True:
                 line = process.stdout.readline()
-                print line.strip()
                 if not line:
                     if process.poll() is not None:
                         break
                     else:
                         continue
+                print line.strip()
                 if 'Initialization Sequence Completed' in line:
                     change_status(True)
                 elif 'Inactivity timeout' in line:
                     change_status(False)
-            change_status(False)
+            print 'EXIT_OVPN'
             data.pop(self.id, None)
+            change_status(False)
 
         def dialog_thread():
             time.sleep(CONNECT_TIMEOUT)
@@ -114,24 +118,80 @@ class Profile:
 
     def stop(self):
         connection_data = _connections.get(self.id)
-        if connection_data:
-            process = connection_data.get('process')
-            if process:
-                process.terminate()
-                for i in xrange(int(OVPN_EXIT_TIMEOUT / 0.1)):
-                    time.sleep(0.1)
-                    if process.poll() is not None:
-                        break
-                    process.terminate()
-                if process.poll() is not None:
-                    return
+        if not connection_data:
+            return
 
-                process.kill()
-                for i in xrange(int(OVPN_EXIT_TIMEOUT / 0.1)):
-                    time.sleep(0.1)
-                    if process.poll() is not None:
+        process = connection_data.get('process')
+        if not process:
+            return
+
+        # TODO run in thread
+        for i in xrange(10):
+            kill_process = subprocess.Popen(['gksudo', '--description',
+                'Pritunl Disconnect', 'pkill -P %s' % process.pid],
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            pass_fail = False
+
+            while True:
+                line = kill_process.stderr.readline()
+                if not line:
+                    if kill_process.poll() is not None:
                         break
-                    process.kill()
+                    else:
+                        continue
+                if 'incorrect password' in line:
+                    pass_fail = True
+
+            if kill_process.poll() == 255:
+                return
+
+            if pass_fail:
+                dialog = gtk.MessageDialog(
+                    type=gtk.MESSAGE_ERROR,
+                    buttons=gtk.BUTTONS_OK,
+                    message_format='Password is incorrect, try again...')
+                dialog.format_secondary_markup(
+                    'Failed to obtain sudo privileges')
+                dialog.set_title('Pritunl - Incorrect Password')
+                dialog.show_all()
+                dialog.run()
+                dialog.destroy()
+                continue
+
+            for i in xrange(int(OVPN_EXIT_TIMEOUT / 0.1)):
+                time.sleep(0.1)
+                if process.poll() is not None:
+                    break
+
+            break
+
+        if process.poll() is None:
+            dialog = gtk.MessageDialog(
+                type=gtk.MESSAGE_ERROR,
+                buttons=gtk.BUTTONS_OK,
+                message_format='Unable to disconnect profile')
+            dialog.format_secondary_markup(
+                'Failed to stop profile connection process')
+            dialog.set_title('Pritunl - Disconnect Failed')
+            dialog.show_all()
+            dialog.run()
+            dialog.destroy()
+
+
+        # for i in xrange(int(OVPN_EXIT_TIMEOUT / 0.1)):
+        #     time.sleep(0.1)
+        #     if process.poll() is not None:
+        #         break
+        #     process.terminate()
+        # if process.poll() is not None:
+        #     return
+
+        # process.kill()
+        # for i in xrange(int(OVPN_EXIT_TIMEOUT / 0.1)):
+        #     time.sleep(0.1)
+        #     if process.poll() is not None:
+        #         break
+        #     process.kill()
 
     @classmethod
     def iter_profiles(cls):

@@ -14,6 +14,7 @@ class Interface:
         self.set_icon_state(False)
         self.icon.connect('activate', self.on_click_left)
         self.icon.connect('popup_menu', self.on_click_right)
+        self.icon.set_tooltip_text('Connections: 0 active')
 
     def set_icon_state(self, state):
         if state == self.icon_state:

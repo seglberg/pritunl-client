@@ -69,33 +69,35 @@ class Interface:
         self.icon.set_tooltip_text('Connections: %s active' % conn_count)
         self.set_icon_state(bool(conn_count))
 
-    def on_toggle_profile(self, widget, profile):
-        # widget.get_active()
+    def on_toggle_profile(self, widget, profile_id):
+        profile = Profile(profile_id)
+        if widget.get_active():
+            dialog = gtk.MessageDialog(
+                type=gtk.MESSAGE_QUESTION,
+                buttons=gtk.BUTTONS_CANCEL,
+                message_format='Connecting to %s' % profile.server_name)
+            dialog.format_secondary_markup('Conecting to the server...')
+            dialog.set_title('Pritunl - Connecting...')
 
-        dialog = gtk.MessageDialog(
-            type=gtk.MESSAGE_QUESTION,
-            buttons=gtk.BUTTONS_CANCEL,
-            message_format='Connecting to %s' % profile.server_name)
-        dialog.format_secondary_markup('Conecting to the server...')
-        dialog.set_title('Pritunl - Connecting...')
+            spinner = gtk.Spinner()
+            spinner.set_size_request(45, 45)
+            spinner.start()
+            dialog.set_image(spinner)
+            dialog.show_all()
 
-        spinner = gtk.Spinner()
-        spinner.set_size_request(45, 45)
-        spinner.start()
-        dialog.set_image(spinner)
-        dialog.show_all()
+            def dialog_callback(profile):
+                dialog.destroy()
+            profile.start(self.on_status_change, dialog_callback)
 
-        def dialog_callback(profile):
+            response = dialog.run()
             dialog.destroy()
-        profile.start(self.on_status_change, dialog_callback)
 
-        response = dialog.run()
-        dialog.destroy()
-
-        if profile.status:
-            self.show_connect_success(profile)
+            if profile.status:
+                self.show_connect_success(profile)
+            else:
+                self.show_connect_error(profile)
         else:
-            self.show_connect_error(profile)
+            profile.stop()
 
     def on_disconnect_all(self, widget):
         pass
@@ -125,7 +127,7 @@ class Interface:
 
             menu_item = gtk.CheckMenuItem(title)
             menu_item.set_active(profile.status)
-            menu_item.connect('activate', self.on_toggle_profile, profile)
+            menu_item.connect('activate', self.on_toggle_profile, profile.id)
             profiles_menu.append(menu_item)
             menu_item.show()
 

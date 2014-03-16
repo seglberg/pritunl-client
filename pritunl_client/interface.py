@@ -3,7 +3,6 @@ from profile import Profile
 import pygtk
 pygtk.require('2.0')
 import gtk
-import gobject
 
 gtk.gdk.threads_init()
 
@@ -30,8 +29,7 @@ class Interface:
         return self.icon_state
 
     def on_click_left(self, widget):
-        self.set_icon_state(not self.get_icon_state())
-        #self.show_menu(0, 0)
+        self.show_menu(0, 0)
 
     def on_click_right(self, widget, button, activate_time):
         self.show_menu(button, gtk.gdk.CURRENT_TIME)
@@ -62,7 +60,14 @@ class Interface:
         dialog.destroy()
 
     def on_status_change(self, profile):
-        print 'STATUS:', profile.status
+        conn_count = 0
+
+        for profile in Profile.iter_profiles():
+            if profile.status:
+                conn_count += 1
+
+        self.icon.set_tooltip_text('Connections: %s active' % conn_count)
+        self.set_icon_state(bool(conn_count))
 
     def on_toggle_profile(self, widget, profile):
         # widget.get_active()
@@ -94,22 +99,41 @@ class Interface:
 
     def show_menu(self, event_button, activate_time):
         menu = gtk.Menu()
+        profiles_menu = gtk.Menu()
 
         for profile in Profile.iter_profiles():
-            menu_item = gtk.CheckMenuItem('%s@%s (%s)' % (
-                profile.user_name, profile.org_name, profile.server_name))
+            title = '%s@%s (%s)' % (profile.user_name, profile.org_name,
+                profile.server_name)
+
+            if profile.status:
+                menu_item = gtk.MenuItem(title)
+                menu.append(menu_item)
+                menu_item.show()
+
+            menu_item = gtk.CheckMenuItem(title)
+            menu_item.set_active(profile.status)
             menu_item.connect('activate', self.on_toggle_profile, profile)
-            # menu_item.set_active(True)
-            menu.append(menu_item)
+            profiles_menu.append(menu_item)
             menu_item.show()
 
         if not len(menu):
-            menu_item = gtk.MenuItem('No Profiles Available')
+            menu_item = gtk.MenuItem('No Active Connections')
             menu_item.set_sensitive(False)
             menu.append(menu_item)
             menu_item.show()
 
+        if not len(profiles_menu):
+            menu_item = gtk.MenuItem('No Profiles Available')
+            menu_item.set_sensitive(False)
+            profiles_menu.append(menu_item)
+            menu_item.show()
+
         menu_item = gtk.SeparatorMenuItem()
+        menu.append(menu_item)
+        menu_item.show()
+
+        menu_item = gtk.MenuItem('Profiles')
+        menu_item.set_submenu(profiles_menu)
         menu.append(menu_item)
         menu_item.show()
 

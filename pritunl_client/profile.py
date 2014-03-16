@@ -5,6 +5,7 @@ import json
 import time
 import subprocess
 import threading
+import gobject
 
 _connections = {}
 

@@ -9,12 +9,28 @@ gtk.gdk.threads_init()
 
 class Interface:
     def __init__(self):
-        icon = gtk.status_icon_new_from_stock(gtk.STOCK_ABOUT)
-        icon.connect('activate', self.on_click_left)
-        icon.connect('popup_menu', self.on_click_right)
+        self.icon = gtk.StatusIcon()
+        self.icon_state = None
+        self.set_icon_state(False)
+        self.icon.connect('activate', self.on_click_left)
+        self.icon.connect('popup_menu', self.on_click_right)
+
+    def set_icon_state(self, state):
+        if state == self.icon_state:
+            return
+
+        self.icon_state = state
+        if state:
+            self.icon.set_from_file('img/connected.svg')
+        else:
+            self.icon.set_from_file('img/disconnected.svg')
+
+    def get_icon_state(self):
+        return self.icon_state
 
     def on_click_left(self, widget):
-        self.show_menu(0, 0)
+        self.set_icon_state(not self.get_icon_state())
+        #self.show_menu(0, 0)
 
     def on_click_right(self, widget, button, activate_time):
         self.show_menu(button, gtk.gdk.CURRENT_TIME)

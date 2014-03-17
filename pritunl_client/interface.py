@@ -1,5 +1,6 @@
 from constants import *
 from profile import Profile
+from daemon_client import DaemonClient
 import pygtk
 pygtk.require('2.0')
 import gtk
@@ -59,7 +60,7 @@ class Interface:
         dialog.run()
         dialog.destroy()
 
-    def on_status_change(self, profile):
+    def on_status_change(self):
         conn_count = 0
 
         for profile in Profile.iter_profiles():
@@ -85,7 +86,7 @@ class Interface:
             dialog.set_image(spinner)
             dialog.show_all()
 
-            def dialog_callback(profile):
+            def dialog_callback():
                 dialog.destroy()
             profile.start(self.on_status_change, dialog_callback)
 
@@ -238,4 +239,8 @@ class Interface:
         gtk.main_quit()
 
     def main(self):
-        gtk.main()
+        try:
+            gtk.main()
+        finally:
+            client = DaemonClient()
+            client.exit()

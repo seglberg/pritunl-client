@@ -16,56 +16,41 @@ _data = {
 
 class DaemonClient:
     def open(self):
-        for i in xrange(3):
-            process = subprocess.Popen(['gksudo', '--description',
-                'Pritunl Client', 'python2 daemon.py %s' % SOCK_PATH],
-                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            _data['process'] = process
-            thread_data = {
-                'pass_fail': False,
-            }
+        process = subprocess.Popen(['gksudo', '--description',
+            'Pritunl Client', 'python2 daemon.py %s' % SOCK_PATH],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        _data['process'] = process
+        thread_data = {
+            'pass_fail': False,
+        }
 
-            def stdout_thread():
-                while True:
-                    line = process.stderr.readline()
-                    if not line:
-                        if process.poll() is not None:
-                            break
-                        else:
-                            continue
-                    if 'incorrect password' in line:
-                        thread_data['pass_fail'] = True
-
-            thread = threading.Thread(target=stdout_thread)
-            thread.daemon = True
-            thread.start()
-
+        def stdout_thread():
             while True:
-                if os.path.exists(SOCK_PATH):
-                    break
-                elif process.poll() is not None:
-                    break
-                time.sleep(0.1)
+                line = process.stderr.readline()
+                if not line:
+                    if process.poll() is not None:
+                        break
+                    else:
+                        continue
+                if 'incorrect password' in line:
+                    thread_data['pass_fail'] = True
 
-            if process.poll() == 255:
-                raise SudoCancel()
-                return
+        thread = threading.Thread(target=stdout_thread)
+        thread.daemon = True
+        thread.start()
 
-            if thread_data['pass_fail']:
-                # TODO
-                dialog = gtk.MessageDialog(
-                    type=gtk.MESSAGE_ERROR,
-                    buttons=gtk.BUTTONS_OK,
-                    message_format='Password is incorrect, try again...')
-                dialog.format_secondary_markup(
-                    'Failed to obtain sudo privileges')
-                dialog.set_title('Pritunl - Incorrect Password')
-                dialog.show_all()
-                dialog.run()
-                dialog.destroy()
-                continue
+        while True:
+            if os.path.exists(SOCK_PATH):
+                break
+            elif process.poll() is not None:
+                break
+            time.sleep(0.1)
 
-            break
+        if process.poll() == 255:
+            raise SudoCancel()
+
+        if thread_data['pass_fail']:
+            raise SudoPassFail()
 
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         sock.connect(SOCK_PATH)

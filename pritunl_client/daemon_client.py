@@ -49,12 +49,12 @@ class DaemonClient:
         if process.poll() == 255:
             raise SudoCancel()
 
-        if thread_data['pass_fail']:
-            raise SudoPassFail()
-
         if process.poll() is not None:
-            # TODO possible pass fail msg not printed or daemon error
-            raise SudoPassFail()
+            if thread_data['pass_fail']:
+                raise SudoPassFail()
+            else:
+                # TODO possible pass fail msg not printed or daemon error
+                raise SudoPassFail()
 
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         sock.connect(SOCK_PATH)

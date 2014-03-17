@@ -36,18 +36,6 @@ class Interface:
     def on_click_right(self, widget, button, activate_time):
         self.show_menu(button, gtk.gdk.CURRENT_TIME)
 
-    def show_connect_success(self, profile):
-        dialog = gtk.MessageDialog(
-            type=gtk.MESSAGE_INFO,
-            buttons=gtk.BUTTONS_OK,
-            message_format='Connected to %s' % profile.server_name)
-        dialog.format_secondary_markup('Successfully connected to the server')
-        dialog.set_title('Pritunl - Connection Successful')
-        dialog.show_all()
-
-        dialog.run()
-        dialog.destroy()
-
     def show_connect_error(self, profile):
         dialog = gtk.MessageDialog(
             type=gtk.MESSAGE_ERROR,
@@ -118,9 +106,7 @@ class Interface:
                 pass_dialog.run()
                 pass_dialog.destroy()
 
-            if profile.status in (CONNECTING, RECONNECTING, CONNECTED):
-                self.show_connect_success(profile)
-            elif profile.status == DISCONNECTED:
+            if profile.status == DISCONNECTED:
                 self.show_connect_error(profile)
         else:
             profile.stop()

@@ -16,7 +16,7 @@ _data = {
 
 class DaemonClient:
     def open(self):
-        for i in xrange(5):
+        for i in xrange(3):
             process = subprocess.Popen(['gksudo', '--description',
                 'Pritunl Client', 'python2 daemon.py %s' % SOCK_PATH],
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)

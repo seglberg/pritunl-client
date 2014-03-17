@@ -1,15 +1,21 @@
 import os
 import uuid
 import sys
+import pkg_resources
 
-CONF_DIR = os.path.expanduser('~/.config/pritunl')
+CONF_DIR = os.path.expanduser(os.path.join('~', '.config', 'pritunl'))
 PROFILES_DIR = os.path.join(CONF_DIR, 'profiles')
-TMP_DIR = '/tmp'
+TMP_DIR = os.path.join(os.path.abspath(os.sep), 'tmp')
 SOCK_PATH = os.path.join(TMP_DIR, 'pritunl_%s.sock' % uuid.uuid4().hex)
 CONNECT_TIMEOUT = 30
 OVPN_START_TIMEOUT = 5
 OVPN_STOP_TIMEOUT = 5
 DAEMON_SOCKET_TIMEOUT = 10
+
+CONNECTED_LOGO = pkg_resources.resource_filename(__name__,
+    os.path.join('..', 'img', 'logo.svg'))
+DISCONNECTED_LOGO = pkg_resources.resource_filename(__name__,
+    os.path.join('..', 'img', 'logo_disconnected.svg'))
 
 SUDO_PASS_FAIL = 'sudo_pass_fail'
 CONNECTING = 'connecting'

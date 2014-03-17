@@ -23,9 +23,9 @@ class Interface:
 
         self.icon_state = state
         if state:
-            self.icon.set_from_file('img/connected.svg')
+            self.icon.set_from_file(CONNECTED_LOGO)
         else:
-            self.icon.set_from_file('img/disconnected.svg')
+            self.icon.set_from_file(DISCONNECTED_LOGO)
 
     def get_icon_state(self):
         return self.icon_state

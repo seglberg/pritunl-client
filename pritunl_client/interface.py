@@ -1,6 +1,7 @@
 from constants import *
 from profile import Profile
 from daemon_client import DaemonClient
+import threading
 import pygtk
 pygtk.require('2.0')
 import gtk
@@ -82,6 +83,9 @@ class Interface:
                 message_format='Connecting to %s' % profile.server_name)
             dialog.format_secondary_markup('Conecting to the server...')
             dialog.set_title('Pritunl - Connecting...')
+            thread_data = {
+                'error': None
+            }
 
             spinner = gtk.Spinner()
             spinner.set_size_request(45, 45)
@@ -89,12 +93,27 @@ class Interface:
             dialog.set_image(spinner)
             dialog.show_all()
 
-            def dialog_callback():
+            def dialog_callback(error):
+                thread_data['error'] = error
                 dialog.destroy()
-            profile.start(self.on_status_change, dialog_callback)
+
+            threading.Thread(target=profile.start,
+                args=(self.on_status_change, dialog_callback)).start()
 
             response = dialog.run()
             dialog.destroy()
+
+            if thread_data['error'] == SUDO_PASS_FAIL:
+                pass_dialog = gtk.MessageDialog(
+                    type=gtk.MESSAGE_ERROR,
+                    buttons=gtk.BUTTONS_OK,
+                    message_format='Password is incorrect, try again...')
+                pass_dialog.format_secondary_markup(
+                    'Failed to obtain sudo privileges')
+                pass_dialog.set_title('Pritunl - Incorrect Password')
+                pass_dialog.show_all()
+                pass_dialog.run()
+                pass_dialog.destroy()
 
             if profile.status in (CONNECTING, RECONNECTING, CONNECTED):
                 self.show_connect_success(profile)

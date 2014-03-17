@@ -9,3 +9,9 @@ CONNECT_TIMEOUT = 30
 OVPN_START_TIMEOUT = 5
 OVPN_STOP_TIMEOUT = 5
 DAEMON_SOCKET_TIMEOUT = 10
+
+CONNECTING = 'connecting'
+RECONNECTING = 'reconnecting'
+CONNECTED = 'connected'
+DISCONNECTED = 'disconnected'
+ENDED = 'ended'

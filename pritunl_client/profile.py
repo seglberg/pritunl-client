@@ -93,7 +93,7 @@ class Profile:
             # TODO
             print 'INVALID STATE'
             return
-        self._linux_start()
+        self._linux_start(status_callback, dialog_callback)
 
     def _linux_start(self, status_callback, dialog_callback):
         data = {
@@ -109,7 +109,7 @@ class Profile:
             client.start_conn(self.id, self.working_dir,
                 self.path, self.log_path)
         except SudoCancel:
-            data['status'] = ENDED
+            self._set_status(ENDED)
             return
 
         for i in xrange(int(OVPN_START_TIMEOUT / 0.1)):

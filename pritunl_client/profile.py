@@ -19,7 +19,7 @@ class Profile:
         if id:
             self.id = id
         else:
-            self.id = uuid.uuid4()
+            self.id = uuid.uuid4().hex
         self._loaded = False
 
         self.user_name = None

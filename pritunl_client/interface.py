@@ -62,12 +62,15 @@ class Interface:
 
     def on_status_change(self):
         conn_count = 0
+        active_count = 0
 
         for profile in Profile.iter_profiles():
-            if profile.status:
+            if profile.status == CONNECTED:
                 conn_count += 1
+            if profile.status in (CONNECTING, RECONNECTING, CONNECTED):
+                active_count += 1
 
-        self.icon.set_tooltip_text('Connections: %s active' % conn_count)
+        self.icon.set_tooltip_text('Connections: %s active' % active_count)
         self.set_icon_state(bool(conn_count))
 
     def on_toggle_profile(self, widget, profile_id):
@@ -93,9 +96,9 @@ class Interface:
             response = dialog.run()
             dialog.destroy()
 
-            if profile.status:
+            if profile.status in (CONNECTING, RECONNECTING, CONNECTED):
                 self.show_connect_success(profile)
-            else:
+            elif profile.status == DISCONNECTED:
                 self.show_connect_error(profile)
         else:
             profile.stop()
@@ -118,16 +121,19 @@ class Interface:
         menu_item.show()
 
         for profile in Profile.iter_profiles():
+            active = False
             title = '%s@%s (%s)' % (profile.user_name, profile.org_name,
                 profile.server_name)
 
-            if profile.status:
+            if profile.status in (CONNECTING, RECONNECTING, CONNECTED):
+                active = True
+                title += ' - %s' % profile.status.capitalize()
                 menu_item = gtk.MenuItem(title)
                 menu.append(menu_item)
                 menu_item.show()
 
             menu_item = gtk.CheckMenuItem(title)
-            menu_item.set_active(profile.status)
+            menu_item.set_active(active)
             menu_item.connect('activate', self.on_toggle_profile, profile.id)
             profiles_menu.append(menu_item)
             menu_item.show()

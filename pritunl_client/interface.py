@@ -229,9 +229,20 @@ class Interface:
 
     def show_about(self, widget, data=None):
         # gtk.AboutDialog
-        dialog = gtk.MessageDialog(buttons=gtk.BUTTONS_OK,
-            message_format='Pritunl Client')
+        import pritunl_client
+        dialog = gtk.MessageDialog(buttons=gtk.BUTTONS_OK)
         dialog.set_title('Pritunl - About')
+        dialog.set_markup(('<b>Pritunl Client - v%s</b>\n\n' +
+            'Copyright (c) 2013 Zachary Huff\n\n' +
+            'http://pritunl.com/') % pritunl_client.__version__)
+
+        pixbuf = gtk.gdk.pixbuf_new_from_file(CONNECTED_LOGO_DARK)
+        pixbuf = pixbuf.scale_simple(90, 90, gtk.gdk.INTERP_BILINEAR)
+        image = gtk.Image()
+        image.set_from_pixbuf(pixbuf)
+        image.show()
+        dialog.set_image(image)
+
         dialog.run()
         dialog.destroy()
 

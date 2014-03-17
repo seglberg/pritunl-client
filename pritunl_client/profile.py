@@ -89,6 +89,9 @@ class Profile:
             gobject.idle_add(callback)
 
     def start(self, status_callback, dialog_callback):
+        self._linux_start()
+
+    def _linux_start(self, status_callback, dialog_callback):
         data = {
             'status': CONNECTING,
             'process': None,
@@ -146,6 +149,9 @@ class Profile:
         thread.start()
 
     def stop(self):
+        self._linux_stop()
+
+    def _linux_stop(self):
         client = DaemonClient()
         client.stop_conn(self.id)
 

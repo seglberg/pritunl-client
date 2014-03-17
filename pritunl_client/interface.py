@@ -224,6 +224,9 @@ class Interface:
         response = dialog.run()
         if response == gtk.RESPONSE_OK:
             profile_path = dialog.get_filename()
+            with open(profile_path, 'r') as profile_file:
+                profile = Profile()
+                profile.write(profile_file.read())
         dialog.destroy()
 
     def show_import_profile_uri(self, widget):

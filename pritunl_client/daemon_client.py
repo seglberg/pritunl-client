@@ -24,7 +24,7 @@ class DaemonClient:
             'pass_fail': False,
         }
 
-        def stdout_thread():
+        def target():
             while True:
                 line = process.stderr.readline()
                 if not line:
@@ -35,7 +35,7 @@ class DaemonClient:
                 if 'incorrect password' in line:
                     thread_data['pass_fail'] = True
 
-        thread = threading.Thread(target=stdout_thread)
+        thread = threading.Thread(target=target)
         thread.daemon = True
         thread.start()
 
@@ -50,6 +50,10 @@ class DaemonClient:
             raise SudoCancel()
 
         if thread_data['pass_fail']:
+            raise SudoPassFail()
+
+        if process.poll() is not None:
+            # TODO possible pass fail msg not printed or daemon error
             raise SudoPassFail()
 
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)

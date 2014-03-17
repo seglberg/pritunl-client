@@ -1,5 +1,6 @@
 import os
 import uuid
+import sys
 
 CONF_DIR = os.path.expanduser('~/.config/pritunl')
 PROFILES_DIR = os.path.join(CONF_DIR, 'profiles')
@@ -16,3 +17,16 @@ RECONNECTING = 'reconnecting'
 CONNECTED = 'connected'
 DISCONNECTED = 'disconnected'
 ENDED = 'ended'
+
+LINUX = 'linux'
+WIN = 'win'
+OSX = 'osx'
+
+if sys.platform == 'linux2':
+    PLATFORM = LINUX
+elif sys.platform == 'win32':
+    PLATFORM = WIN
+elif sys.platform == 'darwin':
+    PLATFORM = OSX
+else:
+    raise ValueError('Unknown platform %s' % sys.platform)

@@ -6,26 +6,45 @@ import pygtk
 pygtk.require('2.0')
 import gtk
 
+HAS_APPINDICATOR = False
+try:
+    import appindicator
+    HAS_APPINDICATOR = True
+except ImportError:
+    pass
+
 gtk.gdk.threads_init()
 
 class Interface:
     def __init__(self):
-        self.icon = gtk.StatusIcon()
+        if HAS_APPINDICATOR:
+            self.icon = appindicator.Indicator('pritunl_client',
+                DISCONNECTED_LOGO_LIGHT,
+                appindicator.CATEGORY_APPLICATION_STATUS)
+            self.icon.set_status(appindicator.STATUS_ACTIVE)
+            self.update_menu()
+        else:
+            self.icon = gtk.StatusIcon()
+            self.icon.connect('activate', self.on_click_left)
+            self.icon.connect('popup_menu', self.on_click_right)
         self.icon_state = None
         self.set_icon_state(False)
-        self.icon.connect('activate', self.on_click_left)
-        self.icon.connect('popup_menu', self.on_click_right)
-        self.icon.set_tooltip_text('Connections: 0 active')
 
     def set_icon_state(self, state):
         if state == self.icon_state:
             return
 
         self.icon_state = state
-        if state:
-            self.icon.set_from_file(CONNECTED_LOGO_LIGHT)
+        if HAS_APPINDICATOR:
+            if state:
+                self.icon.set_icon(CONNECTED_LOGO_LIGHT)
+            else:
+                self.icon.set_icon(DISCONNECTED_LOGO_LIGHT)
         else:
-            self.icon.set_from_file(DISCONNECTED_LOGO_LIGHT)
+            if state:
+                self.icon.set_from_file(CONNECTED_LOGO_LIGHT)
+            else:
+                self.icon.set_from_file(DISCONNECTED_LOGO_LIGHT)
 
     def get_icon_state(self):
         return self.icon_state
@@ -59,8 +78,8 @@ class Interface:
             if profile.status in (CONNECTING, RECONNECTING, CONNECTED):
                 active_count += 1
 
-        self.icon.set_tooltip_text('Connections: %s active' % active_count)
         self.set_icon_state(bool(conn_count))
+        self.update_menu()
 
     def on_toggle_profile(self, widget, profile_id):
         profile = Profile(profile_id)
@@ -114,7 +133,7 @@ class Interface:
     def on_disconnect_all(self, widget):
         pass
 
-    def show_menu(self, event_button, activate_time):
+    def _build_menu(self):
         menu = gtk.Menu()
         profiles_menu = gtk.Menu()
         conn_active = True
@@ -198,7 +217,15 @@ class Interface:
         menu.append(menu_item)
         menu_item.show()
 
+        return menu
+
+    def show_menu(self, event_button, activate_time):
+        menu = self._build_menu()
         menu.popup(None, None, None, event_button, activate_time)
+
+    def update_menu(self):
+        if HAS_APPINDICATOR:
+            self.icon.set_menu(self._build_menu())
 
     def show_about(self, widget, data=None):
         # gtk.AboutDialog
@@ -227,6 +254,7 @@ class Interface:
             with open(profile_path, 'r') as profile_file:
                 profile = Profile()
                 profile.write(profile_file.read())
+                self.update_menu()
         dialog.destroy()
 
     def show_import_profile_uri(self, widget):
@@ -250,6 +278,7 @@ class Interface:
         response = dialog.run()
         if response == gtk.RESPONSE_OK:
             profile_uri = entry.get_text()
+            self.update_menu()
         dialog.destroy()
 
     def destroy(self, widget):

@@ -29,12 +29,8 @@ class Profile:
         if not os.path.isdir(PROFILES_DIR):
             os.makedirs(PROFILES_DIR)
 
-        if not os.path.isdir(LOGS_DIR):
-            os.makedirs(LOGS_DIR)
-
         self.working_dir = PROFILES_DIR
         self.path = os.path.join(PROFILES_DIR, '%s.ovpn' % self.id)
-        self.log_path = os.path.join(LOGS_DIR, '%s.log' % self.id)
 
         if id:
             self.load()
@@ -70,7 +66,6 @@ class Profile:
                 self.server_name = info_data['server']
 
     def write(self, data):
-        data += '\nlog-append ../logs/%s.log' % self.id
         with open(self.path, 'w') as profile_file:
             profile_file.write(data)
 
@@ -103,11 +98,11 @@ class Profile:
             'dialog_callback': dialog_callback,
         }
         _connections[self.id] = data
+        log_path = os.path.join(TMP_DIR, 'pritunl_%s.log' % self.id)
 
         client = DaemonClient()
         try:
-            client.start_conn(self.id, self.working_dir,
-                self.path, self.log_path)
+            client.start_conn(self.id, self.working_dir, self.path, log_path)
         except SudoPassFail:
             self._set_status(ENDED, SUDO_PASS_FAIL)
             return
@@ -117,14 +112,14 @@ class Profile:
 
         for i in xrange(int(OVPN_START_TIMEOUT / 0.1)):
             time.sleep(0.1)
-            if os.path.exists(self.log_path):
+            if os.path.exists(log_path):
                 break
-        if not os.path.exists(self.log_path):
+        if not os.path.exists(log_path):
             self.stop()
 
         def poll_thread():
             process = subprocess.Popen(['tail', '-c', '+1',
-                '--follow=name', self.log_path], stdout=subprocess.PIPE,
+                '--follow=name', log_path], stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE)
             data['process'] = process
             while True:

@@ -16,7 +16,8 @@ class Daemon:
                 os.remove(log_path)
             with open(log_path, 'w') as log_file:
                 pass
-            process = subprocess.Popen(['openvpn', path], cwd=working_dir)
+            process = subprocess.Popen(['openvpn', '--log-append',
+                log_path, '--config', path], cwd=working_dir)
             self._procs[id] = process
             return_code = process.wait()
             if os.path.exists(log_path):

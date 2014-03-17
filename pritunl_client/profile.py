@@ -88,7 +88,7 @@ class Profile:
         if callback:
             gobject.idle_add(callback)
 
-    def start(self, status_callback, dialog_callback):
+    def start(self, status_callback, dialog_callback=None):
         if self.status not in (DISCONNECTED, ENDED):
             # TODO
             print 'INVALID STATE'

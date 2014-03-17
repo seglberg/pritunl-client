@@ -10,6 +10,7 @@ OVPN_START_TIMEOUT = 5
 OVPN_STOP_TIMEOUT = 5
 DAEMON_SOCKET_TIMEOUT = 10
 
+SUDO_PASS_FAIL = 'sudo_pass_fail'
 CONNECTING = 'connecting'
 RECONNECTING = 'reconnecting'
 CONNECTED = 'connected'

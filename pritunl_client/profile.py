@@ -74,7 +74,7 @@ class Profile:
         with open(self.path, 'w') as profile_file:
             profile_file.write(data)
 
-    def _set_status(self, status):
+    def _set_status(self, status, dialog_error=None):
         data = _connections.get(self.id)
         if not data:
             return
@@ -82,7 +82,7 @@ class Profile:
         callback = data.get('dialog_callback')
         if callback:
             data['dialog_callback'] = None
-            gobject.idle_add(callback)
+            gobject.idle_add(callback, dialog_error)
 
         callback = data.get('status_callback')
         if callback:
@@ -108,6 +108,9 @@ class Profile:
         try:
             client.start_conn(self.id, self.working_dir,
                 self.path, self.log_path)
+        except SudoPassFail:
+            self._set_status(ENDED, SUDO_PASS_FAIL)
+            return
         except SudoCancel:
             self._set_status(ENDED)
             return

@@ -12,10 +12,14 @@ OVPN_START_TIMEOUT = 5
 OVPN_STOP_TIMEOUT = 5
 DAEMON_SOCKET_TIMEOUT = 10
 
-CONNECTED_LOGO = pkg_resources.resource_filename(__name__,
-    os.path.join('..', 'img', 'logo.svg'))
-DISCONNECTED_LOGO = pkg_resources.resource_filename(__name__,
-    os.path.join('..', 'img', 'logo_disconnected.svg'))
+CONNECTED_LOGO_DARK = pkg_resources.resource_filename(__name__,
+    os.path.join('..', 'img', 'logo_dark.svg'))
+DISCONNECTED_LOGO_DARK = pkg_resources.resource_filename(__name__,
+    os.path.join('..', 'img', 'logo_disconnected_dark.svg'))
+CONNECTED_LOGO_LIGHT = pkg_resources.resource_filename(__name__,
+    os.path.join('..', 'img', 'logo_light.svg'))
+DISCONNECTED_LOGO_LIGHT = pkg_resources.resource_filename(__name__,
+    os.path.join('..', 'img', 'logo_disconnected_light.svg'))
 
 SUDO_PASS_FAIL = 'sudo_pass_fail'
 CONNECTING = 'connecting'

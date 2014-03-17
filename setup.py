@@ -18,8 +18,10 @@ setup(
     zip_safe=False,
     data_files=[
         ('img', [
-            os.path.join('img', 'logo.svg'),
-            os.path.join('img', 'logo_disconnected.svg'),
+            os.path.join('img', 'logo_dark.svg'),
+            os.path.join('img', 'logo_disconnected_dark.svg'),
+            os.path.join('img', 'logo_light.svg'),
+            os.path.join('img', 'logo_disconnected_light.svg'),
         ]),
     ],
     entry_points={

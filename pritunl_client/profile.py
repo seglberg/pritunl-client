@@ -89,6 +89,10 @@ class Profile:
             gobject.idle_add(callback)
 
     def start(self, status_callback, dialog_callback):
+        if self.status != ENDED:
+            # TODO
+            print 'INVALID STATE'
+            return
         self._linux_start()
 
     def _linux_start(self, status_callback, dialog_callback):

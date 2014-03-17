@@ -102,6 +102,9 @@ class Interface:
 
             response = dialog.run()
             dialog.destroy()
+            if response == gtk.RESPONSE_CANCEL:
+                threading.Thread(target=profile.stop).start()
+                return
 
             if thread_data['error'] == SUDO_PASS_FAIL:
                 pass_dialog = gtk.MessageDialog(

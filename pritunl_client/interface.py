@@ -51,7 +51,8 @@ class Interface:
         return self.icon_state
 
     def on_click_left(self, widget):
-        self.show_menu(0, 0)
+        #TODO self.show_menu(0, 0)
+        self.set_icon_state(not self.get_icon_state())
 
     def on_click_right(self, widget, button, activate_time):
         self.show_menu(button, gtk.gdk.CURRENT_TIME)

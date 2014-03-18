@@ -28,7 +28,7 @@ DAEMON_SOCKET_TIMEOUT = 10
 IMG_ROOT = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), 'img')
 LOGO = os.path.join(IMG_ROOT, 'logo.png')
 if PLATFORM == WIN:
-    CONNECTED_LOGO = os.path.join(IMG_ROOT, 'logo_win.png')
+    CONNECTED_LOGO = os.path.join(IMG_ROOT, 'logo_connected_win.png')
     DISCONNECTED_LOGO = os.path.join(IMG_ROOT, 'logo_disconnected_win.png')
 else:
     CONNECTED_LOGO = os.path.join(IMG_ROOT, 'logo_connected_light.svg')

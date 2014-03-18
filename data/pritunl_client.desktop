@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Pritunl Client
+Comment=Pritunl openvpn client
+Exec=pritunl_client
+Terminal=false
+Type=Application
+StartupNotify=true
+Icon=pritunl_client
+Categories=Network;TrayIcon;

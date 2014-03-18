@@ -216,7 +216,7 @@ class Profile:
 
     def _win_stop(self):
         data = _connections.get(self.id)
-        if not data:
+        if data:
             process = data.get('process')
             if process:
                 process.terminate()

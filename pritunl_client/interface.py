@@ -293,6 +293,7 @@ class Interface:
         dialog.destroy()
 
     def destroy(self, widget):
+        self.icon.set_visible(False)
         gtk.main_quit()
 
     def main(self):

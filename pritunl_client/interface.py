@@ -13,7 +13,8 @@ try:
 except ImportError:
     pass
 
-gtk.gdk.threads_init()
+gtk.threads_init()
+gtk.threads_enter()
 
 class Interface:
     def __init__(self):
@@ -298,6 +299,7 @@ class Interface:
     def main(self):
         try:
             gtk.main()
+            gtk.threads_leave()
         finally:
             client = DaemonClient()
             client.exit()

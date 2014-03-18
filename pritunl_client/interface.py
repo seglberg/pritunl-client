@@ -26,6 +26,7 @@ class Interface:
             self.update_menu()
         else:
             self.icon = gtk.StatusIcon()
+            self.icon.set_tooltip('Pritunl Client')
             self.icon.connect('activate', self.on_click_left)
             self.icon.connect('popup_menu', self.on_click_right)
         self.icon_state = None

@@ -1,30 +1,21 @@
+from pritunl_client.constants import *
 from setuptools import setup
 import os
+import py2exe
 import pritunl_client
 
-setup(
-    name='pritunl_client',
-    version=pritunl_client.__version__,
-    description='Pritunl openvpn client',
-    long_description=open('README.rst').read(),
-    author='Zachary Huff',
-    author_email='zach.huff.386@gmail.com',
-    url='https://github.com/pritunl/pritunl-client',
-    download_url='https://github.com/pritunl/pritunl-client/archive/' + \
-        '%s.tar.gz' % pritunl_client.__version__,
-    keywords='pritunl, openvpn, vpn, management, client',
-    packages=['pritunl_client'],
-    license=open('LICENSE').read(),
-    zip_safe=False,
-    data_files=[
+data_files = [
+    ('img', [os.path.join('img', 'logo.png')])
+]
+
+if PLATFORM == LINUX:
+    data_files += [
         ('img', [
-            os.path.join('img', 'logo_dark.svg'),
+            os.path.join('img', 'logo_connected_dark.svg'),
             os.path.join('img', 'logo_disconnected_dark.svg'),
-            os.path.join('img', 'logo_light.svg'),
+            os.path.join('img', 'logo_connected_light.svg'),
             os.path.join('img', 'logo_disconnected_light.svg'),
         ]),
-
-        # TODO linux only
         (os.path.join(os.path.abspath(os.sep), 'usr', 'share', 'icons',
             'hicolor', '16x16', 'apps'), [os.path.join(
             'img', '16x16', 'pritunl_client.png')]),
@@ -80,11 +71,42 @@ setup(
             'hicolor', 'scalable', 'apps'), [os.path.join(
             'img', 'scalable', 'pritunl_client.svg')]),
         (os.path.join(os.path.abspath(os.sep), 'usr', 'share',
-            'applications'), [os.path.join('data', 'pritunl_client.desktop')]),
-    ],
+            'applications'), [os.path.join(
+            'data', 'applications', 'pritunl_client.desktop')]),
+    ]
+elif PLATFORM == WIN:
+    GTK_BASE_PATH = sys.modules['gtk'].__path__[0]
+    data_files += [
+        ('img', [
+            os.path.join('img', 'logo_connected_win.png'),
+            os.path.join('img', 'logo_disconnected_win.png'),
+        ]),
+        (os.path.join('etc', 'gtk-2.0'), [os.path.join('data', 'etc', 'gtkrc')]),
+        (os.path.join('share', 'themes', 'MS-Windows', 'gtk-2.0'), [os.path.join('data', 'theme', 'gtkrc')]),
+        (os.path.join('lib', 'gtk-2.0', '2.10.0', 'engines'), [
+            os.path.join(GTK_BASE_PATH, '..', 'runtime', 'lib', 'gtk-2.0', '2.10.0', 'engines', 'libpixmap.dll'),
+            os.path.join(GTK_BASE_PATH, '..', 'runtime', 'lib', 'gtk-2.0', '2.10.0', 'engines', 'libsvg.dll'),
+            os.path.join(GTK_BASE_PATH, '..', 'runtime', 'lib', 'gtk-2.0', '2.10.0', 'engines', 'libwimp.dll'),
+        ]),
+    ]
+
+setup(
+    name='pritunl_client',
+    version=pritunl_client.__version__,
+    description='Pritunl openvpn client',
+    long_description=open('README.rst').read(),
+    author='Zachary Huff',
+    author_email='zach.huff.386@gmail.com',
+    url='https://github.com/pritunl/pritunl-client',
+    download_url='https://github.com/pritunl/pritunl-client/archive/' + \
+        '%s.tar.gz' % pritunl_client.__version__,
+    keywords='pritunl, openvpn, vpn, management, client',
+    packages=['pritunl_client'],
+    license=open('LICENSE').read(),
+    zip_safe=False,
+    data_files=data_files,
     entry_points={
-        'console_scripts': [
-            'pritunl_client = pritunl_client.__main__:client'],
+        'console_scripts': ['pritunl_client = pritunl_client.__main__:client'],
     },
     platforms=[
         'Linux',
@@ -103,4 +125,14 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Topic :: System :: Networking',
     ],
+    windows = [{
+        'script': 'win_main.py',
+    }],
+    options = {
+        'py2exe': {
+            'packages':'encodings',
+            'includes': 'cairo, pango, pangocairo, atk, gobject, ' + \
+                'gio, gtk.keysyms, rsvg',
+        },
+    },
 )

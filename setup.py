@@ -81,12 +81,17 @@ elif PLATFORM == WIN:
             os.path.join('img', 'logo_connected_win.png'),
             os.path.join('img', 'logo_disconnected_win.png'),
         ]),
-        (os.path.join('etc', 'gtk-2.0'), [os.path.join('data', 'etc', 'gtkrc')]),
-        (os.path.join('share', 'themes', 'MS-Windows', 'gtk-2.0'), [os.path.join('data', 'theme', 'gtkrc')]),
+        (os.path.join('etc', 'gtk-2.0'), [
+            os.path.join('data', 'etc', 'gtkrc')]),
+        (os.path.join('share', 'themes', 'MS-Windows', 'gtk-2.0'), [
+            os.path.join('data', 'theme', 'gtkrc')]),
         (os.path.join('lib', 'gtk-2.0', '2.10.0', 'engines'), [
-            os.path.join(GTK_BASE_PATH, '..', 'runtime', 'lib', 'gtk-2.0', '2.10.0', 'engines', 'libpixmap.dll'),
-            os.path.join(GTK_BASE_PATH, '..', 'runtime', 'lib', 'gtk-2.0', '2.10.0', 'engines', 'libsvg.dll'),
-            os.path.join(GTK_BASE_PATH, '..', 'runtime', 'lib', 'gtk-2.0', '2.10.0', 'engines', 'libwimp.dll'),
+            os.path.join(GTK_BASE_PATH, '..', 'runtime', 'lib', 'gtk-2.0',
+                '2.10.0', 'engines', 'libpixmap.dll'),
+            os.path.join(GTK_BASE_PATH, '..', 'runtime', 'lib', 'gtk-2.0',
+                '2.10.0', 'engines', 'libsvg.dll'),
+            os.path.join(GTK_BASE_PATH, '..', 'runtime', 'lib', 'gtk-2.0',
+                '2.10.0', 'engines', 'libwimp.dll'),
         ]),
     ]
 

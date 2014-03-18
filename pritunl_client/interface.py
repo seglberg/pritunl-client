@@ -20,7 +20,7 @@ class Interface:
     def __init__(self):
         if HAS_APPINDICATOR:
             self.icon = appindicator.Indicator('pritunl_client',
-                DISCONNECTED_LOGO_LIGHT,
+                DISCONNECTED_LOGO,
                 appindicator.CATEGORY_APPLICATION_STATUS)
             self.icon.set_status(appindicator.STATUS_ACTIVE)
             self.update_menu()
@@ -38,14 +38,14 @@ class Interface:
         self.icon_state = state
         if HAS_APPINDICATOR:
             if state:
-                self.icon.set_icon(CONNECTED_LOGO_LIGHT)
+                self.icon.set_icon(CONNECTED_LOGO)
             else:
-                self.icon.set_icon(DISCONNECTED_LOGO_LIGHT)
+                self.icon.set_icon(DISCONNECTED_LOGO)
         else:
             if state:
-                self.icon.set_from_file(CONNECTED_LOGO_LIGHT)
+                self.icon.set_from_file(CONNECTED_LOGO)
             else:
-                self.icon.set_from_file(DISCONNECTED_LOGO_LIGHT)
+                self.icon.set_from_file(DISCONNECTED_LOGO)
 
     def get_icon_state(self):
         return self.icon_state
@@ -237,10 +237,7 @@ class Interface:
             'Copyright (c) 2013 Zachary Huff\n\n' +
             'http://pritunl.com/') % pritunl_client.__version__)
 
-        pixbuf = gtk.gdk.pixbuf_new_from_file(CONNECTED_LOGO_DARK)
-        pixbuf = pixbuf.scale_simple(90, 90, gtk.gdk.INTERP_BILINEAR)
-        image = gtk.Image()
-        image.set_from_pixbuf(pixbuf)
+        image = gtk.image_new_from_file(LOGO)
         image.show()
         dialog.set_image(image)
 

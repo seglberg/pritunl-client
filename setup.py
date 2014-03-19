@@ -72,7 +72,7 @@ if PLATFORM == LINUX:
             'img', 'scalable', 'pritunl_client.svg')]),
         (os.path.join(os.path.abspath(os.sep), 'usr', 'share',
             'applications'), [os.path.join(
-            'data', 'applications', 'pritunl_client.desktop')]),
+            'data', 'linux', 'applications', 'pritunl_client.desktop')]),
     ]
 elif PLATFORM == WIN:
     GTK_BASE_PATH = sys.modules['gtk'].__path__[0]
@@ -82,9 +82,9 @@ elif PLATFORM == WIN:
             os.path.join('img', 'logo_disconnected_win.png'),
         ]),
         (os.path.join('etc', 'gtk-2.0'), [
-            os.path.join('data', 'etc', 'gtkrc')]),
+            os.path.join('data', 'win', 'etc', 'gtkrc')]),
         (os.path.join('share', 'themes', 'MS-Windows', 'gtk-2.0'), [
-            os.path.join('data', 'theme', 'gtkrc')]),
+            os.path.join('data', 'win', 'theme', 'gtkrc')]),
         (os.path.join('lib', 'gtk-2.0', '2.10.0', 'engines'), [
             os.path.join(GTK_BASE_PATH, '..', 'runtime', 'lib', 'gtk-2.0',
                 '2.10.0', 'engines', 'libpixmap.dll'),

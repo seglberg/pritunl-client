@@ -85,7 +85,7 @@ class Interface:
         self.update_menu()
 
     def on_toggle_profile(self, widget, profile_id):
-        profile = Profile(profile_id)
+        profile = Profile.get_profile(profile_id)
         if widget.get_active():
             dialog = gtk.MessageDialog(
                 type=gtk.MESSAGE_QUESTION,
@@ -263,7 +263,7 @@ class Interface:
         if response == gtk.RESPONSE_OK:
             profile_path = dialog.get_filename()
             with open(profile_path, 'r') as profile_file:
-                profile = Profile()
+                profile = Profile.get_profile()
                 profile.write(profile_file.read())
                 self.update_menu()
         dialog.destroy()

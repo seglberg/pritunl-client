@@ -1,4 +1,0 @@
-PKGNAME=pritunl
-post_remove() {
-    rm -rf /var/lib/pritunl
-}

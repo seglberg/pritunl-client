@@ -1,0 +1,5 @@
+# Add tap
+devcon.exe install OemWin2k.inf tap0901
+
+# Remove taps
+devcon.exe remove tap0901

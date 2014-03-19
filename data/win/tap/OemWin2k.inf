@@ -58,8 +58,8 @@
    DriverVer=07/02/2012,9.00.00.9
 
 [Strings]
-   DeviceDescription = "Pritunl Client TAP Adapter"
-   Provider = "Pritunl Client TAP Adapter"
+   DeviceDescription = "TAP-Windows Adapter V9"
+   Provider = "TAP-Windows Provider V9"
 
 ;----------------------------------------------------------------
 ;                      Manufacturer + Product Section (Done)

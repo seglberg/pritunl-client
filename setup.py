@@ -3,13 +3,12 @@ from setuptools import setup
 import os
 import pritunl_client
 
-data_files = [
-    ('img', [os.path.join('img', 'logo.png')])
-]
+data_files = []
 
 if PLATFORM == LINUX:
     data_files += [
         (os.path.join(os.path.abspath(os.sep), 'usr', 'share', 'pritunl'), [
+            os.path.join('img', 'logo.png'),
             os.path.join('img', 'logo_connected_dark.svg'),
             os.path.join('img', 'logo_disconnected_dark.svg'),
             os.path.join('img', 'logo_connected_light.svg'),
@@ -78,6 +77,7 @@ elif PLATFORM == WIN:
     GTK_BASE_PATH = sys.modules['gtk'].__path__[0]
     data_files += [
         ('img', [
+            os.path.join('img', 'logo.png'),
             os.path.join('img', 'logo_connected_win.png'),
             os.path.join('img', 'logo_disconnected_win.png'),
         ]),

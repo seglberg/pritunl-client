@@ -7,7 +7,7 @@ import subprocess
 import threading
 
 class ProfileLinux(Profile):
-    def _start(self, status_callback, dialog_callback):
+    def _start(self, status_callback, dialog_callback, retry=True):
         data = {
             'status': CONNECTING,
             'process': None,
@@ -21,7 +21,14 @@ class ProfileLinux(Profile):
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         data['process'] = process
 
+        def dialog_thread():
+            time.sleep(CONNECT_TIMEOUT)
+            if not data.get('dialog_callback'):
+                return
+            self.stop()
+
         def poll_thread():
+            started = False
             while True:
                 line = process.stdout.readline()
                 if not line:
@@ -31,6 +38,11 @@ class ProfileLinux(Profile):
                         continue
                 # TODO log
                 print line.strip()
+                if not started:
+                    started = True
+                    thread = threading.Thread(target=dialog_thread)
+                    thread.daemon = True
+                    thread.start()
                 if 'Initialization Sequence Completed' in line:
                     self._set_status(CONNECTED)
                 elif 'Inactivity timeout' in line:
@@ -38,20 +50,15 @@ class ProfileLinux(Profile):
             # Canceled
             if process.returncode == 126:
                 self._set_status(ENDED)
+            # Random error, retry
+            elif process.returncode == -15 and not started and retry:
+                data['status_callback'] = None
+                data['dialog_callback'] = None
+                self._start(status_callback, dialog_callback, False)
             else:
                 self._set_status(DISCONNECTED)
 
-        def dialog_thread():
-            time.sleep(CONNECT_TIMEOUT)
-            if not data.get('dialog_callback'):
-                return
-            self.stop()
-
         thread = threading.Thread(target=poll_thread)
-        thread.daemon = True
-        thread.start()
-
-        thread = threading.Thread(target=dialog_thread)
         thread.daemon = True
         thread.start()
 

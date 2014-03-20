@@ -22,7 +22,7 @@ def pk():
     if sys.argv[1] == 'stop':
         regex = r'(?:/pritunl/profiles/[a-z0-9]+\.ovpn)$'
         with open('/proc/%s/cmdline' % sys.argv[2], 'r') as cmdline_file:
-            cmdline = cmdline_file.read().strip('\x00')
+            cmdline = cmdline_file.read().strip().strip('\x00')
             if not re.search(regex, cmdline):
                 raise ValueError('Not a pritunl client process')
         subprocess.check_call(['kill', sys.argv[2]])

@@ -1,4 +1,9 @@
 # Maintainer: Zachary Huff <zach.huff.386@gmail.com>
+# TODO Req
+# lxpolkit
+# mate-polkit
+# polkit-gnome
+# polkit-kde
 
 pkgname=pritunl-client-git
 _pkgname=pritunl-client

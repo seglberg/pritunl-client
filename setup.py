@@ -74,6 +74,7 @@ if PLATFORM == LINUX:
             'data', 'linux', 'applications', 'pritunl_client.desktop')]),
     ]
 elif PLATFORM == WIN:
+    import gtk
     import py2exe
     GTK_BASE_PATH = sys.modules['gtk'].__path__[0]
     data_files += [

@@ -1,6 +1,5 @@
 from constants import *
 from profile import Profile
-from daemon_client import DaemonClient
 import threading
 import pygtk
 pygtk.require('2.0')
@@ -303,9 +302,5 @@ class Interface:
         gtk.main_quit()
 
     def main(self):
-        try:
-            gtk.main()
-            gtk.threads_leave()
-        finally:
-            client = DaemonClient()
-            client.exit()
+        gtk.main()
+        gtk.threads_leave()

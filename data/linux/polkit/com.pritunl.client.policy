@@ -4,7 +4,7 @@
   <vendor>Pritunl</vendor>
   <vendor_url>http://pritunl.com/</vendor_url>
 
-  <action id="com.pritunl.client.start">
+  <action id="com.pritunl.client">
     <description>Pritunl Client</description>
     <message>Authentication is required to run the Pritunl Client</message>
     <defaults>

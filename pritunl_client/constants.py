@@ -38,10 +38,10 @@ if PLATFORM == LINUX:
     _DISCONNECTED_LOGO_NAME = 'logo_disconnected_light.svg'
 elif PLATFORM == WIN:
     _CONNECTED_LOGO_NAME = 'logo_connected_win.png'
-    _DISCONNECTED_LOGO_NAME = 'logo_connected_win.png'
+    _DISCONNECTED_LOGO_NAME = 'logo_disconnected_win.png'
 elif PLATFORM == OSX:
     _CONNECTED_LOGO_NAME = 'logo_connected_osx.png'
-    _DISCONNECTED_LOGO_NAME = 'logo_connected_osx.png'
+    _DISCONNECTED_LOGO_NAME = 'logo_disconnected_osx.png'
 else:
     raise NotImplementedError('Platform not supported')
 

@@ -4,15 +4,41 @@
   <vendor>Pritunl</vendor>
   <vendor_url>http://pritunl.com/</vendor_url>
 
-  <action id="com.pritunl.client">
-    <description>Pritunl Client</description>
-    <message>Authentication is required to run the Pritunl Client</message>
+  <action id="com.pritunl.client.openvpn">
+    <description>Start pritunl connection</description>
+    <message>Authentication is required to perform this action</message>
     <defaults>
       <allow_any>auth_admin_keep</allow_any>
       <allow_inactive>auth_admin_keep</allow_inactive>
       <allow_active>auth_admin_keep</allow_active>
     </defaults>
     <annotate key="org.freedesktop.policykit.exec.path">/usr/sbin/openvpn</annotate>
+    <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
+  </action>
+
+  <action id="com.pritunl.client.stop">
+    <description>Stop pritunl connection</description>
+    <message>Authentication is required to perform this action</message>
+    <defaults>
+      <allow_any>auth_admin_keep</allow_any>
+      <allow_inactive>auth_admin_keep</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/pritunl_client_pk</annotate>
+    <annotate key="org.freedesktop.policykit.exec.argv1">stop</annotate>
+    <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
+  </action>
+
+  <action id="com.pritunl.client.copy">
+    <description>Autostart pritunl connection</description>
+    <message>Authentication is required to perform this action</message>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/pritunl_client_pk</annotate>
+    <annotate key="org.freedesktop.policykit.exec.argv1">copy</annotate>
     <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
   </action>
 </policyconfig>

@@ -91,9 +91,6 @@ class Interface:
                 message_format='Connecting to %s' % profile.server_name)
             dialog.format_secondary_markup('Conecting to the server...')
             dialog.set_title('Pritunl - Connecting...')
-            thread_data = {
-                'error': None
-            }
 
             spinner = gtk.Spinner()
             spinner.set_size_request(45, 45)
@@ -101,8 +98,7 @@ class Interface:
             dialog.set_image(spinner)
             dialog.show_all()
 
-            def dialog_callback(error):
-                thread_data['error'] = error
+            def dialog_callback():
                 dialog.destroy()
 
             threading.Thread(target=profile.start,
@@ -113,18 +109,6 @@ class Interface:
             if response == gtk.RESPONSE_CANCEL:
                 threading.Thread(target=profile.stop).start()
                 return
-
-            if thread_data['error'] == SUDO_PASS_FAIL:
-                pass_dialog = gtk.MessageDialog(
-                    type=gtk.MESSAGE_ERROR,
-                    buttons=gtk.BUTTONS_OK,
-                    message_format='Password is incorrect, try again...')
-                pass_dialog.format_secondary_markup(
-                    'Failed to obtain sudo privileges')
-                pass_dialog.set_title('Pritunl - Incorrect Password')
-                pass_dialog.show_all()
-                pass_dialog.run()
-                pass_dialog.destroy()
 
             if profile.status == DISCONNECTED:
                 self.show_connect_error(profile)

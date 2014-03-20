@@ -63,7 +63,7 @@ class Profile:
         with open(self.path, 'w') as profile_file:
             profile_file.write(data)
 
-    def _set_status(self, status, dialog_error=None):
+    def _set_status(self, status):
         data = _connections.get(self.id)
         if not data:
             return
@@ -71,7 +71,7 @@ class Profile:
         callback = data.get('dialog_callback')
         if callback:
             data['dialog_callback'] = None
-            gobject.idle_add(callback, dialog_error)
+            gobject.idle_add(callback)
 
         callback = data.get('status_callback')
         if callback:

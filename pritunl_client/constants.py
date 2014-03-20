@@ -29,7 +29,7 @@ LOGO = None
 CONNECTED_LOGO = None
 DISCONNECTED_LOGO = None
 IMG_ROOTS = [
-    os.path.join(os.path.abspath(os.sep), 'usr', 'share', 'pritunl'),
+    os.path.join(os.path.abspath(os.sep), 'usr', 'share', 'pritunl_client'),
     os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), 'img'),
 ]
 

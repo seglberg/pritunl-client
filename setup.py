@@ -7,7 +7,8 @@ data_files = []
 
 if PLATFORM == LINUX:
     data_files += [
-        (os.path.join(os.path.abspath(os.sep), 'usr', 'share', 'pritunl'), [
+        (os.path.join(os.path.abspath(os.sep), 'usr', 'share',
+                'pritunl_client'), [
             os.path.join('img', 'logo.png'),
             os.path.join('img', 'logo_connected_dark.svg'),
             os.path.join('img', 'logo_disconnected_dark.svg'),

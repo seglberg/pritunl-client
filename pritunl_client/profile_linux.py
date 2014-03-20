@@ -22,7 +22,6 @@ class ProfileLinux(Profile):
             stderr=subprocess.PIPE, stdin=subprocess.PIPE)
         data['process'] = process
 
-
         def poll_thread():
             while True:
                 line = process.stdout.readline()

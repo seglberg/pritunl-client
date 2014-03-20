@@ -1,9 +1,9 @@
-from constants import *
 import optparse
 import sys
 import os
 import re
 import subprocess
+import signal
 
 def client():
     import pritunl_client.interface
@@ -19,7 +19,17 @@ def client():
     interface.main()
 
 def pk():
-    if sys.argv[1] == 'stop':
+    if sys.argv[1] in ('start', 'autostart'):
+        regex = r'^/etc/pritunl_conf/[a-z0-9]+.ovpn$'
+        if sys.argv[1] == 'autostart' and not re.match(regex, sys.argv[2]):
+            raise ValueError('Autostart conf must be in etc directory')
+        process = subprocess.Popen(['openvpn', sys.argv[2]])
+        def sig_handler(signum, frame):
+            process.send_signal(signum)
+        signal.signal(signal.SIGINT, sig_handler)
+        signal.signal(signal.SIGTERM, sig_handler)
+        sys.exit(process.wait())
+    elif sys.argv[1] == 'stop':
         regex = r'(?:/pritunl/profiles/[a-z0-9]+\.ovpn)$'
         with open('/proc/%s/cmdline' % sys.argv[2], 'r') as cmdline_file:
             cmdline = cmdline_file.read().strip().strip('\x00')

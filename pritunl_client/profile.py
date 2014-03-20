@@ -16,6 +16,7 @@ class Profile:
             self.id = uuid.uuid4().hex
         self._loaded = False
 
+        self.profile_name = None
         self.user_name = None
         self.org_name = None
         self.server_name = None
@@ -30,8 +31,9 @@ class Profile:
             self.load()
 
     def __getattr__(self, name):
-        if name in ('user_name', 'org_name', 'server_name'):
-            self._load()
+        if name == 'name':
+            return self.profile_name or '%s@%s (%s)' % (
+                self.user_name, self.org_name, self.server_name)
         elif name == 'status':
             connection_data = _connections.get(self.id)
             if connection_data:
@@ -42,6 +44,7 @@ class Profile:
         return self.__dict__[name]
 
     def load(self):
+        self.profile_name = None
         self.user_name = None
         self.org_name = None
         self.server_name = None
@@ -51,16 +54,20 @@ class Profile:
             try:
                 info_data = json.loads(info_str)
             except ValueError:
-                return
-            if 'user' in info_data:
-                self.user_name = info_data['user']
-            if 'organization' in info_data:
-                self.org_name = info_data['organization']
-            if 'server' in info_data:
-                self.server_name = info_data['server']
+                info_data = {}
+            self.profile_name = info_data.get('name')
+            self.user_name = info_data.get('user')
+            self.org_name = info_data.get('organization')
+            self.server_name = info_data.get('server')
 
-    def write(self, data):
+    def write(self, data, default_name='New Profile'):
+        info_str = data.splitlines()[0].replace('#', '', 1).strip()
+        try:
+            json.loads(info_str)
+        except ValueError:
+            data = '# {"name": "%s"}\n' % default_name + data
         with open(self.path, 'w') as profile_file:
+            # TODO file permissions
             profile_file.write(data)
 
     def _set_status(self, status):

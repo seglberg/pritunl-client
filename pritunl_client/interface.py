@@ -134,17 +134,15 @@ class Interface:
 
         for profile in Profile.iter_profiles():
             active = False
-            title = '%s@%s (%s)' % (profile.user_name, profile.org_name,
-                profile.server_name)
 
             if profile.status in (CONNECTING, RECONNECTING, CONNECTED):
                 active = True
-                title += ' - %s' % profile.status.capitalize()
-                menu_item = gtk.MenuItem(title)
+                menu_item = gtk.MenuItem(
+                    profile.name + ' - %s' % profile.status.capitalize())
                 menu.append(menu_item)
                 menu_item.show()
 
-            menu_item = gtk.CheckMenuItem(title)
+            menu_item = gtk.CheckMenuItem(profile.name)
             menu_item.set_active(active)
             menu_item.connect('activate', self.on_toggle_profile, profile.id)
             profiles_menu.append(menu_item)

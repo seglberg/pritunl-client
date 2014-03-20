@@ -17,7 +17,7 @@ class ProfileLinux(Profile):
         _connections[self.id] = data
 
         process = subprocess.Popen([
-            'pkexec', '/usr/sbin/openvpn', self.path],
+            'pkexec', '/usr/bin/pritunl_client_pk', 'start', self.path],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         data['process'] = process
 

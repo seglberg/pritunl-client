@@ -57,10 +57,10 @@ class ProfileLinux(Profile):
     def _stop(self):
         data = _connections.get(self.id)
         if data:
-            stop_cmd = ['pkexec', '/usr/bin/pritunl_client_pk',
-                'stop', str(process.pid)]
             process = data.get('process')
             if process:
+                stop_cmd = ['pkexec', '/usr/bin/pritunl_client_pk',
+                    'stop', str(process.pid)]
                 subprocess.check_call(stop_cmd)
                 for i in xrange(int(5 / 0.1)):
                     time.sleep(0.1)

@@ -18,8 +18,7 @@ class ProfileLinux(Profile):
 
         process = subprocess.Popen([
             'pkexec', '/usr/sbin/openvpn', self.path],
-            cwd=self.working_dir, stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         data['process'] = process
 
         def poll_thread():

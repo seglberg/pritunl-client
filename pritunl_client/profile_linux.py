@@ -29,6 +29,7 @@ class ProfileLinux(Profile):
                         break
                     else:
                         continue
+                # TODO log
                 print line.strip()
                 if 'Initialization Sequence Completed' in line:
                     self._set_status(CONNECTED)

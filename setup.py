@@ -111,7 +111,10 @@ setup(
     zip_safe=False,
     data_files=data_files,
     entry_points={
-        'console_scripts': ['pritunl_client = pritunl_client.__main__:client'],
+        'console_scripts': [
+            'pritunl_client = pritunl_client.__main__:client',
+            'pritunl_client_pk = pritunl_client.__main__:pk',
+        ],
     },
     platforms=[
         'Linux',

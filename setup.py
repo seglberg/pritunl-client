@@ -1,7 +1,6 @@
 from pritunl_client.constants import *
 from setuptools import setup
 import os
-import py2exe
 import pritunl_client
 
 data_files = [
@@ -75,6 +74,7 @@ if PLATFORM == LINUX:
             'data', 'linux', 'applications', 'pritunl_client.desktop')]),
     ]
 elif PLATFORM == WIN:
+    import py2exe
     GTK_BASE_PATH = sys.modules['gtk'].__path__[0]
     data_files += [
         ('img', [

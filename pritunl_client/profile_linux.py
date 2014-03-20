@@ -1,7 +1,6 @@
 from constants import *
 from exceptions import *
 from profile import Profile, _connections
-from daemon_client import DaemonClient
 import os
 import time
 import subprocess
@@ -16,30 +15,15 @@ class ProfileLinux(Profile):
             'dialog_callback': dialog_callback,
         }
         _connections[self.id] = data
-        log_path = os.path.join(TMP_DIR, 'pritunl_%s.log' % self.id)
 
-        client = DaemonClient()
-        try:
-            client.start_conn(self.id, self.working_dir, self.path, log_path)
-        except SudoPassFail:
-            self._set_status(ENDED, SUDO_PASS_FAIL)
-            return
-        except SudoCancel:
-            self._set_status(ENDED)
-            return
+        process = subprocess.Popen([
+            'pkexec', '/usr/sbin/openvpn', self.path],
+            cwd=self.working_dir, stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+        data['process'] = process
 
-        for i in xrange(int(OVPN_START_TIMEOUT / 0.1)):
-            time.sleep(0.1)
-            if os.path.exists(log_path):
-                break
-        if not os.path.exists(log_path):
-            self.stop()
 
         def poll_thread():
-            process = subprocess.Popen(['tail', '-c', '+1',
-                '--follow=name', log_path], stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
-            data['process'] = process
             while True:
                 line = process.stdout.readline()
                 if not line:
@@ -52,7 +36,11 @@ class ProfileLinux(Profile):
                     self._set_status(CONNECTED)
                 elif 'Inactivity timeout' in line:
                     self._set_status(RECONNECTING)
-            self._set_status(DISCONNECTED)
+            # Canceled
+            if process.returncode == 126:
+                self._set_status(ENDED)
+            else:
+                self._set_status(DISCONNECTED)
 
         def dialog_thread():
             time.sleep(CONNECT_TIMEOUT)
@@ -69,13 +57,17 @@ class ProfileLinux(Profile):
         thread.start()
 
     def _stop(self):
-        client = DaemonClient()
-        client.stop_conn(self.id)
-
         data = _connections.get(self.id)
         if data:
             process = data.get('process')
             if process:
-                process.kill()
+                print process.pid
+                subprocess.check_call(['pkexec',
+                    '/usr/bin/pritunl_client_pk', 'stop', str(process.pid)])
+                for i in xrange(int(5 / 0.1)):
+                    time.sleep(0.1)
+                    print process.poll()
+                    if process.poll() is not None:
+                        return
 
         self._set_status(ENDED)

@@ -56,6 +56,14 @@ for img_root in IMG_ROOTS:
     if os.path.exists(img_path) and not DISCONNECTED_LOGO:
         DISCONNECTED_LOGO = img_path
 
+# TODO
+if not LOGO:
+    LOGO = None
+if not CONNECTED_LOGO:
+    CONNECTED_LOGO = None
+if not DISCONNECTED_LOGO:
+    DISCONNECTED_LOGO = None
+
 SUDO_PASS_FAIL = 'sudo_pass_fail'
 CONNECTING = 'connecting'
 RECONNECTING = 'reconnecting'

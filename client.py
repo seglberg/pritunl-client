@@ -1,4 +1,4 @@
-import pritunl_client
+import pritunl_client.interface
 
 print '##############################################################'
 print '#                                                            #'
@@ -22,5 +22,5 @@ print '#            \_______/|__/|__/ \_______/|__/  |__/   \___/   #'
 print '#                                                            #'
 print '##############################################################'
 
-interface = pritunl_client.Interface()
+interface = pritunl_client.interface.Interface()
 interface.main()

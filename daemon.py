@@ -1,3 +1,3 @@
-import pritunl_client
-daemon = pritunl_client.Daemon()
+import pritunl_client.daemon
+daemon = pritunl_client.daemon.Daemon()
 daemon.run()

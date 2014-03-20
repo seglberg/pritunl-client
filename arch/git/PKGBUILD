@@ -1,9 +1,4 @@
 # Maintainer: Zachary Huff <zach.huff.386@gmail.com>
-# TODO Req
-# lxpolkit
-# mate-polkit
-# polkit-gnome
-# polkit-kde
 
 pkgname=pritunl-client-git
 _pkgname=pritunl-client
@@ -15,8 +10,8 @@ license=("AGPL3")
 url="https://github.com/pritunl/${_pkgname}"
 depends=(
     "python2"
-    "gksu"
     "pygtk"
+    "polkit"
     "net-tools"
     "iproute2"
     "openvpn"

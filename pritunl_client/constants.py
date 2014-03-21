@@ -16,8 +16,9 @@ elif sys.platform == 'darwin':
 else:
     raise ValueError('Unknown platform %s' % sys.platform)
 
-CONF_DIR = os.path.expanduser(os.path.join('~', '.config', 'pritunl'))
+CONF_DIR = os.path.expanduser(os.path.join('~', '.config', 'pritunl_client'))
 PROFILES_DIR = os.path.join(CONF_DIR, 'profiles')
+LINUX_ETC_DIR = os.path.join(os.path.abspath(os.sep), 'etc', 'pritunl_client')
 TMP_DIR = os.path.join(os.path.abspath(os.sep), 'tmp')
 SOCK_PATH = os.path.join(TMP_DIR, 'pritunl_%s.sock' % uuid.uuid4().hex)
 CONNECT_TIMEOUT = 30

@@ -68,9 +68,6 @@ class Profile:
         with open(self.path, 'w') as profile_file:
             os.chmod(self.path, 0600)
             profile_file.write(data)
-        if conf_data.get('autostart'):
-            # TODO copy conf to /etc
-            pass
 
     def _set_conf(self, name, value):
         with open(self.path, 'r') as profile_file:

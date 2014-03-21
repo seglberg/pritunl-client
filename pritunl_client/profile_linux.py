@@ -7,6 +7,10 @@ import subprocess
 import threading
 
 class ProfileLinux(Profile):
+    def __init__(self, *args, **kwargs):
+        Profile.__init__(self, *args, **kwargs)
+        self.autostart_path = os.path.join(LINUX_ETC_DIR, '%s.ovpn' % self.id)
+
     def _start(self, status_callback, dialog_callback, retry=True):
         data = {
             'status': CONNECTING,
@@ -77,3 +81,23 @@ class ProfileLinux(Profile):
                     subprocess.check_call(stop_cmd)
 
         self._set_status(ENDED)
+
+    def _copy_profile_autostart(self):
+        # TODO remove conf_str from autostart conf
+        subprocess.check_call([
+            'pkexec', '/usr/bin/pritunl_client_pk', 'copy', self.path],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    def _remove_profile_autostart(self):
+        subprocess.check_call(['pkexec',
+            '/usr/bin/pritunl_client_pk', 'remove', self.autostart_path],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    def write(self, data, *args, **kwargs):
+        Profile.write(self, data, *args, **kwargs)
+        conf_data = self._parse_conf(data)
+        if os.path.exists(self.autostart_path) != conf_data.get('autostart'):
+            if conf_data.get('autostart'):
+                self._copy_profile_autostart()
+            else:
+                self._remove_profile_autostart()

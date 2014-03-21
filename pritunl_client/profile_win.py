@@ -16,8 +16,7 @@ class ProfileWin(Profile):
         _connections[self.id] = data
 
         process = subprocess.Popen(['openvpn.exe', self.path],
-            cwd=self.working_dir, stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         data['process'] = process
 
         def poll_thread():

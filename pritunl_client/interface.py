@@ -117,7 +117,31 @@ class Interface:
         profile.stop()
 
     def on_rename_profile(self, widget, profile_id):
-        pass
+        profile = Profile.get_profile(profile_id)
+
+        dialog = gtk.MessageDialog(
+            type=gtk.MESSAGE_QUESTION,
+            buttons=gtk.BUTTONS_OK_CANCEL,
+            message_format='Rename Profile')
+        dialog.format_secondary_markup('Enter new name for profile')
+        dialog.set_title('Pritunl - Rename Profile')
+
+        entry = gtk.Entry()
+        entry.set_width_chars(32)
+
+        hbox = gtk.HBox()
+        hbox.pack_start(gtk.Label('Profile Name:'), False, 5, 5)
+        hbox.pack_end(entry)
+
+        dialog.vbox.pack_end(hbox, True, True, 0)
+        dialog.show_all()
+
+        response = dialog.run()
+        if response == gtk.RESPONSE_OK:
+            new_name = entry.get_text()
+            profile.set_name(new_name[:32])
+            self.update_menu()
+        dialog.destroy()
 
     def on_delete_profile(self, widget, profile_id):
         pass

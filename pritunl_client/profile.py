@@ -43,6 +43,14 @@ class Profile:
             raise AttributeError('Config instance has no attribute %r' % name)
         return self.__dict__[name]
 
+    def _parse_data(self, data):
+        info_str = data.splitlines()[0].replace('#', '', 1).strip()
+        try:
+            info_data = json.loads(info_str)
+        except ValueError:
+            info_data = {}
+        return info_data
+
     def load(self):
         self.profile_name = None
         self.user_name = None
@@ -50,25 +58,29 @@ class Profile:
         self.server_name = None
 
         with open(self.path, 'r') as profile_file:
-            info_str = profile_file.readline().replace('#', '', 1).strip()
-            try:
-                info_data = json.loads(info_str)
-            except ValueError:
-                info_data = {}
+            data = profile_file.read()
+            info_data = self._parse_data(data)
             self.profile_name = info_data.get('name')
             self.user_name = info_data.get('user')
             self.org_name = info_data.get('organization')
             self.server_name = info_data.get('server')
 
-    def write(self, data, default_name='New Profile'):
-        info_str = data.splitlines()[0].replace('#', '', 1).strip()
-        try:
-            json.loads(info_str)
-        except ValueError:
+    def write(self, data, default_name='Unknown Profile'):
+        if not self._parse_data(data):
             data = '# {"name": "%s"}\n' % default_name + data
         with open(self.path, 'w') as profile_file:
             os.chmod(self.path, 0600)
             profile_file.write(data)
+
+    def set_name(self, name):
+        with open(self.path, 'r') as profile_file:
+            data = profile_file.read()
+            info_data = self._parse_data(data)
+            if info_data:
+                data = '\n'.join(data.splitlines()[1:])
+            info_data['name'] = name
+        data = '# %s\n' % json.dumps(info_data) + data
+        self.write(data)
 
     def _set_status(self, status):
         data = _connections.get(self.id)

@@ -204,7 +204,6 @@ class Interface:
             self.icon.set_menu(self._build_menu())
 
     def show_about(self, widget, data=None):
-        # gtk.AboutDialog
         import pritunl_client
         dialog = gtk.MessageDialog(buttons=gtk.BUTTONS_OK)
         dialog.set_title('Pritunl - About')

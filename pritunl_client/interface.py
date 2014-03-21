@@ -126,11 +126,9 @@ class Interface:
         menu_item = gtk.MenuItem('Toggle Profile Connections')
         menu_item.set_sensitive(False)
         profiles_menu.append(menu_item)
-        menu_item.show()
 
         menu_item = gtk.SeparatorMenuItem()
         profiles_menu.append(menu_item)
-        menu_item.show()
 
         for profile in Profile.iter_profiles():
             active = False
@@ -140,73 +138,61 @@ class Interface:
                 menu_item = gtk.MenuItem(
                     profile.name + ' - %s' % profile.status.capitalize())
                 menu.append(menu_item)
-                menu_item.show()
 
             menu_item = gtk.CheckMenuItem(profile.name)
             menu_item.set_active(active)
             menu_item.connect('activate', self.on_toggle_profile, profile.id)
             profiles_menu.append(menu_item)
-            menu_item.show()
 
         if not len(menu):
             conn_active = False
             menu_item = gtk.MenuItem('No Active Connections')
             menu_item.set_sensitive(False)
             menu.append(menu_item)
-            menu_item.show()
 
         if len(profiles_menu) == 2:
             menu_item = gtk.MenuItem('No Profiles Available')
             menu_item.set_sensitive(False)
             profiles_menu.append(menu_item)
-            menu_item.show()
 
         if conn_active:
             menu_item = gtk.SeparatorMenuItem()
             profiles_menu.append(menu_item)
-            menu_item.show()
 
             menu_item = gtk.MenuItem('Disconnect All Profiles')
             menu_item.connect('activate', self.on_disconnect_all)
             profiles_menu.append(menu_item)
-            menu_item.show()
 
         menu_item = gtk.SeparatorMenuItem()
         menu.append(menu_item)
-        menu_item.show()
 
         menu_item = gtk.MenuItem('Profiles')
         menu_item.set_submenu(profiles_menu)
         menu.append(menu_item)
-        menu_item.show()
 
         menu_item = gtk.MenuItem('Import Profile')
         menu_item.connect('activate', self.show_import_profile)
         menu.append(menu_item)
-        menu_item.show()
 
         menu_item = gtk.MenuItem('Import Profile URI')
         menu_item.connect('activate', self.show_import_profile_uri)
         menu.append(menu_item)
-        menu_item.show()
 
         menu_item = gtk.MenuItem('About')
         menu_item.connect('activate', self.show_about)
         menu.append(menu_item)
-        menu_item.show()
 
         menu_item = gtk.MenuItem('Exit')
         menu_item.connect('activate', self.destroy)
         menu.append(menu_item)
-        menu_item.show()
 
         def _toggle_icon(widget):
             self.set_icon_state(not self.get_icon_state())
         menu_item = gtk.MenuItem('Toggle Icon State (Debug)')
         menu_item.connect('activate', _toggle_icon)
         menu.append(menu_item)
-        menu_item.show()
 
+        menu.show_all()
         return menu
 
     def show_menu(self, event_button, activate_time):

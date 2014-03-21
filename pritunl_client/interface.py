@@ -82,38 +82,51 @@ class Interface:
         self.set_icon_state(bool(conn_count))
         self.update_menu()
 
-    def on_toggle_profile(self, widget, profile_id):
+    def on_connect_profile(self, widget, profile_id):
         profile = Profile.get_profile(profile_id)
-        if widget.get_active():
-            dialog = gtk.MessageDialog(
-                type=gtk.MESSAGE_QUESTION,
-                buttons=gtk.BUTTONS_CANCEL,
-                message_format='Connecting to %s' % profile.server_name)
-            dialog.format_secondary_markup('Conecting to the server...')
-            dialog.set_title('Pritunl - Connecting...')
+        dialog = gtk.MessageDialog(
+            type=gtk.MESSAGE_QUESTION,
+            buttons=gtk.BUTTONS_CANCEL,
+            message_format='Connecting to %s' % profile.server_name)
+        dialog.format_secondary_markup('Conecting to the server...')
+        dialog.set_title('Pritunl - Connecting...')
 
-            spinner = gtk.Spinner()
-            spinner.set_size_request(45, 45)
-            spinner.start()
-            dialog.set_image(spinner)
-            dialog.show_all()
+        spinner = gtk.Spinner()
+        spinner.set_size_request(45, 45)
+        spinner.start()
+        dialog.set_image(spinner)
+        dialog.show_all()
 
-            def dialog_callback():
-                dialog.destroy()
-
-            threading.Thread(target=profile.start,
-                args=(self.on_status_change, dialog_callback)).start()
-
-            response = dialog.run()
+        def dialog_callback():
             dialog.destroy()
-            if response == gtk.RESPONSE_CANCEL:
-                threading.Thread(target=profile.stop).start()
-                return
 
-            if profile.status == DISCONNECTED:
-                self.show_connect_error(profile)
-        else:
-            profile.stop()
+        threading.Thread(target=profile.start,
+            args=(self.on_status_change, dialog_callback)).start()
+
+        response = dialog.run()
+        dialog.destroy()
+        if response == gtk.RESPONSE_CANCEL:
+            threading.Thread(target=profile.stop).start()
+            return
+
+        if profile.status == DISCONNECTED:
+            self.show_connect_error(profile)
+
+    def on_disconnect_profile(self, widget, profile_id):
+        profile = Profile.get_profile(profile_id)
+        profile.stop()
+
+    def on_rename_profile(self, widget, profile_id):
+        pass
+
+    def on_delete_profile(self, widget, profile_id):
+        pass
+
+    def on_autostart_profile(self, widget, profile_id):
+        pass
+
+    def on_no_autostart_profile(self, widget, profile_id):
+        pass
 
     def on_disconnect_all(self, widget):
         pass
@@ -139,9 +152,31 @@ class Interface:
                     profile.name + ' - %s' % profile.status.capitalize())
                 menu.append(menu_item)
 
-            menu_item = gtk.CheckMenuItem(profile.name)
+            profile_menu = gtk.Menu()
+
+            menu_item = gtk.CheckMenuItem(
+                'Disconnect' if active else 'Connect')
             menu_item.set_active(active)
-            menu_item.connect('activate', self.on_toggle_profile, profile.id)
+            menu_item.connect('activate', self.on_disconnect_profile if
+                active else self.on_connect_profile, profile.id)
+            profile_menu.append(menu_item)
+
+            menu_item = gtk.MenuItem('Rename')
+            menu_item.connect('activate', self.on_rename_profile, profile.id)
+            profile_menu.append(menu_item)
+
+            menu_item = gtk.MenuItem('Delete')
+            menu_item.connect('activate', self.on_delete_profile, profile.id)
+            profile_menu.append(menu_item)
+
+            menu_item = gtk.CheckMenuItem('Autostart')
+            menu_item.set_active(False)
+            menu_item.connect('activate', self.on_autostart_profile,
+                profile.id)
+            profile_menu.append(menu_item)
+
+            menu_item = gtk.MenuItem(profile.name)
+            menu_item.set_submenu(profile_menu)
             profiles_menu.append(menu_item)
 
         if not len(menu):

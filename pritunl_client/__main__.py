@@ -20,9 +20,9 @@ def client():
 
 def pk():
     if sys.argv[1] in ('start', 'autostart'):
-        regex = r'^/etc/pritunl_conf/[a-z0-9]+.ovpn$'
+        regex = r'^/etc/pritunl_client/[a-z0-9]+.ovpn$'
         if sys.argv[1] == 'autostart' and not re.match(regex, sys.argv[2]):
-            raise ValueError('Autostart conf must be in etc directory')
+            raise ValueError('Autostart profile must be in etc directory')
         process = subprocess.Popen(['openvpn', sys.argv[2]])
         def sig_handler(signum, frame):
             process.send_signal(signum)
@@ -37,4 +37,10 @@ def pk():
                 raise ValueError('Not a pritunl client process')
         subprocess.check_call(['kill', sys.argv[2]])
     elif sys.argv[1] == 'copy':
-        pass
+        subprocess.check_call(['cp', '--preserve=mode', sys.argv[2],
+            os.path.join(os.path.abspath(os.sep), 'etc', 'pritunl_client')])
+    elif sys.argv[1] == 'remove':
+        regex = r'^/etc/pritunl_client/[a-z0-9]+.ovpn$'
+        if not re.match(regex, sys.argv[2]):
+            raise ValueError('Profile must be in etc directory')
+        subprocess.check_call(['rm', sys.argv[2]])

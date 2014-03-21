@@ -82,6 +82,9 @@ class Profile:
         data = '# %s\n' % json.dumps(info_data) + data
         self.write(data)
 
+    def delete(self):
+        os.remove(self.path)
+
     def _set_status(self, status):
         data = _connections.get(self.id)
         if not data:

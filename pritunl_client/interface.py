@@ -161,10 +161,12 @@ class Interface:
         dialog.destroy()
 
     def on_autostart_profile(self, widget, profile_id):
-        pass
+        profile = Profile.get_profile(profile_id)
+        profile.set_autostart(True)
 
     def on_no_autostart_profile(self, widget, profile_id):
-        pass
+        profile = Profile.get_profile(profile_id)
+        profile.set_autostart(False)
 
     def on_disconnect_all(self, widget):
         pass
@@ -208,9 +210,9 @@ class Interface:
             profile_menu.append(menu_item)
 
             menu_item = gtk.CheckMenuItem('Autostart')
-            menu_item.set_active(False)
-            menu_item.connect('activate', self.on_autostart_profile,
-                profile.id)
+            menu_item.set_active(profile.autostart)
+            menu_item.connect('activate', self.on_no_autostart_profile if
+                profile.autostart else self.on_autostart_profile, profile.id)
             profile_menu.append(menu_item)
 
             menu_item = gtk.MenuItem(profile.name)

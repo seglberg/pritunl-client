@@ -67,7 +67,7 @@ class Profile:
         except ValueError:
             data = '# {"name": "%s"}\n' % default_name + data
         with open(self.path, 'w') as profile_file:
-            # TODO file permissions
+            os.chmod(self.path, 0600)
             profile_file.write(data)
 
     def _set_status(self, status):

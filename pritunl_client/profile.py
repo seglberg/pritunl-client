@@ -94,23 +94,28 @@ class Profile:
             return
         data['status'] = status
         data['state'] = True
-        callback = data.get('dialog_callback')
+        callback = data.get('connect_callback')
         if callback:
-            data['dialog_callback'] = None
+            data['connect_callback'] = None
             gobject.idle_add(callback)
 
         callback = data.get('status_callback')
         if callback:
             gobject.idle_add(callback)
 
-    def start(self, status_callback, dialog_callback=None):
+    def start(self, status_callback, connect_callback=None):
         if self.status not in (DISCONNECTED, ENDED):
             # TODO
             print 'INVALID STATE'
             return
-        self._start(status_callback, dialog_callback)
+        self._start(status_callback, connect_callback)
 
-    def _start(self, status_callback, dialog_callback=None):
+    def start_autostart(self, status_callback, connect_callback=None):
+        if self.status not in (DISCONNECTED, ENDED):
+            return
+        self._start_autostart(status_callback, connect_callback)
+
+    def _start(self, status_callback, connect_callback=None):
         raise NotImplementedError()
 
     def stop(self):

@@ -6,12 +6,12 @@ import subprocess
 import threading
 
 class ProfileWin(Profile):
-    def _start(self, status_callback, dialog_callback):
+    def _start(self, status_callback, connect_callback):
         data = {
             'status': CONNECTING,
             'process': None,
             'status_callback': status_callback,
-            'dialog_callback': dialog_callback,
+            'connect_callback': connect_callback,
         }
         _connections[self.id] = data
 
@@ -36,7 +36,7 @@ class ProfileWin(Profile):
 
         def dialog_thread():
             time.sleep(CONNECT_TIMEOUT)
-            if not data.get('dialog_callback'):
+            if not data.get('connect_callback'):
                 return
             self.stop()
 

@@ -11,22 +11,28 @@ class ProfileLinux(Profile):
         Profile.__init__(self, *args, **kwargs)
         self.autostart_path = os.path.join(LINUX_ETC_DIR, '%s.ovpn' % self.id)
 
-    def _start(self, status_callback, dialog_callback, retry=True):
+    def _start(self, status_callback, connect_callback, mode=START,
+            retry=True):
         data = {
             'status': CONNECTING,
             'process': None,
             'status_callback': status_callback,
-            'dialog_callback': dialog_callback,
+            'connect_callback': connect_callback,
             'state': False,
         }
         _connections[self.id] = data
 
+        if mode == AUTOSTART:
+            path = self.autostart_path
+        else:
+            path = self.path
+
         process = subprocess.Popen([
-            'pkexec', '/usr/bin/pritunl_client_pk', 'start', self.path],
+            'pkexec', '/usr/bin/pritunl_client_pk', mode, path],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         data['process'] = process
 
-        def dialog_thread():
+        def connect_thread():
             time.sleep(CONNECT_TIMEOUT)
             if data.get('state'):
                 return
@@ -45,7 +51,7 @@ class ProfileLinux(Profile):
                 print line.strip()
                 if not started:
                     started = True
-                    thread = threading.Thread(target=dialog_thread)
+                    thread = threading.Thread(target=connect_thread)
                     thread.daemon = True
                     thread.start()
                 if 'Initialization Sequence Completed' in line:
@@ -58,14 +64,18 @@ class ProfileLinux(Profile):
             # Random error, retry
             elif process.returncode == -15 and not started and retry:
                 data['status_callback'] = None
-                data['dialog_callback'] = None
-                self._start(status_callback, dialog_callback, False)
+                data['connect_callback'] = None
+                self._start(status_callback, connect_callback, start_cmd,
+                    retry=False)
             else:
                 self._set_status(DISCONNECTED)
 
         thread = threading.Thread(target=poll_thread)
         thread.daemon = True
         thread.start()
+
+    def _start_autostart(self, status_callback, connect_callback):
+        self._start(status_callback, connect_callback, AUTOSTART, retry=False)
 
     def _stop(self):
         data = _connections.get(self.id)
@@ -84,12 +94,14 @@ class ProfileLinux(Profile):
         self._set_status(ENDED)
 
     def _copy_profile_autostart(self):
+        # TODO exit code 126, -15
         # TODO remove conf_str from autostart conf
         subprocess.check_call([
             'pkexec', '/usr/bin/pritunl_client_pk', 'copy', self.path],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     def _remove_profile_autostart(self):
+        # TODO exit code 126, -15
         subprocess.check_call(['pkexec',
             '/usr/bin/pritunl_client_pk', 'remove', self.autostart_path],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -97,7 +109,8 @@ class ProfileLinux(Profile):
     def write(self, data, *args, **kwargs):
         Profile.write(self, data, *args, **kwargs)
         conf_data = self._parse_conf(data)
-        if os.path.exists(self.autostart_path) != conf_data.get('autostart'):
+        if os.path.exists(self.autostart_path) != conf_data.get(
+                'autostart', False):
             if conf_data.get('autostart'):
                 self._copy_profile_autostart()
             else:

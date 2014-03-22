@@ -2,6 +2,7 @@ from constants import *
 from profile import Profile
 import utils
 import threading
+import time
 import pygtk
 pygtk.require('2.0')
 import gtk
@@ -97,11 +98,11 @@ class Interface:
         dialog.set_image(spinner)
         dialog.show_all()
 
-        def dialog_callback():
+        def connect_callback():
             dialog.destroy()
 
         threading.Thread(target=profile.start,
-            args=(self.on_status_change, dialog_callback)).start()
+            args=(self.on_status_change, connect_callback)).start()
 
         response = dialog.run()
         dialog.destroy()
@@ -350,10 +351,25 @@ class Interface:
             self.update_menu()
         dialog.destroy()
 
+    def autostart(self):
+        time.sleep(0.3)
+        for profile in Profile.iter_profiles():
+            if not profile.autostart:
+                continue
+            def connect_callback():
+                if profile.status == DISCONNECTED:
+                    self.show_connect_error(profile)
+
+            threading.Thread(target=profile.start_autostart,
+                args=(self.on_status_change, connect_callback)).start()
+
     def destroy(self, widget):
         self.icon.set_visible(False)
         gtk.main_quit()
 
     def main(self):
+        thread = threading.Thread(target=self.autostart)
+        thread.daemon = True
+        thread.start()
         gtk.main()
         gtk.threads_leave()

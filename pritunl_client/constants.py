@@ -63,3 +63,6 @@ RECONNECTING = 'reconnecting'
 CONNECTED = 'connected'
 DISCONNECTED = 'disconnected'
 ENDED = 'ended'
+
+START = 'start'
+AUTOSTART = 'autostart'

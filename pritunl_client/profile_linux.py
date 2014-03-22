@@ -107,7 +107,7 @@ class ProfileLinux(Profile):
         else:
             raise ProcessCallError(
                 'Pritunl polkit process returned error %s.' % (
-                    process.returncode)
+                    process.returncode))
 
     def _remove_profile_autostart(self, retry=True):
         process = subprocess.Popen(['pkexec',
@@ -124,11 +124,12 @@ class ProfileLinux(Profile):
         else:
             raise ProcessCallError(
                 'Pritunl polkit process returned error %s.' % (
-                    process.returncode)
+                    process.returncode))
 
     def write(self, data, *args, **kwargs):
         Profile.write(self, data, *args, **kwargs)
         conf_data = self._parse_conf(data)
+        # TODO check for autostart_path on load
         if os.path.exists(self.autostart_path) != conf_data.get(
                 'autostart', False):
             if conf_data.get('autostart'):

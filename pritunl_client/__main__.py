@@ -33,7 +33,7 @@ def pk():
         signal.signal(signal.SIGTERM, sig_handler)
         sys.exit(process.wait())
     elif sys.argv[1] == 'stop':
-        regex_etc = r'^/etc/pritunl_client/[a-z0-9]+.ovpn$'
+        regex_etc = r'(?:/etc/pritunl_client/[a-z0-9]+.ovpn)$'
         regex_home = r'(?:/pritunl_client/profiles/[a-z0-9]+\.ovpn)$'
         with open('/proc/%s/cmdline' % int(sys.argv[2]), 'r') as cmdline_file:
             cmdline = cmdline_file.read().strip().strip('\x00')

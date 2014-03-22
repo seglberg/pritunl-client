@@ -9,6 +9,7 @@ post_install() {
 }
 
 post_remove() {
+    rm -rf /etc/pritunl_client
     gtk-update-icon-cache -q -t -f /usr/share/icons/hicolor || true
     gtk-update-icon-cache -q -t -f /usr/share/icons/ubuntu-mono-dark || true
     gtk-update-icon-cache -q -t -f /usr/share/icons/ubuntu-mono-light || true

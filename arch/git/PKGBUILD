@@ -40,5 +40,6 @@ build() {
 
 package() {
     cd "${srcdir}/${_pkgname}"
+    mkdir -p "${pkgdir}/etc/pritunl_client"
     python2 setup.py install --root="${pkgdir}" --prefix=/usr
 }

@@ -29,11 +29,12 @@ class Interface:
             self.icon.set_tooltip('Pritunl Client')
             self.icon.connect('activate', self.on_click_left)
             self.icon.connect('popup_menu', self.on_click_right)
+        self._cur_icon_path = utils.get_disconnected_logo()
         self.icon_state = None
         self.set_icon_state(False)
 
-    def set_icon_state(self, state):
-        if state == self.icon_state:
+    def set_icon_state(self, state, force=False):
+        if state == self.icon_state and not force:
             return
 
         self.icon_state = state
@@ -270,15 +271,20 @@ class Interface:
         return menu
 
     def show_menu(self, event_button, activate_time):
+        self.update_icon()
         menu = self._build_menu()
         menu.popup(None, None, None, event_button, activate_time)
 
     def update_menu(self):
+        self.update_icon()
         if HAS_APPINDICATOR:
             self.icon.set_menu(self._build_menu())
 
     def update_icon(self):
-        self._cur_icon_path = ''
+        icon_path = utils.get_disconnected_logo()
+        if self._cur_icon_path != icon_path:
+            self._cur_icon_path = icon_path
+            self.set_icon_state(self.get_icon_state(), True)
 
     def show_about(self, widget, data=None):
         import pritunl_client

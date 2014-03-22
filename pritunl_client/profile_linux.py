@@ -101,3 +101,8 @@ class ProfileLinux(Profile):
                 self._copy_profile_autostart()
             else:
                 self._remove_profile_autostart()
+
+    def delete(self):
+        if os.path.exists(self.autostart_path):
+            self._remove_profile_autostart()
+        Profile.delete(self)

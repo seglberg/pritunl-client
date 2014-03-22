@@ -29,6 +29,12 @@ if PLATFORM == LINUX:
             os.path.join('img', 'logo_connected_light.svg'),
             os.path.join('img', 'logo_disconnected_light.svg'),
         ]),
+        (os.path.join(os.path.abspath(os.sep), 'usr', 'share',
+            'applications'), [os.path.join(
+            'data', 'linux', 'applications', 'pritunl_client.desktop')]),
+        (os.path.join(os.path.abspath(os.sep), 'etc', 'xdg', 'autostart'),
+            [os.path.join('data', 'linux', 'applications',
+                'pritunl_client.desktop')]),
     ]
 
 elif PLATFORM == WIN:

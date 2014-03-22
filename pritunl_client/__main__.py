@@ -24,7 +24,7 @@ def pk():
         regex_home = r'(?:/pritunl_client/profiles/[a-z0-9]+\.ovpn)$'
         if sys.argv[1] == 'autostart' and not re.match(regex_etc, sys.argv[2]):
             raise ValueError('Autostart profile must be in etc directory')
-        if sys.argv[1] == 'start' and not re.match(regex_home, sys.argv[2]):
+        if sys.argv[1] == 'start' and not re.search(regex_home, sys.argv[2]):
             raise ValueError('Profile must be in home directory')
         process = subprocess.Popen(['openvpn', sys.argv[2]])
         def sig_handler(signum, frame):
@@ -43,7 +43,7 @@ def pk():
         subprocess.check_call(['kill', sys.argv[2]])
     elif sys.argv[1] == 'copy':
         regex = r'(?:/pritunl_client/profiles/[a-z0-9]+\.ovpn)$'
-        if not re.match(regex, sys.argv[2]):
+        if not re.search(regex, sys.argv[2]):
             raise ValueError('Profile must be in home directory')
         subprocess.check_call(['cp', '--preserve=mode', sys.argv[2],
             os.path.join(os.path.abspath(os.sep), 'etc', 'pritunl_client')])

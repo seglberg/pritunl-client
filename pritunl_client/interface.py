@@ -367,8 +367,12 @@ class Interface:
         gtk.main_quit()
 
     def main(self):
-        thread = threading.Thread(target=self.autostart)
-        thread.daemon = True
-        thread.start()
-        gtk.main()
-        gtk.threads_leave()
+        try:
+            thread = threading.Thread(target=self.autostart)
+            thread.daemon = True
+            thread.start()
+            gtk.main()
+            gtk.threads_leave()
+        finally:
+            for profile in Profile.iter_profiles():
+                profile.stop()

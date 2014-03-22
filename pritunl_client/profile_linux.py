@@ -64,7 +64,7 @@ class ProfileLinux(Profile):
             elif process.returncode == -15 and not started and retry:
                 data['status_callback'] = None
                 data['connect_callback'] = None
-                self._start(status_callback, connect_callback, start_cmd,
+                self._start(status_callback, connect_callback, mode,
                     retry=False)
             else:
                 self._set_status(DISCONNECTED)

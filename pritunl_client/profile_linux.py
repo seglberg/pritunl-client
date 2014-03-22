@@ -57,6 +57,7 @@ class ProfileLinux(Profile):
                     self._set_status(CONNECTED)
                 elif 'Inactivity timeout' in line:
                     self._set_status(RECONNECTING)
+
             # Canceled
             if process.returncode == 126:
                 self._set_status(ENDED)
@@ -104,7 +105,7 @@ class ProfileLinux(Profile):
         # Random error, retry
         elif process.returncode == -15 and retry:
             self._copy_profile_autostart(retry=False)
-        else:
+        elif process.returncode != 0:
             raise ProcessCallError(
                 'Pritunl polkit process returned error %s.' % (
                     process.returncode))
@@ -121,7 +122,7 @@ class ProfileLinux(Profile):
         # Random error, retry
         elif process.returncode == -15 and retry:
             self._remove_profile_autostart(retry=False)
-        else:
+        elif process.returncode != 0:
             raise ProcessCallError(
                 'Pritunl polkit process returned error %s.' % (
                     process.returncode))

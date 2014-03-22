@@ -1,7 +1,4 @@
 from constants import *
 
-class SudoPassFail(Exception):
-    pass
-
-class SudoCancel(Exception):
+class ProcessCallError(Exception):
     pass

@@ -92,18 +92,39 @@ class ProfileLinux(Profile):
 
         self._set_status(ENDED)
 
-    def _copy_profile_autostart(self):
-        # TODO exit code 126, -15
-        # TODO remove conf_str from autostart conf
-        subprocess.check_call([
+    def _copy_profile_autostart(self, retry=True):
+        process = subprocess.Popen([
             'pkexec', '/usr/bin/pritunl_client_pk', 'copy', self.path],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process.wait()
 
-    def _remove_profile_autostart(self):
-        # TODO exit code 126, -15
-        subprocess.check_call(['pkexec',
+        # Canceled
+        if process.returncode == 126:
+            return
+        # Random error, retry
+        elif process.returncode == -15 and retry:
+            self._copy_profile_autostart(retry=False)
+        else:
+            raise ProcessCallError(
+                'Pritunl polkit process returned error %s.' % (
+                    process.returncode)
+
+    def _remove_profile_autostart(self, retry=True):
+        process = subprocess.Popen(['pkexec',
             '/usr/bin/pritunl_client_pk', 'remove', self.autostart_path],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process.wait()
+
+        # Canceled
+        if process.returncode == 126:
+            return
+        # Random error, retry
+        elif process.returncode == -15 and retry:
+            self._remove_profile_autostart(retry=False)
+        else:
+            raise ProcessCallError(
+                'Pritunl polkit process returned error %s.' % (
+                    process.returncode)
 
     def write(self, data, *args, **kwargs):
         Profile.write(self, data, *args, **kwargs)

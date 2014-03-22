@@ -74,7 +74,7 @@ class ProfileLinux(Profile):
         thread.start()
 
     def _start_autostart(self, status_callback, connect_callback):
-        self._start(status_callback, connect_callback, AUTOSTART, retry=False)
+        self._start(status_callback, connect_callback, AUTOSTART)
 
     def _stop(self):
         data = _connections.get(self.id)

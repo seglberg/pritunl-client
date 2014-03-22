@@ -20,9 +20,12 @@ def client():
 
 def pk():
     if sys.argv[1] in ('start', 'autostart'):
-        regex = r'^/etc/pritunl_client/[a-z0-9]+.ovpn$'
-        if sys.argv[1] == 'autostart' and not re.match(regex, sys.argv[2]):
+        regex_etc = r'^/etc/pritunl_client/[a-z0-9]+.ovpn$'
+        regex_home = r'(?:/pritunl/profiles/[a-z0-9]+\.ovpn)$'
+        if sys.argv[1] == 'autostart' and not re.match(regex_etc, sys.argv[2]):
             raise ValueError('Autostart profile must be in etc directory')
+        if sys.argv[1] == 'start' and not re.match(regex_home, sys.argv[2]):
+            raise ValueError('Profile must be in home directory')
         process = subprocess.Popen(['openvpn', sys.argv[2]])
         def sig_handler(signum, frame):
             process.send_signal(signum)
@@ -30,13 +33,18 @@ def pk():
         signal.signal(signal.SIGTERM, sig_handler)
         sys.exit(process.wait())
     elif sys.argv[1] == 'stop':
-        regex = r'(?:[a-z0-9]+\.ovpn)$'
-        with open('/proc/%s/cmdline' % sys.argv[2], 'r') as cmdline_file:
+        regex_etc = r'^/etc/pritunl_client/[a-z0-9]+.ovpn$'
+        regex_home = r'(?:/pritunl/profiles/[a-z0-9]+\.ovpn)$'
+        with open('/proc/%s/cmdline' % int(sys.argv[2]), 'r') as cmdline_file:
             cmdline = cmdline_file.read().strip().strip('\x00')
-            if not re.search(regex, cmdline):
+            if not re.search(regex_etc, cmdline) and \
+                    not re.search(regex_home, cmdline):
                 raise ValueError('Not a pritunl client process')
         subprocess.check_call(['kill', sys.argv[2]])
     elif sys.argv[1] == 'copy':
+        regex = r'(?:/pritunl/profiles/[a-z0-9]+\.ovpn)$'
+        if not re.match(regex, sys.argv[2]):
+            raise ValueError('Profile must be in home directory')
         subprocess.check_call(['cp', '--preserve=mode', sys.argv[2],
             os.path.join(os.path.abspath(os.sep), 'etc', 'pritunl_client')])
     elif sys.argv[1] == 'remove':

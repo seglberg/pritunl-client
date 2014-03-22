@@ -17,6 +17,7 @@ class ProfileLinux(Profile):
             'process': None,
             'status_callback': status_callback,
             'dialog_callback': dialog_callback,
+            'state': False,
         }
         _connections[self.id] = data
 
@@ -27,7 +28,7 @@ class ProfileLinux(Profile):
 
         def dialog_thread():
             time.sleep(CONNECT_TIMEOUT)
-            if not data.get('dialog_callback'):
+            if data.get('state'):
                 return
             self.stop()
 

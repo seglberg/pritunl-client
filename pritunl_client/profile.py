@@ -93,6 +93,7 @@ class Profile:
         if not data:
             return
         data['status'] = status
+        data['state'] = True
         callback = data.get('dialog_callback')
         if callback:
             data['dialog_callback'] = None

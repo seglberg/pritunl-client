@@ -35,6 +35,9 @@ if PLATFORM == LINUX:
         (os.path.join(os.path.abspath(os.sep), 'etc', 'xdg', 'autostart'),
             [os.path.join('data', 'linux', 'applications',
                 'pritunl_client.desktop')]),
+        (os.path.join(os.path.abspath(os.sep), 'usr', 'share', 'polkit-1',
+            'actions'), [os.path.join('data', 'linux', 'polkit',
+            'com.pritunl.client.policy')]),
     ]
 
 elif PLATFORM == WIN:

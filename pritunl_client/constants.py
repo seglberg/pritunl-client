@@ -26,14 +26,15 @@ OVPN_START_TIMEOUT = 5
 OVPN_STOP_TIMEOUT = 5
 DAEMON_SOCKET_TIMEOUT = 10
 
-LOGO = None
-CONNECTED_LOGO = None
-DISCONNECTED_LOGO = None
+LOGO_DEFAULT_PATH = None
+CONNECTED_LOGO_DEFAULT_PATH = None
+DISCONNECTED_LOGO_DEFAULT_PATH = None
 IMG_ROOTS = [
     os.path.join(os.path.abspath(os.sep), 'usr', 'share', 'pritunl_client'),
     os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), 'img'),
 ]
 
+_LOGO_NAME = 'logo.png'
 if PLATFORM == LINUX:
     _CONNECTED_LOGO_NAME = 'logo_connected_light.svg'
     _DISCONNECTED_LOGO_NAME = 'logo_disconnected_light.svg'
@@ -47,22 +48,14 @@ else:
 
 for img_root in IMG_ROOTS:
     img_path = os.path.join(img_root, 'logo.png')
-    if os.path.exists(img_path) and not LOGO:
-        LOGO = img_path
+    if os.path.exists(img_path) and not LOGO_DEFAULT_PATH:
+        LOGO_DEFAULT_PATH = img_path
     img_path = os.path.join(img_root, _CONNECTED_LOGO_NAME)
-    if os.path.exists(img_path) and not CONNECTED_LOGO:
-        CONNECTED_LOGO = img_path
+    if os.path.exists(img_path) and not CONNECTED_LOGO_DEFAULT_PATH:
+        CONNECTED_LOGO_DEFAULT_PATH = img_path
     img_path = os.path.join(img_root, _DISCONNECTED_LOGO_NAME)
-    if os.path.exists(img_path) and not DISCONNECTED_LOGO:
-        DISCONNECTED_LOGO = img_path
-
-# TODO
-if not LOGO:
-    LOGO = None
-if not CONNECTED_LOGO:
-    CONNECTED_LOGO = None
-if not DISCONNECTED_LOGO:
-    DISCONNECTED_LOGO = None
+    if os.path.exists(img_path) and not DISCONNECTED_LOGO_DEFAULT_PATH:
+        DISCONNECTED_LOGO_DEFAULT_PATH = img_path
 
 SUDO_PASS_FAIL = 'sudo_pass_fail'
 CONNECTING = 'connecting'

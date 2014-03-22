@@ -1,5 +1,6 @@
 from constants import *
 from profile import Profile
+import utils
 import threading
 import pygtk
 pygtk.require('2.0')
@@ -19,7 +20,7 @@ class Interface:
     def __init__(self):
         if HAS_APPINDICATOR:
             self.icon = appindicator.Indicator('pritunl_client',
-                DISCONNECTED_LOGO,
+                utils.get_disconnected_logo(),
                 appindicator.CATEGORY_APPLICATION_STATUS)
             self.icon.set_status(appindicator.STATUS_ACTIVE)
             self.update_menu()
@@ -37,15 +38,13 @@ class Interface:
 
         self.icon_state = state
         if HAS_APPINDICATOR:
-            if state:
-                self.icon.set_icon(CONNECTED_LOGO)
-            else:
-                self.icon.set_icon(DISCONNECTED_LOGO)
+            set_icon = self.icon.set_icon
         else:
-            if state:
-                self.icon.set_from_file(CONNECTED_LOGO)
-            else:
-                self.icon.set_from_file(DISCONNECTED_LOGO)
+            set_icon = self.icon.set_from_file
+        if state:
+            set_icon(utils.get_connected_logo())
+        else:
+            set_icon(utils.get_disconnected_logo())
 
     def get_icon_state(self):
         return self.icon_state
@@ -278,6 +277,9 @@ class Interface:
         if HAS_APPINDICATOR:
             self.icon.set_menu(self._build_menu())
 
+    def update_icon(self):
+        self._cur_icon_path = ''
+
     def show_about(self, widget, data=None):
         import pritunl_client
         dialog = gtk.MessageDialog(buttons=gtk.BUTTONS_OK)
@@ -286,7 +288,10 @@ class Interface:
             'Copyright (c) 2013 Zachary Huff\n\n' +
             'http://pritunl.com/') % pritunl_client.__version__)
 
-        image = gtk.image_new_from_file(LOGO)
+        pix_buf = gtk.gdk.pixbuf_new_from_file(utils.get_logo())
+        pix_buf = pix_buf.scale_simple(90, 90, gtk.gdk.INTERP_BILINEAR)
+        image = gtk.Image()
+        image.set_from_pixbuf(pix_buf)
         image.show()
         dialog.set_image(image)
 

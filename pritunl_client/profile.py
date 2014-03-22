@@ -104,8 +104,7 @@ class Profile:
 
     def start(self, status_callback, connect_callback=None):
         if self.status not in (DISCONNECTED, ENDED):
-            # TODO
-            print 'INVALID STATE'
+            self._set_status(self.status)
             return
         self._start(status_callback, connect_callback)
 

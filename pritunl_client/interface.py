@@ -85,6 +85,9 @@ class Interface:
 
     def on_connect_profile(self, widget, profile_id):
         profile = Profile.get_profile(profile_id)
+        if profile.status not in (DISCONNECTED, ENDED):
+            return
+
         dialog = gtk.MessageDialog(
             type=gtk.MESSAGE_QUESTION,
             buttons=gtk.BUTTONS_CANCEL,

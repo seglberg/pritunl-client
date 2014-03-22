@@ -18,7 +18,6 @@ class ProfileLinux(Profile):
             'process': None,
             'status_callback': status_callback,
             'connect_callback': connect_callback,
-            'state': False,
         }
         _connections[self.id] = data
 
@@ -34,7 +33,7 @@ class ProfileLinux(Profile):
 
         def connect_thread():
             time.sleep(CONNECT_TIMEOUT)
-            if data.get('state'):
+            if not data.get('connect_callback'):
                 return
             self.stop()
 

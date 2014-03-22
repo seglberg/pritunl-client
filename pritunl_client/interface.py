@@ -356,12 +356,8 @@ class Interface:
         for profile in Profile.iter_profiles():
             if not profile.autostart:
                 continue
-            def connect_callback():
-                if profile.status == DISCONNECTED:
-                    self.show_connect_error(profile)
-
             threading.Thread(target=profile.start_autostart,
-                args=(self.on_status_change, connect_callback)).start()
+                args=(self.on_status_change,)).start()
 
     def destroy(self, widget):
         self.icon.set_visible(False)

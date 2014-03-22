@@ -93,7 +93,6 @@ class Profile:
         if not data:
             return
         data['status'] = status
-        data['state'] = True
         callback = data.get('connect_callback')
         if callback:
             data['connect_callback'] = None

@@ -67,6 +67,7 @@ class ProfileLinux(Profile):
                 data['connect_callback'] = None
                 self._start(status_callback, connect_callback, mode,
                     retry=False)
+                return
             else:
                 self._set_status(DISCONNECTED)
 
@@ -77,19 +78,32 @@ class ProfileLinux(Profile):
     def _start_autostart(self, status_callback, connect_callback):
         self._start(status_callback, connect_callback, AUTOSTART)
 
-    def _stop(self):
+    def _stop(self, retry=True):
         data = _connections.get(self.id)
         if data:
             process = data.get('process')
             if process:
-                stop_cmd = ['pkexec', '/usr/bin/pritunl_client_pk',
-                    'stop', str(process.pid)]
-                subprocess.check_call(stop_cmd)
-                for i in xrange(int(5 / 0.1)):
-                    time.sleep(0.1)
-                    if process.poll() is not None:
-                        return
-                    subprocess.check_call(stop_cmd)
+                stop_process = subprocess.Popen(['pkexec',
+                    '/usr/bin/pritunl_client_pk', 'stop', str(process.pid)],
+                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                stop_process.wait()
+
+                # Canceled
+                if stop_process.returncode == 126:
+                    return
+                # Random error, retry
+                elif stop_process.returncode == -15 and retry:
+                    self._stop(retry=False)
+                    return
+                elif stop_process.returncode != 0:
+                    raise ProcessCallError(
+                        'Pritunl polkit process returned error %s.' % (
+                            stop_process.returncode))
+                else:
+                    for i in xrange(int(3 / 0.1)):
+                        time.sleep(0.1)
+                        if process.poll() is not None:
+                            data['process'] = None
 
         self._set_status(ENDED)
 
@@ -105,6 +119,7 @@ class ProfileLinux(Profile):
         # Random error, retry
         elif process.returncode == -15 and retry:
             self._copy_profile_autostart(retry=False)
+            return
         elif process.returncode != 0:
             raise ProcessCallError(
                 'Pritunl polkit process returned error %s.' % (
@@ -122,6 +137,7 @@ class ProfileLinux(Profile):
         # Random error, retry
         elif process.returncode == -15 and retry:
             self._remove_profile_autostart(retry=False)
+            return
         elif process.returncode != 0:
             raise ProcessCallError(
                 'Pritunl polkit process returned error %s.' % (

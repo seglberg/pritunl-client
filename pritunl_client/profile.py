@@ -71,8 +71,10 @@ class Profile:
 
     def _parse_profile(self, data):
         conf_str = data.splitlines()[0].replace('#', '', 1).strip()
+        profile_data = data
         try:
             conf_data = json.loads(conf_str)
+            profile_data = '\n'.join(profile_data.splitlines()[1:])
         except ValueError:
             conf_data = {}
         return conf_data, profile_data

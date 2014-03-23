@@ -141,13 +141,11 @@ class ProfileLinux(Profile):
                 'Pritunl polkit process returned error %s.' % (
                     process.returncode))
 
-    def write(self, data, *args, **kwargs):
-        Profile.write(self, data, *args, **kwargs)
-        conf_data = self._parse_conf(data)
+    def commit(self):
+        Profile.commit(self)
         # TODO check for autostart_path on load
-        if os.path.exists(self.autostart_path) != conf_data.get(
-                'autostart', False):
-            if conf_data.get('autostart'):
+        if os.path.exists(self.autostart_path) != self.autostart:
+            if self.autostart:
                 self._copy_profile_autostart()
             else:
                 self._remove_profile_autostart()

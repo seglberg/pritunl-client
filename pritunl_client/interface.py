@@ -327,7 +327,7 @@ class Interface:
             profile_path = dialog.get_filename()
             with open(profile_path, 'r') as profile_file:
                 profile = Profile.get_profile()
-                profile.write(profile_file.read())
+                profile.write_profile(profile_file.read())
                 self.update_menu()
         dialog.destroy()
 

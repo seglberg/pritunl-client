@@ -26,14 +26,20 @@ class Profile:
             os.makedirs(PROFILES_DIR)
 
         self.path = os.path.join(PROFILES_DIR, '%s.ovpn' % self.id)
+        self.conf_path = os.path.join(PROFILES_DIR, '%s.conf' % self.id)
 
         if id:
             self.load()
 
     def __getattr__(self, name):
         if name == 'name':
-            return self.profile_name or '%s@%s (%s)' % (
-                self.user_name, self.org_name, self.server_name)
+            if self.profile_name:
+                return self.profile_name
+            elif self.user_name and self.org_name and self.server_name:
+                return '%s@%s (%s)' % (self.user_name, self.org_name,
+                    self.server_name)
+            else:
+                return 'Unknown Profile'
         elif name == 'status':
             connection_data = _connections.get(self.id)
             if connection_data:
@@ -43,50 +49,60 @@ class Profile:
             raise AttributeError('Config instance has no attribute %r' % name)
         return self.__dict__[name]
 
-    def _parse_conf(self, data):
+    def load(self):
+        if os.path.exists(self.conf_path):
+            with open(self.conf_path, 'r') as conf_file:
+                data = json.loads(conf_file.read())
+                self.profile_name = data.get('name')
+                self.user_name = data.get('user')
+                self.org_name = data.get('organization')
+                self.server_name = data.get('server')
+                self.autostart = data.get('autostart') or False
+
+    def commit(self):
+        with open(self.conf_path, 'w') as conf_file:
+            conf_file.write(json.dumps({
+                'name': self.profile_name,
+                'user': self.user_name,
+                'organization': self.org_name,
+                'server': self.server_name,
+                'autostart': self.autostart,
+            }))
+
+    def _parse_profile(self, data):
         conf_str = data.splitlines()[0].replace('#', '', 1).strip()
         try:
             conf_data = json.loads(conf_str)
         except ValueError:
             conf_data = {}
-        return conf_data
+        return conf_data, profile_data
 
-    def load(self):
-        with open(self.path, 'r') as profile_file:
-            data = profile_file.read()
-            conf_data = self._parse_conf(data)
-            self.profile_name = conf_data.get('name')
-            self.user_name = conf_data.get('user')
-            self.org_name = conf_data.get('organization')
-            self.server_name = conf_data.get('server')
-            self.autostart = conf_data.get('autostart') or False
-
-    def write(self, data, default_name='Unknown Profile'):
-        conf_data = self._parse_conf(data)
-        if not conf_data:
-            data = '# {"name": "%s"}\n' % default_name + data
+    def write_profile(self, data, default_name='Unknown Profile'):
+        conf_data, profile_data = self._parse_profile(data)
+        self.profile_name = conf_data.get('name')
+        self.user_name = conf_data.get('user')
+        self.org_name = conf_data.get('organization')
+        self.server_name = conf_data.get('server')
+        self.autostart = conf_data.get('autostart') or False
+        self.commit()
         with open(self.path, 'w') as profile_file:
             os.chmod(self.path, 0600)
-            profile_file.write(data)
-
-    def _set_conf(self, name, value):
-        with open(self.path, 'r') as profile_file:
-            data = profile_file.read()
-            conf_data = self._parse_conf(data)
-            if conf_data:
-                data = '\n'.join(data.splitlines()[1:])
-            conf_data[name] = value
-        data = '# %s\n' % json.dumps(conf_data) + data
-        self.write(data)
+            profile_file.write(profile_data)
 
     def set_name(self, name):
-        self._set_conf('name', name)
+        self.profile_name = name
+        self.commit()
 
     def set_autostart(self, state):
-        self._set_conf('autostart', state)
+        self.autostart = state
+        self.commit()
 
     def delete(self):
-        os.remove(self.path)
+        self.stop()
+        if os.path.exists(self.path):
+            os.remove(self.path)
+        if os.path.exists(self.conf_path):
+            os.remove(self.conf_path)
 
     def _set_status(self, status):
         data = _connections.get(self.id)
@@ -125,9 +141,10 @@ class Profile:
     @classmethod
     def iter_profiles(cls):
         if os.path.isdir(PROFILES_DIR):
-            for profile_id in os.listdir(PROFILES_DIR):
-                profile_id = profile_id.replace('.ovpn', '')
-                yield cls.get_profile(profile_id)
+            for profile_path in os.listdir(PROFILES_DIR):
+                profile_id, extension = os.path.splitext(profile_path)
+                if extension == '.ovpn':
+                    yield cls.get_profile(profile_id)
 
     @classmethod
     def get_profile(cls, id=None):

@@ -41,12 +41,12 @@ def pk():
             if not re.search(regex_etc, cmdline) and \
                     not re.search(regex_home, cmdline):
                 raise ValueError('Not a pritunl client process')
-        os.kill(int(sys.argv[2]), os.SIGTERM)
+        os.kill(int(sys.argv[2]), signal.SIGTERM)
         for i in xrange(int(5 / 0.1)):
             time.sleep(0.1)
             if not os.path.exists('/proc/%s' % int(sys.argv[2])):
                 break
-            os.kill(int(sys.argv[2]), os.SIGTERM)
+            os.kill(int(sys.argv[2]), signal.SIGTERM)
     elif sys.argv[1] == 'copy':
         regex = r'(?:/pritunl_client/profiles/[a-z0-9]+\.ovpn)$'
         if not re.search(regex, sys.argv[2]):

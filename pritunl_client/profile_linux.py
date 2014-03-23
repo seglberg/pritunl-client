@@ -5,17 +5,25 @@ import os
 import time
 import subprocess
 import threading
+import hashlib
 
 class ProfileLinux(Profile):
     def __init__(self, *args, **kwargs):
         Profile.__init__(self, *args, **kwargs)
-        self.autostart_path = os.path.join(LINUX_ETC_DIR, '%s.ovpn' % self.id)
+
+    def _get_profile_hash(self):
+        with open(self.path, 'r') as profile_file:
+            return hashlib.sha1(profile_file.read()).hexdigest()
+
+    def _get_profile_hash_path(self):
+        profile_hash = self._get_profile_hash()
+        return os.path.join(os.path.abspath(os.sep),
+            'etc', 'pritunl_client', profile_hash)
 
     def _start(self, status_callback, connect_callback, mode=START,
             retry=True):
         if mode == AUTOSTART:
-            path = self.autostart_path
-            if not os.path.exists(path):
+            if not os.path.exists(self._get_profile_hash_path()):
                 self.set_autostart(False)
                 return
         else:
@@ -30,7 +38,7 @@ class ProfileLinux(Profile):
         _connections[self.id] = data
 
         process = subprocess.Popen([
-            'pkexec', '/usr/bin/pritunl_client_pk', mode, path],
+            'pkexec', '/usr/bin/pritunl_client_pk', mode, self.path],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         data['process'] = process
 
@@ -105,9 +113,9 @@ class ProfileLinux(Profile):
             data['process'] = None
         self._set_status(ENDED)
 
-    def _copy_profile_autostart(self, retry=True):
-        process = subprocess.Popen([
-            'pkexec', '/usr/bin/pritunl_client_pk', 'copy', self.path],
+    def _set_profile_autostart(self, retry=True):
+        process = subprocess.Popen(['pkexec',
+            '/usr/bin/pritunl_client_pk', 'set_autostart', self.path],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         process.wait()
 
@@ -123,10 +131,11 @@ class ProfileLinux(Profile):
                 'Pritunl polkit process returned error %s.' % (
                     process.returncode))
 
-    def _remove_profile_autostart(self, retry=True):
+    def _clear_profile_autostart(self, retry=True):
         process = subprocess.Popen(['pkexec',
-            '/usr/bin/pritunl_client_pk', 'remove', self.autostart_path],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            '/usr/bin/pritunl_client_pk', 'clear_autostart',
+            self._get_profile_hash()], stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
         process.wait()
 
         # Canceled
@@ -143,14 +152,13 @@ class ProfileLinux(Profile):
 
     def commit(self):
         Profile.commit(self)
-        # TODO check for autostart_path on load
-        if os.path.exists(self.autostart_path) != self.autostart:
+        if os.path.exists(self._get_profile_hash_path()) != self.autostart:
             if self.autostart:
-                self._copy_profile_autostart()
+                self._set_profile_autostart()
             else:
-                self._remove_profile_autostart()
+                self._clear_profile_autostart()
 
     def delete(self):
-        if os.path.exists(self.autostart_path):
-            self._remove_profile_autostart()
+        if os.path.exists(self._get_profile_hash_path()):
+            self._clear_profile_autostart()
         Profile.delete(self)

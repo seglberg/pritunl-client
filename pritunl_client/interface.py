@@ -181,13 +181,6 @@ class Interface:
         profiles_menu = gtk.Menu()
         conn_active = True
 
-        menu_item = gtk.MenuItem('Toggle Profile Connections')
-        menu_item.set_sensitive(False)
-        profiles_menu.append(menu_item)
-
-        menu_item = gtk.SeparatorMenuItem()
-        profiles_menu.append(menu_item)
-
         for profile in Profile.iter_profiles():
             active = False
 
@@ -230,7 +223,7 @@ class Interface:
             menu_item.set_sensitive(False)
             menu.append(menu_item)
 
-        if len(profiles_menu) == 2:
+        if not len(profiles_menu):
             menu_item = gtk.MenuItem('No Profiles Available')
             menu_item.set_sensitive(False)
             profiles_menu.append(menu_item)

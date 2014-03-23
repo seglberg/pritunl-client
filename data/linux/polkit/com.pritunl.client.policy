@@ -43,8 +43,8 @@
     <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
   </action>
 
-  <action id="com.pritunl.client.copy">
-    <description>Autostart pritunl connection</description>
+  <action id="com.pritunl.client.set_autostart">
+    <description>Enable autostart pritunl connection</description>
     <message>Authentication is required to modify a pritunl connection</message>
     <defaults>
       <allow_any>auth_admin</allow_any>
@@ -52,11 +52,11 @@
       <allow_active>auth_admin</allow_active>
     </defaults>
     <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/pritunl_client_pk</annotate>
-    <annotate key="org.freedesktop.policykit.exec.argv1">copy</annotate>
+    <annotate key="org.freedesktop.policykit.exec.argv1">set_autostart</annotate>
     <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
   </action>
 
-  <action id="com.pritunl.client.remove">
+  <action id="com.pritunl.client.clear_autostart">
     <description>Disable autostart pritunl connection</description>
     <message>Authentication is required to modify a pritunl connection</message>
     <defaults>
@@ -65,7 +65,7 @@
       <allow_active>auth_admin</allow_active>
     </defaults>
     <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/pritunl_client_pk</annotate>
-    <annotate key="org.freedesktop.policykit.exec.argv1">remove</annotate>
+    <annotate key="org.freedesktop.policykit.exec.argv1">clear_autostart</annotate>
     <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
   </action>
 </policyconfig>

@@ -82,7 +82,7 @@ class ProfileLinux(Profile):
         data = _connections.get(self.id)
         if data:
             process = data.get('process')
-            if process and process.poll():
+            if process and not process.poll():
                 stop_process = subprocess.Popen(['pkexec',
                     '/usr/bin/pritunl_client_pk', 'stop', str(process.pid)],
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)

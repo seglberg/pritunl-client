@@ -81,15 +81,15 @@ class Profile:
 
     def write_profile(self, data, default_name='Unknown Profile'):
         conf_data, profile_data = self._parse_profile(data)
+        with open(self.path, 'w') as profile_file:
+            os.chmod(self.path, 0600)
+            profile_file.write(profile_data)
         self.profile_name = conf_data.get('name')
         self.user_name = conf_data.get('user')
         self.org_name = conf_data.get('organization')
         self.server_name = conf_data.get('server')
         self.autostart = conf_data.get('autostart') or False
         self.commit()
-        with open(self.path, 'w') as profile_file:
-            os.chmod(self.path, 0600)
-            profile_file.write(profile_data)
 
     def set_name(self, name):
         self.profile_name = name

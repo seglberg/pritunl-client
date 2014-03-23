@@ -82,7 +82,7 @@ class ProfileLinux(Profile):
         data = _connections.get(self.id)
         if data:
             process = data.get('process')
-            if process:
+            if process and process.poll():
                 stop_process = subprocess.Popen(['pkexec',
                     '/usr/bin/pritunl_client_pk', 'stop', str(process.pid)],
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -99,12 +99,7 @@ class ProfileLinux(Profile):
                     raise ProcessCallError(
                         'Pritunl polkit process returned error %s.' % (
                             stop_process.returncode))
-                else:
-                    for i in xrange(int(3 / 0.1)):
-                        time.sleep(0.1)
-                        if process.poll() is not None:
-                            data['process'] = None
-
+            data['process'] = None
         self._set_status(ENDED)
 
     def _copy_profile_autostart(self, retry=True):

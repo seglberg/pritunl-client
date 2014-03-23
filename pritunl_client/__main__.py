@@ -5,6 +5,7 @@ import re
 import subprocess
 import signal
 import time
+import hashlib
 
 def client():
     import pritunl_client.interface
@@ -21,12 +22,16 @@ def client():
 
 def pk():
     if sys.argv[1] in ('start', 'autostart'):
-        regex_etc = r'^/etc/pritunl_client/[a-z0-9]+.ovpn$'
-        regex_home = r'(?:/pritunl_client/profiles/[a-z0-9]+\.ovpn)$'
-        if sys.argv[1] == 'autostart' and not re.match(regex_etc, sys.argv[2]):
-            raise ValueError('Autostart profile must be in etc directory')
-        if sys.argv[1] == 'start' and not re.search(regex_home, sys.argv[2]):
+        regex = r'(?:/pritunl_client/profiles/[a-z0-9]+\.ovpn)$'
+        if not re.search(regex, sys.argv[2]):
             raise ValueError('Profile must be in home directory')
+        if sys.argv[1] == 'autostart':
+            with open(sys.argv[2], 'r') as profile_file:
+                profile_hash = hashlib.sha1(profile_file.read()).hexdigest()
+            profile_hash_path = os.path.join(os.path.abspath(os.sep),
+                'etc', 'pritunl_client', profile_hash)
+            if not os.path.exists(profile_hash_path):
+                raise ValueError('Profile not authorized to autostart')
         process = subprocess.Popen(['openvpn', sys.argv[2]])
         def sig_handler(signum, frame):
             process.send_signal(signum)
@@ -34,12 +39,10 @@ def pk():
         signal.signal(signal.SIGTERM, sig_handler)
         sys.exit(process.wait())
     elif sys.argv[1] == 'stop':
-        regex_etc = r'(?:/etc/pritunl_client/[a-z0-9]+.ovpn)$'
-        regex_home = r'(?:/pritunl_client/profiles/[a-z0-9]+\.ovpn)$'
+        regex = r'(?:/pritunl_client/profiles/[a-z0-9]+\.ovpn)$'
         with open('/proc/%s/cmdline' % int(sys.argv[2]), 'r') as cmdline_file:
             cmdline = cmdline_file.read().strip().strip('\x00')
-            if not re.search(regex_etc, cmdline) and \
-                    not re.search(regex_home, cmdline):
+            if not re.search(regex, cmdline):
                 raise ValueError('Not a pritunl client process')
         os.kill(int(sys.argv[2]), signal.SIGTERM)
         for i in xrange(int(5 / 0.1)):
@@ -47,14 +50,18 @@ def pk():
             if not os.path.exists('/proc/%s' % int(sys.argv[2])):
                 break
             os.kill(int(sys.argv[2]), signal.SIGTERM)
-    elif sys.argv[1] == 'copy':
+    elif sys.argv[1] == 'set_autostart':
         regex = r'(?:/pritunl_client/profiles/[a-z0-9]+\.ovpn)$'
         if not re.search(regex, sys.argv[2]):
             raise ValueError('Profile must be in home directory')
-        subprocess.check_call(['cp', '--preserve=mode', sys.argv[2],
-            os.path.join(os.path.abspath(os.sep), 'etc', 'pritunl_client')])
-    elif sys.argv[1] == 'remove':
-        regex = r'^/etc/pritunl_client/[a-z0-9]+.ovpn$'
-        if not re.match(regex, sys.argv[2]):
-            raise ValueError('Profile must be in etc directory')
-        subprocess.check_call(['rm', sys.argv[2]])
+        with open(sys.argv[2], 'r') as profile_file:
+            profile_hash = hashlib.sha1(profile_file.read()).hexdigest()
+        profile_hash_path = os.path.join(os.path.abspath(os.sep),
+            'etc', 'pritunl_client', profile_hash)
+        with open(profile_hash_path, 'w') as profile_hash_file:
+            pass
+    elif sys.argv[1] == 'clear_autostart':
+        profile_hash_path = os.path.join(os.path.abspath(os.sep),
+            'etc', 'pritunl_client', sys.argv[2])
+        if os.path.exists(profile_hash_path):
+            os.remove(profile_hash_path)

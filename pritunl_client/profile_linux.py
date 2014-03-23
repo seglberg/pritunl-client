@@ -26,8 +26,6 @@ class ProfileLinux(Profile):
             if not os.path.exists(self._get_profile_hash_path()):
                 self.set_autostart(False)
                 return
-        else:
-            path = self.path
 
         data = {
             'status': CONNECTING,

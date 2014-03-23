@@ -51,6 +51,8 @@ class ProfileLinux(Profile):
 
         def poll_thread():
             started = False
+            with open(self.log_path, 'w') as log_file:
+                pass
             while True:
                 line = process.stdout.readline()
                 if not line:
@@ -58,8 +60,8 @@ class ProfileLinux(Profile):
                         break
                     else:
                         continue
-                # TODO log
-                print line.strip()
+                with open(self.log_path, 'a') as log_file:
+                    log_file.write(line)
                 if not started:
                     started = True
                     thread = threading.Thread(target=connect_thread)

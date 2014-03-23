@@ -27,6 +27,7 @@ class Profile:
 
         self.path = os.path.join(PROFILES_DIR, '%s.ovpn' % self.id)
         self.conf_path = os.path.join(PROFILES_DIR, '%s.conf' % self.id)
+        self.log_path = os.path.join(PROFILES_DIR, '%s.log' % self.id)
 
         if id:
             self.load()
@@ -105,6 +106,8 @@ class Profile:
             os.remove(self.path)
         if os.path.exists(self.conf_path):
             os.remove(self.conf_path)
+        if os.path.exists(self.log_path):
+            os.remove(self.log_path)
 
     def _set_status(self, status):
         data = _connections.get(self.id)

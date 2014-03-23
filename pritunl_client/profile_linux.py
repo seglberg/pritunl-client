@@ -13,6 +13,14 @@ class ProfileLinux(Profile):
 
     def _start(self, status_callback, connect_callback, mode=START,
             retry=True):
+        if mode == AUTOSTART:
+            path = self.autostart_path
+            if not os.path.exists(path):
+                self.set_autostart(False)
+                return
+        else:
+            path = self.path
+
         data = {
             'status': CONNECTING,
             'process': None,
@@ -20,11 +28,6 @@ class ProfileLinux(Profile):
             'connect_callback': connect_callback,
         }
         _connections[self.id] = data
-
-        if mode == AUTOSTART:
-            path = self.autostart_path
-        else:
-            path = self.path
 
         process = subprocess.Popen([
             'pkexec', '/usr/bin/pritunl_client_pk', mode, path],

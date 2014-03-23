@@ -173,7 +173,8 @@ class Interface:
         profile.set_autostart(False)
 
     def on_disconnect_all(self, widget):
-        pass
+        for profile in Profile.iter_profiles():
+            profile.stop()
 
     def _build_menu(self):
         menu = gtk.Menu()

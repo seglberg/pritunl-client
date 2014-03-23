@@ -22,10 +22,13 @@ class ProfileLinux(Profile):
 
     def _start(self, status_callback, connect_callback, mode=START,
             retry=True):
-        if mode == AUTOSTART:
+        if self.autostart or mode == AUTOSTART:
             if not os.path.exists(self._get_profile_hash_path()):
                 self.set_autostart(False)
-                return
+                if mode == AUTOSTART:
+                    return
+            else:
+                mode = AUTOSTART
 
         data = {
             'status': CONNECTING,

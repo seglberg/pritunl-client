@@ -27,6 +27,7 @@ class App:
     def update_menu(self):
         self.update_icon()
         menu = interface.Menu()
+        # TODO move profiles to main menu
         profiles_menu = interface.Menu()
         profiles_menu.set_label('Profiles')
         conn_active = False

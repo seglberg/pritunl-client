@@ -3,6 +3,9 @@ import uuid
 import sys
 import pkg_resources
 
+APP_NAME = 'pritunl_client'
+APP_NAME_FORMATED = 'Pritunl Client'
+
 LINUX = 'linux'
 WIN = 'win'
 OSX = 'osx'
@@ -16,9 +19,9 @@ elif sys.platform == 'darwin':
 else:
     raise ValueError('Unknown platform %s' % sys.platform)
 
-CONF_DIR = os.path.expanduser(os.path.join('~', '.config', 'pritunl_client'))
+CONF_DIR = os.path.expanduser(os.path.join('~', '.config', APP_NAME))
 PROFILES_DIR = os.path.join(CONF_DIR, 'profiles')
-LINUX_ETC_DIR = os.path.join(os.path.abspath(os.sep), 'etc', 'pritunl_client')
+LINUX_ETC_DIR = os.path.join(os.path.abspath(os.sep), 'etc', APP_NAME)
 TMP_DIR = os.path.join(os.path.abspath(os.sep), 'tmp')
 SOCK_PATH = os.path.join(TMP_DIR, 'pritunl_%s.sock' % uuid.uuid4().hex)
 CONNECT_TIMEOUT = 30
@@ -30,7 +33,7 @@ LOGO_DEFAULT_PATH = None
 CONNECTED_LOGO_DEFAULT_PATH = None
 DISCONNECTED_LOGO_DEFAULT_PATH = None
 IMG_ROOTS = [
-    os.path.join(os.path.abspath(os.sep), 'usr', 'share', 'pritunl_client'),
+    os.path.join(os.path.abspath(os.sep), 'usr', 'share', APP_NAME),
     os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), 'img'),
 ]
 

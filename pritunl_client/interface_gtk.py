@@ -21,6 +21,12 @@ _mappings = {
     MESSAGE_LOADING: gtk.MESSAGE_INFO,
 }
 
+def lookup_icon(name):
+    icons = gtk.icon_theme_get_default()
+    logo = icons.lookup_icon(name, -1, 0)
+    if logo:
+        return logo.get_filename()
+
 def add_idle_call(call):
     gobject.idle_add(call)
 

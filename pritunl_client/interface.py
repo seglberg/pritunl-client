@@ -65,6 +65,9 @@ class Interface:
         dialog.format_secondary_markup(
             'An error occurred while connecting to server')
         dialog.set_title('Pritunl - Connection Error')
+        dialog.set_skip_taskbar_hint(False)
+        dialog.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
+        dialog.set_icon_from_file(utils.get_logo())
         dialog.show_all()
 
         dialog.run()
@@ -93,6 +96,9 @@ class Interface:
             buttons=gtk.BUTTONS_CANCEL,
             message_format='Connecting to %s' % profile.server_name)
         dialog.format_secondary_markup('Conecting to the server...')
+        dialog.set_skip_taskbar_hint(False)
+        dialog.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
+        dialog.set_icon_from_file(utils.get_logo())
         dialog.set_title('Pritunl - Connecting...')
 
         spinner = gtk.Spinner()
@@ -128,6 +134,9 @@ class Interface:
             message_format='Rename Profile')
         dialog.format_secondary_markup('Enter new name for profile %s' % (
             profile.name))
+        dialog.set_skip_taskbar_hint(False)
+        dialog.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
+        dialog.set_icon_from_file(utils.get_logo())
         dialog.set_title('Pritunl - Rename Profile')
 
         entry = gtk.Entry()
@@ -155,6 +164,9 @@ class Interface:
             message_format='Delete profile')
         dialog.format_secondary_markup(
             'Are you sure you want to delete the profile %s' % profile.name)
+        dialog.set_skip_taskbar_hint(False)
+        dialog.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
+        dialog.set_icon_from_file(utils.get_logo())
         dialog.set_title('Pritunl - Delete Profile')
         dialog.show_all()
 
@@ -286,11 +298,16 @@ class Interface:
 
     def show_about(self, widget, data=None):
         import pritunl_client
-        dialog = gtk.MessageDialog(buttons=gtk.BUTTONS_OK)
+        dialog = gtk.MessageDialog(parent=gtk.Window(),
+            buttons=gtk.BUTTONS_OK)
+        dialog.set_skip_taskbar_hint(False)
+        dialog.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
+        dialog.set_icon_from_file(utils.get_logo())
         dialog.set_title('Pritunl - About')
         dialog.set_markup(('<b>Pritunl Client - v%s</b>\n\n' +
             'Copyright (c) 2013 Zachary Huff\n\n' +
             'http://pritunl.com/') % pritunl_client.__version__)
+        dialog.set_icon_from_file(utils.get_logo())
 
         pix_buf = gtk.gdk.pixbuf_new_from_file(utils.get_logo())
         pix_buf = pix_buf.scale_simple(90, 90, gtk.gdk.INTERP_BILINEAR)
@@ -306,6 +323,9 @@ class Interface:
         dialog = gtk.FileChooserDialog('Select profile to import...',
             buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
                 gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+        dialog.set_skip_taskbar_hint(False)
+        dialog.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
+        dialog.set_icon_from_file(utils.get_logo())
         dialog.set_title('Pritunl - Import Profile')
 
         profile_filter = gtk.FileFilter()
@@ -330,6 +350,9 @@ class Interface:
             buttons=gtk.BUTTONS_OK_CANCEL,
             message_format='Import Profile URI')
         dialog.format_secondary_markup('Enter profile URI to import...')
+        dialog.set_skip_taskbar_hint(False)
+        dialog.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
+        dialog.set_icon_from_file(utils.get_logo())
         dialog.set_title('Pritunl - Import Profile URI')
 
         entry = gtk.Entry()

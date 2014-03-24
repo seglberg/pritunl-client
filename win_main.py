@@ -1,7 +1,7 @@
 import optparse
 import sys
 import os
-import pritunl_client.interface
+import pritunl_client.app
 
 parser = optparse.OptionParser()
 parser.add_option('--version', action='store_true', help='Print version')
@@ -11,5 +11,5 @@ if options.version:
     print '%s v%s' % (pritunl.__title__, pritunl.__version__)
     sys.exit(0)
 
-interface = pritunl_client.interface.Interface()
-interface.main()
+app = pritunl_client.app.App()
+app.main()

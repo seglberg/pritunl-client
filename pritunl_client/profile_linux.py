@@ -124,15 +124,15 @@ class ProfileLinux(Profile):
 
         # Canceled
         if process.returncode == 126:
-            return
+            return False
         # Random error, retry
         elif process.returncode == -15 and retry:
-            self._copy_profile_autostart(retry=False)
-            return
+            return self._set_profile_autostart(retry=False)
         elif process.returncode != 0:
             raise ProcessCallError(
                 'Pritunl polkit process returned error %s.' % (
                     process.returncode))
+        return True
 
     def _clear_profile_autostart(self, retry=True):
         process = subprocess.Popen(['pkexec',
@@ -143,26 +143,28 @@ class ProfileLinux(Profile):
 
         # Canceled
         if process.returncode == 126:
-            return
+            return False
         # Random error, retry
         elif process.returncode == -15 and retry:
-            self._remove_profile_autostart(retry=False)
-            return
+            return self._clear_profile_autostart(retry=False)
         elif process.returncode != 0:
             raise ProcessCallError(
                 'Pritunl polkit process returned error %s.' % (
                     process.returncode))
+        return True
 
     def commit(self):
-        Profile.commit(self)
         if os.path.exists(self._get_profile_hash_path()) != self.autostart:
             if self.autostart:
-                self._set_profile_autostart()
+                if not self._set_profile_autostart():
+                    return
             else:
-                self._clear_profile_autostart()
+                if not self._clear_profile_autostart():
+                    return
+        Profile.commit(self)
 
     def delete(self):
         if os.path.exists(self._get_profile_hash_path()):
-            # TODO stop delete when canceled
-            self._clear_profile_autostart()
+            if not self._clear_profile_autostart():
+                return
         Profile.delete(self)

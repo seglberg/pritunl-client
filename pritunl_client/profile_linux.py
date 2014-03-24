@@ -163,5 +163,6 @@ class ProfileLinux(Profile):
 
     def delete(self):
         if os.path.exists(self._get_profile_hash_path()):
+            # TODO stop delete when canceled
             self._clear_profile_autostart()
         Profile.delete(self)

@@ -1,10 +1,10 @@
 from constants import *
 from exceptions import *
+import interface
 import os
 import uuid
 import json
 import time
-import gobject
 
 _connections = {}
 
@@ -117,11 +117,11 @@ class Profile:
         callback = data.get('connect_callback')
         if callback:
             data['connect_callback'] = None
-            gobject.idle_add(callback)
+            interface.add_idle_call(callback)
 
         callback = data.get('status_callback')
         if callback:
-            gobject.idle_add(callback)
+            interface.add_idle_call(callback)
 
     def start(self, status_callback, connect_callback=None):
         if self.status not in (DISCONNECTED, ENDED):

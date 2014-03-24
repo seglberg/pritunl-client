@@ -1,4 +1,5 @@
 from constants import *
+import gobject
 import pygtk
 pygtk.require('2.0')
 import gtk
@@ -20,6 +21,9 @@ _mappings = {
     MESSAGE_LOADING: gtk.MESSAGE_INFO,
 }
 
+def add_idle_call(call):
+    gobject.idle_add(call)
+
 class MessageDialog:
     def __init__(self):
         self._dialog = None
@@ -28,6 +32,7 @@ class MessageDialog:
         self._title = None
         self._message = None
         self._message_secondary = None
+        self._image_path = None
         self._icon = None
 
     def _build_dialog(self):
@@ -53,6 +58,8 @@ class MessageDialog:
             self.set_message(self._message)
         if self._message_secondary:
             self.set_message_secondary(self._message_secondary)
+        if self._image_path:
+            self.set_image(self._image_path)
 
     def set_title(self, title):
         self._title = title
@@ -82,6 +89,19 @@ class MessageDialog:
         else:
             self._build_dialog()
 
+    def set_image(self, image_path):
+        self._image_path = image_path
+
+        if self._dialog:
+            pix_buf = gtk.gdk.pixbuf_new_from_file(image_path)
+            pix_buf = pix_buf.scale_simple(90, 90, gtk.gdk.INTERP_BILINEAR)
+            image = gtk.Image()
+            image.set_from_pixbuf(pix_buf)
+            image.show()
+            self._dialog.set_image(image)
+        else:
+            self._build_dialog()
+
     def set_type(self, type):
         self._type = type
         if not self._dialog:
@@ -97,7 +117,8 @@ class MessageDialog:
         response = self._dialog.run()
         if response == gtk.RESPONSE_OK:
             return True
-        return False
+        elif response == gtk.RESPONSE_CANCEL:
+            return False
 
     def destroy(self):
         self._dialog.destroy()
@@ -160,14 +181,15 @@ class FileChooserDialog:
     def add_filter(self, name, pattern):
         if name not in self._filters:
             self._filters[name] = gtk.FileFilter()
+            self._filters[name].set_name(name)
         self._filters[name].add_pattern(pattern)
 
     def run(self):
-        for file_filter in self._filters:
+        for file_filter in self._filters.values():
             self._dialog.add_filter(file_filter)
-        response = dialog.run()
+        response = self._dialog.run()
         if response == gtk.RESPONSE_OK:
-            response_path = dialog.get_filename()
+            response_path = self._dialog.get_filename()
             if response_path:
                 return response_path
 

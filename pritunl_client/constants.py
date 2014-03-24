@@ -69,3 +69,12 @@ ENDED = 'ended'
 
 START = 'start'
 AUTOSTART = 'autostart'
+
+BUTTONS_OK = 'buttons_ok'
+BUTTONS_CANCEL = 'buttons_cancel'
+BUTTONS_OK_CANCEL = 'buttons_ok_cancel'
+
+MESSAGE_INFO = 'message_info'
+MESSAGE_QUESTION = 'message_question'
+MESSAGE_ERROR = 'message_error'
+MESSAGE_LOADING = 'message_loading'

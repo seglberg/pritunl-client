@@ -2,6 +2,7 @@ from constants import *
 import wx
 import collections
 import time
+import sys
 
 _mappings = {
     BUTTONS_OK: wx.OK,
@@ -206,7 +207,6 @@ class MenuItem:
         root_menu.Bind(wx.EVT_MENU, self._on_activate, id=item_id)
 
     def _on_activate(self, event):
-        print 'test'
         if self._callback:
             if self._callback_data:
                 self._callback(self._callback_data)
@@ -308,5 +308,7 @@ class StatusIconApp:
         self._app.MainLoop()
 
     def destroy(self):
-        add_idle_call(self._icon.Destroy)
-        self._app.interupt = True
+        self._icon.RemoveIcon()
+        self._icon.Destroy()
+        self._app.Destroy()
+        sys.exit(0)

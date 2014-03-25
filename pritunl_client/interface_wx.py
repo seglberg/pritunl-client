@@ -202,9 +202,11 @@ class MenuItem:
         menu.Append(item_id, self._label, '')
         if not self._state:
             menu.Enable(item_id, False)
+        menu.Bind(wx.EVT_MENU, self._on_activate, id=item_id)
         root_menu.Bind(wx.EVT_MENU, self._on_activate, id=item_id)
 
     def _on_activate(self, event):
+        print 'test'
         if self._callback:
             if self._callback_data:
                 self._callback(self._callback_data)
@@ -239,6 +241,7 @@ class CheckMenuItem:
             menu.Enable(item_id, False)
         if self._active:
             menu.Check(item_id, True)
+        menu.Bind(wx.EVT_MENU, self._on_activate, id=item_id)
         root_menu.Bind(wx.EVT_MENU, self._on_activate, id=item_id)
 
     def _on_activate(self, event):

@@ -37,6 +37,7 @@ class ProfileLinux(Profile):
             'connect_callback': connect_callback,
         }
         _connections[self.id] = data
+        self._set_status(CONNECTING, connect_event=False)
 
         process = subprocess.Popen([
             'pkexec', '/usr/bin/pritunl_client_pk', mode, self.path],

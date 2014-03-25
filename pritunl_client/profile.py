@@ -109,15 +109,17 @@ class Profile:
         if os.path.exists(self.log_path):
             os.remove(self.log_path)
 
-    def _set_status(self, status):
+    def _set_status(self, status, connect_event=True):
         data = _connections.get(self.id)
         if not data:
             return
         data['status'] = status
-        callback = data.get('connect_callback')
-        if callback:
-            data['connect_callback'] = None
-            interface.add_idle_call(callback)
+
+        if connect_event:
+            callback = data.get('connect_callback')
+            if callback:
+                data['connect_callback'] = None
+                interface.add_idle_call(callback)
 
         callback = data.get('status_callback')
         if callback:

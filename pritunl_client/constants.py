@@ -45,7 +45,8 @@ elif PLATFORM == WIN:
     _CONNECTED_LOGO_NAME = 'logo_connected_win.png'
     _DISCONNECTED_LOGO_NAME = 'logo_disconnected_win.png'
 elif PLATFORM == OSX:
-    raise NotImplementedError('OSX not supported')
+    _CONNECTED_LOGO_NAME = 'logo_connected_osx.png'
+    _DISCONNECTED_LOGO_NAME = 'logo_disconnected_osx.png'
 else:
     raise NotImplementedError('Platform not supported')
 

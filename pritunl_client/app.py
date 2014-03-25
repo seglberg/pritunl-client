@@ -24,6 +24,9 @@ class App:
     def get_icon_state(self):
         return self._icon_state
 
+    def toggle_icon_state(self):
+        self.set_icon_state(not self.get_icon_state())
+
     def update_menu(self):
         self.update_icon()
         menu = interface.Menu()
@@ -108,6 +111,11 @@ class App:
         menu_item = interface.MenuItem()
         menu_item.set_label('Exit')
         menu_item.set_callback(self.icon.destroy)
+        menu.add_item(menu_item)
+
+        menu_item = interface.MenuItem()
+        menu_item.set_label('Toggle Icon State (Debug)')
+        menu_item.set_callback(self.toggle_icon_state)
         menu.add_item(menu_item)
 
         self.icon.set_menu(menu)

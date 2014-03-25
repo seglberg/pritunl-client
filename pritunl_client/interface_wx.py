@@ -178,7 +178,7 @@ class Menu:
         root_menu = root_menu or menu
         for menu_item in self._items:
             if isinstance(menu_item, Menu):
-                sub_menu = menu_item._build()
+                sub_menu = menu_item._build(root_menu)
                 menu.AppendMenu(wx.NewId(), menu_item._label, sub_menu, '')
             else:
                 menu_item._build(menu, root_menu)

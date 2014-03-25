@@ -173,14 +173,15 @@ class Menu:
         self._label = None
         self._items = []
 
-    def _build(self):
+    def _build(self, root_menu=None):
         menu = wx.Menu()
+        root_menu = root_menu or menu
         for menu_item in self._items:
             if isinstance(menu_item, Menu):
                 sub_menu = menu_item._build()
                 menu.AppendMenu(wx.NewId(), menu_item._label, sub_menu, '')
             else:
-                menu_item._build(menu)
+                menu_item._build(menu, root_menu)
         return menu
 
     def set_label(self, label):
@@ -196,14 +197,14 @@ class MenuItem:
         self._label = ''
         self._state = True
 
-    def _build(self, menu):
+    def _build(self, menu, root_menu):
         item_id = wx.NewId()
         menu.Append(item_id, self._label, '')
         if not self._state:
             menu.Enable(item_id, False)
-        menu.Bind(wx.EVT_MENU, self._on_activate, id=item_id)
+        root_menu.Bind(wx.EVT_MENU, self._on_activate, id=item_id)
 
-    def _on_activate(self, widget):
+    def _on_activate(self, event):
         if self._callback:
             if self._callback_data:
                 self._callback(self._callback_data)
@@ -231,23 +232,23 @@ class CheckMenuItem:
         self._state = True
         self._active = False
 
-    def _build(self, menu):
+    def _build(self, menu, root_menu):
         item_id = wx.NewId()
         menu.AppendCheckItem(item_id, self._label, '')
         if not self._state:
             menu.Enable(item_id, False)
         if self._active:
             menu.Check(item_id, True)
-        menu.Bind(wx.EVT_MENU, self._on_activate, id=item_id)
+        root_menu.Bind(wx.EVT_MENU, self._on_activate, id=item_id)
 
-    def _on_activate(self, widget):
+    def _on_activate(self, event):
         if self._callback:
             if self._callback_data:
                 self._callback(self._callback_data)
             else:
                 self._callback()
 
-    def _on_activate(self, widget):
+    def _on_activate(self, event):
         if self._callback:
             if self._callback_data:
                 self._callback(self._callback_data)
@@ -274,7 +275,7 @@ class SeparatorMenuItem:
     def __init__(self):
         pass
 
-    def _build(self, menu):
+    def _build(self, menu, root_menu):
         menu.AppendSeparator()
 
 class StatusIconApp:

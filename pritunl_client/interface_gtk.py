@@ -27,8 +27,8 @@ def lookup_icon(name):
     if logo:
         return logo.get_filename()
 
-def add_idle_call(call):
-    gobject.idle_add(call)
+def add_idle_call(call, *args):
+    gobject.idle_add(call, *args)
 
 class MessageDialog:
     def __init__(self):
@@ -210,12 +210,9 @@ class Menu:
     def set_label(self, label):
         self._label = label
 
-    def get_label(self):
-        return self._label
-
     def add_item(self, item):
         if isinstance(item, Menu):
-            sub_menu = gtk.MenuItem(item.get_label())
+            sub_menu = gtk.MenuItem(item._label)
             sub_menu.set_submenu(item._menu)
             self._menu.append(sub_menu)
         else:
@@ -237,9 +234,6 @@ class MenuItem:
 
     def set_label(self, label):
         self._menu_item.set_label(label)
-
-    def get_label(self):
-        return self._menu_item.get_label()
 
     def set_state(self, state):
         self._menu_item.set_sensitive(state)
@@ -264,9 +258,6 @@ class CheckMenuItem:
 
     def set_label(self, label):
         self._menu_item.set_label(label)
-
-    def get_label(self):
-        return self._menu_item.get_label()
 
     def set_state(self, state):
         self._menu_item.set_sensitive(state)

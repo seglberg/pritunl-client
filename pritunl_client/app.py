@@ -30,26 +30,18 @@ class App:
     def update_menu(self):
         self.update_icon()
         menu = interface.Menu()
-        # TODO move profiles to main menu
-        profiles_menu = interface.Menu()
-        profiles_menu.set_label('Profiles')
-        conn_active = False
         profile_count = 0
 
         for profile in Profile.iter_profiles():
             profile_count += 1
-            active = False
-
-            if profile.status in (CONNECTING, RECONNECTING, CONNECTED):
-                active = True
-                conn_active = True
-                menu_item = interface.MenuItem()
-                menu_item.set_label(
-                    profile.name + ' - %s' % profile.status.capitalize())
-                menu.add_item(menu_item)
+            active = profile.status in (CONNECTING, RECONNECTING, CONNECTED)
 
             profile_menu = interface.Menu()
-            profile_menu.set_label(profile.name)
+            if active:
+                profile_menu.set_label(
+                    profile.name + ' - %s' % profile.status.capitalize())
+            else:
+                profile_menu.set_label(profile.name)
 
             menu_item = interface.MenuItem()
             menu_item.set_label('Disconnect' if active else 'Connect')
@@ -74,24 +66,16 @@ class App:
                 profile.autostart else self.on_autostart_profile, profile.id)
             profile_menu.add_item(menu_item)
 
-            profiles_menu.add_item(profile_menu)
-
-        if not conn_active:
-            menu_item = interface.MenuItem()
-            menu_item.set_label('No Active Connections')
-            menu_item.set_state(False)
-            menu.add_item(menu_item)
-
-        menu_item = interface.SeparatorMenuItem()
-        menu.add_item(menu_item)
+            menu.add_item(profile_menu)
 
         if not profile_count:
             menu_item = interface.MenuItem()
             menu_item.set_label('No Profiles Available')
             menu_item.set_state(False)
-            profiles_menu.add_item(menu_item)
+            menu.add_item(menu_item)
 
-        menu.add_item(profiles_menu)
+        menu_item = interface.SeparatorMenuItem()
+        menu.add_item(menu_item)
 
         menu_item = interface.MenuItem()
         menu_item.set_label('Import Profile')

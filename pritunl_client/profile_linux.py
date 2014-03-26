@@ -20,7 +20,7 @@ class ProfileLinux(Profile):
         return os.path.join(os.path.abspath(os.sep),
             'etc', 'pritunl_client', profile_hash)
 
-    def _start(self, status_callback, connect_callback, mode=START,
+    def _start(self, status_callback, connect_callback, passwd, mode=START,
             retry=0):
         if self.autostart or mode == AUTOSTART:
             if not os.path.exists(self._get_profile_hash_path()):
@@ -41,18 +41,17 @@ class ProfileLinux(Profile):
         retry += 1
         self._set_status(CONNECTING, connect_event=False)
 
-        # TODO
-        if False:
-            data['passwd_path'] = os.path.join(os.path.abspath(os.sep), 'tmp',
-                'pritunl_%s' % uuid.uuid4().hex)
+        args = ['pkexec', '/usr/bin/pritunl_client_pk', mode, self.path]
 
-            with open(data['passwd_path'], 'w') as passwd_file:
-                os.chmod(passwd_path, 0600)
-                passwd_file.write('USERNAME\n')
-                passwd_file.write('PASSWORD\n')
+        if passwd:
+            with open(self.passwd_path, 'w') as passwd_file:
+                os.chmod(self.passwd_path, 0600)
+                passwd_file.write('pritunl_client\n')
+                passwd_file.write('%s\n' % passwd)
 
-        process = subprocess.Popen(['pkexec',
-            '/usr/bin/pritunl_client_pk', mode, self.path, passwd_path],
+            args.append(self.passwd_path)
+
+        process = subprocess.Popen(args,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         data['process'] = process
 
@@ -85,13 +84,11 @@ class ProfileLinux(Profile):
                 elif 'Inactivity timeout' in line:
                     self._set_status(RECONNECTING)
 
-            passwd_path = data.get('passwd_path')
-            if passwd_path:
+            if passwd:
                 try:
-                    os.remove(passwd_path)
+                    os.remove(self.passwd_path)
                 except:
                     pass
-                data['passwd_path'] = None
 
             # Canceled
             if process.returncode == 126:
@@ -100,7 +97,7 @@ class ProfileLinux(Profile):
             elif process.returncode == -15 and not started and retry < 2:
                 data['status_callback'] = None
                 data['connect_callback'] = None
-                self._start(status_callback, connect_callback, mode,
+                self._start(status_callback, connect_callback, passwd, mode,
                     retry=retry)
                 return
             else:
@@ -111,7 +108,7 @@ class ProfileLinux(Profile):
         thread.start()
 
     def _start_autostart(self, status_callback, connect_callback):
-        self._start(status_callback, connect_callback, AUTOSTART)
+        self._start(status_callback, connect_callback, None, AUTOSTART)
 
     def _stop(self, retry=0):
         data = _connections.get(self.id)

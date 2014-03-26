@@ -149,7 +149,7 @@ class App:
         dialog.set_message_secondary('Conecting to the server...')
 
         def connect_callback():
-            dialog.destroy()
+            dialog.close()
 
         threading.Thread(target=profile.start,
             args=(self.on_status_change, connect_callback)).start()

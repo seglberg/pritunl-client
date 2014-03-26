@@ -59,12 +59,14 @@ class App:
             menu_item.set_callback(self.on_delete_profile, profile.id)
             profile_menu.add_item(menu_item)
 
-            menu_item = interface.CheckMenuItem()
-            menu_item.set_label('Autostart')
-            menu_item.set_active(profile.autostart)
-            menu_item.set_callback(self.on_no_autostart_profile if
-                profile.autostart else self.on_autostart_profile, profile.id)
-            profile_menu.add_item(menu_item)
+            if not profile.auth_passwd:
+                menu_item = interface.CheckMenuItem()
+                menu_item.set_label('Autostart')
+                menu_item.set_active(profile.autostart)
+                menu_item.set_callback(self.on_no_autostart_profile if
+                    profile.autostart else self.on_autostart_profile,
+                    profile.id)
+                profile_menu.add_item(menu_item)
 
             menu.add_item(profile_menu)
 
@@ -136,9 +138,24 @@ class App:
         self.update_menu()
 
     def on_connect_profile(self, profile_id):
+        passwd = None
         profile = Profile.get_profile(profile_id)
         if profile.status not in (DISCONNECTED, ENDED):
             return
+
+        if profile.auth_passwd:
+            dialog = interface.InputDialog()
+            dialog.set_title('%s - Profile Authenticator' % APP_NAME_FORMATED)
+            dialog.set_icon(utils.get_logo())
+            dialog.set_message('Profile Authenticator Required')
+            dialog.set_message_secondary('Enter authenticator key for %s' % (
+                profile.name))
+            dialog.set_input_label('Authenticator Key:')
+            dialog.set_input_width(16)
+            passwd = dialog.run()
+            dialog.destroy()
+            if passwd is None:
+                return
 
         dialog = interface.MessageDialog()
         dialog.set_type(MESSAGE_LOADING)
@@ -152,7 +169,7 @@ class App:
             dialog.close()
 
         threading.Thread(target=profile.start,
-            args=(self.on_status_change, connect_callback)).start()
+            args=(self.on_status_change, connect_callback, passwd)).start()
 
         response = dialog.run()
         dialog.destroy()

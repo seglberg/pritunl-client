@@ -35,13 +35,24 @@ class ProfileLinux(Profile):
             'process': None,
             'status_callback': status_callback,
             'connect_callback': connect_callback,
+            'passwd_path': None,
         }
         _connections[self.id] = data
         retry += 1
         self._set_status(CONNECTING, connect_event=False)
 
-        process = subprocess.Popen([
-            'pkexec', '/usr/bin/pritunl_client_pk', mode, self.path],
+        # TODO
+        if False:
+            data['passwd_path'] = os.path.join(os.path.abspath(os.sep), 'tmp',
+                'pritunl_%s' % uuid.uuid4().hex)
+
+            with open(data['passwd_path'], 'w') as passwd_file:
+                os.chmod(passwd_path, 0600)
+                passwd_file.write('USERNAME\n')
+                passwd_file.write('PASSWORD\n')
+
+        process = subprocess.Popen(['pkexec',
+            '/usr/bin/pritunl_client_pk', mode, self.path, passwd_path],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         data['process'] = process
 
@@ -74,13 +85,19 @@ class ProfileLinux(Profile):
                 elif 'Inactivity timeout' in line:
                     self._set_status(RECONNECTING)
 
+            passwd_path = data.get('passwd_path')
+            if passwd_path:
+                try:
+                    os.remove(passwd_path)
+                except:
+                    pass
+                data['passwd_path'] = None
+
             # Canceled
             if process.returncode == 126:
                 self._set_status(ENDED)
             # Random error, retry
             elif process.returncode == -15 and not started and retry < 2:
-                # TODO
-                print 'RANDOM_ERROR'
                 data['status_callback'] = None
                 data['connect_callback'] = None
                 self._start(status_callback, connect_callback, mode,

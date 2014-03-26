@@ -23,7 +23,6 @@ class ProfileWin(Profile):
                 os.chmod(self.passwd_path, 0600)
                 passwd_file.write('pritunl_client\n')
                 passwd_file.write('%s\n' % passwd)
-
             args.append('--auth-user-pass')
             args.append(self.passwd_path)
 

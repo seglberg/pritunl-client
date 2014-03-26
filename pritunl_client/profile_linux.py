@@ -48,7 +48,6 @@ class ProfileLinux(Profile):
                 os.chmod(self.passwd_path, 0600)
                 passwd_file.write('pritunl_client\n')
                 passwd_file.write('%s\n' % passwd)
-
             args.append(self.passwd_path)
 
         process = subprocess.Popen(args,

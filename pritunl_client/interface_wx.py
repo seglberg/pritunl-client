@@ -92,7 +92,8 @@ class MessageDialog:
                 cont, skip = self._dialog.UpdatePulse()
                 if not cont:
                     return False
-                time.sleep(0.01)
+                wx.MilliSleep(50)
+                wx.Yield()
 
         else:
             self._dialog = wx.MessageDialog(

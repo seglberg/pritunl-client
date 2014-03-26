@@ -93,6 +93,9 @@ class MessageDialog:
     def destroy(self):
         self._dialog.Destroy()
 
+    def close(self):
+        self.destroy()
+
 class InputDialog:
     def __init__(self):
         self._dialog = None
@@ -135,6 +138,9 @@ class InputDialog:
     def destroy(self):
         self._dialog.Destroy()
 
+    def close(self):
+        self.destroy()
+
 class FileChooserDialog:
     def __init__(self):
         self._title = None
@@ -168,6 +174,9 @@ class FileChooserDialog:
 
     def destroy(self):
         self._dialog.Destroy()
+
+    def close(self):
+        self.destroy()
 
 class Menu:
     def __init__(self):

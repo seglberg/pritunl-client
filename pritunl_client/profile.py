@@ -21,6 +21,7 @@ class Profile:
         self.org_name = None
         self.server_name = None
         self.autostart = False
+        self.auth_passwd = False
         # TODO add pid
         self.pid = None
 
@@ -30,6 +31,7 @@ class Profile:
         self.path = os.path.join(PROFILES_DIR, '%s.ovpn' % self.id)
         self.conf_path = os.path.join(PROFILES_DIR, '%s.conf' % self.id)
         self.log_path = os.path.join(PROFILES_DIR, '%s.log' % self.id)
+        self.passwd_path = os.path.join(PROFILES_DIR, '%s.passwd' % self.id)
 
         if id:
             self.load()
@@ -61,6 +63,10 @@ class Profile:
                 self.org_name = data.get('organization')
                 self.server_name = data.get('server')
                 self.autostart = data.get('autostart') or False
+            with open(self.path, 'r') as ovpn_file:
+                self.auth_passwd = 'auth-user-pass' in ovpn_file.read()
+            if self.auth_passwd:
+                self.autostart = False
 
     def commit(self):
         with open(self.conf_path, 'w') as conf_file:
@@ -127,18 +133,18 @@ class Profile:
         if callback:
             interface.add_idle_call(callback)
 
-    def start(self, status_callback, connect_callback=None):
+    def start(self, status_callback, connect_callback=None, passwd=None):
         if self.status not in (DISCONNECTED, ENDED):
             self._set_status(self.status)
             return
-        self._start(status_callback, connect_callback)
+        self._start(status_callback, connect_callback, passwd)
 
     def start_autostart(self, status_callback, connect_callback=None):
         if self.status not in (DISCONNECTED, ENDED):
             return
         self._start_autostart(status_callback, connect_callback)
 
-    def _start(self, status_callback, connect_callback=None):
+    def _start(self, status_callback, connect_callback, passwd):
         raise NotImplementedError()
 
     def stop(self):

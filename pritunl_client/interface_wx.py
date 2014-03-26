@@ -53,6 +53,7 @@ class MessageDialog:
         self._message_secondary = None
         self._image_path = None
         self._icon = None
+        self._interrupt = False
 
     def set_title(self, title):
         self._title = title
@@ -77,24 +78,44 @@ class MessageDialog:
         self._buttons = buttons
 
     def run(self):
-        self._dialog = wx.MessageDialog(
-            parent=None,
-            message=self._message + ('\n\n' + self._message_secondary
-                if self._message_secondary else ''),
-            caption=self._title,
-            style=_mappings[self._buttons] | _mappings[self._type])
+        if self._type == MESSAGE_LOADING:
+            message = self._message + ('\n\n' + self._message_secondary
+                if self._message_secondary else '')
+            self._dialog = wx.ProgressDialog(
+                parent=None,
+                title=self._title,
+                message=message,
+                style=wx.PD_CAN_ABORT)
+            self._dialog.Pulse(message)
 
-        response = self._dialog.ShowModal()
-        if response == wx.ID_OK:
-            return True
-        elif response == wx.ID_CANCEL:
-            return False
+            while not self._interrupt:
+                cont, skip = self._dialog.UpdatePulse()
+                if not cont:
+                    return False
+                time.sleep(0.01)
+
+        else:
+            self._dialog = wx.MessageDialog(
+                parent=None,
+                message=self._message + ('\n\n' + self._message_secondary
+                    if self._message_secondary else ''),
+                caption=self._title,
+                style=_mappings[self._buttons] | _mappings[self._type])
+
+            response = self._dialog.ShowModal()
+            if response == wx.ID_OK:
+                return True
+            elif response == wx.ID_CANCEL:
+                return False
 
     def destroy(self):
         self._dialog.Destroy()
 
     def close(self):
-        self.destroy()
+        if self._type == MESSAGE_LOADING:
+            self._interrupt = True
+        else:
+            self.destroy()
 
 class InputDialog:
     def __init__(self):

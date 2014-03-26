@@ -129,6 +129,9 @@ class MessageDialog:
     def destroy(self):
         self._dialog.destroy()
 
+    def close(self):
+        self.destroy()
+
 class InputDialog:
     def __init__(self):
         self._dialog = gtk.MessageDialog(
@@ -170,6 +173,9 @@ class InputDialog:
     def destroy(self):
         self._dialog.destroy()
 
+    def close(self):
+        self.destroy()
+
 class FileChooserDialog:
     def __init__(self):
         self._filters = {}
@@ -201,6 +207,9 @@ class FileChooserDialog:
 
     def destroy(self):
         self._dialog.destroy()
+
+    def close(self):
+        self.destroy()
 
 class Menu:
     def __init__(self):

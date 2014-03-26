@@ -322,7 +322,7 @@ class StatusIconApp:
 
     def set_menu(self, menu):
         if HAS_APPINDICATOR:
-            self._menu._menu.show_all()
+            self._menu.show_all()
             self._icon.set_menu(menu)
         else:
             self._menu = menu

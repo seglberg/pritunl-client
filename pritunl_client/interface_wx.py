@@ -22,7 +22,7 @@ class _App(wx.App):
         while not self.interupt:
             while evt_loop.Pending():
                 evt_loop.Dispatch()
-            time.sleep(0.10)
+            wx.MilliSleep(50)
             evt_loop.ProcessIdle()
 
     def OnInit(self):

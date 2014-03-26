@@ -6,7 +6,7 @@ import subprocess
 import threading
 
 class ProfileWin(Profile):
-    def _start(self, status_callback, connect_callback):
+    def _start(self, status_callback, connect_callback, passwd):
         data = {
             'status': CONNECTING,
             'process': None,
@@ -16,7 +16,18 @@ class ProfileWin(Profile):
         _connections[self.id] = data
         self._set_status(CONNECTING, connect_event=False)
 
-        process = subprocess.Popen(['openvpn.exe', self.path],
+        args = ['openvpn.exe', '--config', self.path]
+
+        if passwd:
+            with open(self.passwd_path, 'w') as passwd_file:
+                os.chmod(self.passwd_path, 0600)
+                passwd_file.write('pritunl_client\n')
+                passwd_file.write('%s\n' % passwd)
+
+            args.append('--auth-user-pass')
+            args.append(self.passwd_path)
+
+        process = subprocess.Popen(args,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         data['process'] = process
 
@@ -52,12 +63,18 @@ class ProfileWin(Profile):
                     self._set_status(RECONNECTING)
             self._set_status(DISCONNECTED)
 
+            if passwd:
+                try:
+                    os.remove(self.passwd_path)
+                except:
+                    pass
+
         thread = threading.Thread(target=poll_thread)
         thread.daemon = True
         thread.start()
 
     def _start_autostart(self, status_callback, connect_callback):
-        self._start(status_callback, connect_callback)
+        self._start(status_callback, connect_callback, None)
 
     def _stop(self):
         data = _connections.get(self.id)

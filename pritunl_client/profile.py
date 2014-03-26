@@ -21,6 +21,8 @@ class Profile:
         self.org_name = None
         self.server_name = None
         self.autostart = False
+        # TODO add pid
+        self.pid = None
 
         if not os.path.isdir(PROFILES_DIR):
             os.makedirs(PROFILES_DIR)

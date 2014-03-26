@@ -32,14 +32,26 @@ def pk():
                 'etc', 'pritunl_client', profile_hash)
             if not os.path.exists(profile_hash_path):
                 raise ValueError('Profile not authorized to autostart')
-        process = subprocess.Popen(['openvpn', sys.argv[2]])
-        def sig_handler(signum, frame):
-            process.send_signal(signum)
-        signal.signal(signal.SIGINT, sig_handler)
-        signal.signal(signal.SIGTERM, sig_handler)
-        sys.exit(process.wait())
+
+        args = ['openvpn', '--config', sys.argv[2]]
+
+        if len(sys.argv) > 3:
+            os.chown(sys.argv[3], os.getuid(), os.getgid())
+            args.append('--auth-user-pass')
+            args.append(sys.argv[3])
+
+        try:
+            process = subprocess.Popen(args)
+            def sig_handler(signum, frame):
+                process.send_signal(signum)
+            signal.signal(signal.SIGINT, sig_handler)
+            signal.signal(signal.SIGTERM, sig_handler)
+            sys.exit(process.wait())
+        finally:
+            if len(sys.argv) > 3:
+                os.remove(sys.argv[3])
     elif sys.argv[1] == 'stop':
-        regex = r'(?:/pritunl_client/profiles/[a-z0-9]+\.ovpn)$'
+        regex = r'/pritunl_client/profiles/[a-z0-9]+\.ovpn'
         with open('/proc/%s/cmdline' % int(sys.argv[2]), 'r') as cmdline_file:
             cmdline = cmdline_file.read().strip().strip('\x00')
             if not re.search(regex, cmdline):

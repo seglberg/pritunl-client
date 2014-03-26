@@ -21,7 +21,7 @@ class ProfileLinux(Profile):
             'etc', 'pritunl_client', profile_hash)
 
     def _start(self, status_callback, connect_callback, mode=START,
-            retry=True):
+            retry=0):
         if self.autostart or mode == AUTOSTART:
             if not os.path.exists(self._get_profile_hash_path()):
                 self.set_autostart(False)
@@ -37,6 +37,7 @@ class ProfileLinux(Profile):
             'connect_callback': connect_callback,
         }
         _connections[self.id] = data
+        retry += 1
         self._set_status(CONNECTING, connect_event=False)
 
         process = subprocess.Popen([
@@ -77,11 +78,13 @@ class ProfileLinux(Profile):
             if process.returncode == 126:
                 self._set_status(ENDED)
             # Random error, retry
-            elif process.returncode == -15 and not started and retry:
+            elif process.returncode == -15 and not started and retry < 2:
+                # TODO
+                print 'RANDOM_ERROR'
                 data['status_callback'] = None
                 data['connect_callback'] = None
                 self._start(status_callback, connect_callback, mode,
-                    retry=False)
+                    retry=retry)
                 return
             else:
                 self._set_status(DISCONNECTED)
@@ -93,7 +96,7 @@ class ProfileLinux(Profile):
     def _start_autostart(self, status_callback, connect_callback):
         self._start(status_callback, connect_callback, AUTOSTART)
 
-    def _stop(self, retry=True):
+    def _stop(self, retry=0):
         data = _connections.get(self.id)
         if data:
             process = data.get('process')
@@ -107,8 +110,9 @@ class ProfileLinux(Profile):
                 if stop_process.returncode == 126:
                     return
                 # Random error, retry
-                elif stop_process.returncode == -15 and retry:
-                    self._stop(retry=False)
+                elif stop_process.returncode == -15 and retry < 2:
+                    retry += 1
+                    self._stop(retry=retry)
                     return
                 elif stop_process.returncode != 0:
                     raise ProcessCallError(
@@ -117,7 +121,7 @@ class ProfileLinux(Profile):
             data['process'] = None
         self._set_status(ENDED)
 
-    def _set_profile_autostart(self, retry=True):
+    def _set_profile_autostart(self, retry=0):
         process = subprocess.Popen(['pkexec',
             '/usr/bin/pritunl_client_pk', 'set_autostart', self.path],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -127,15 +131,16 @@ class ProfileLinux(Profile):
         if process.returncode == 126:
             return False
         # Random error, retry
-        elif process.returncode == -15 and retry:
-            return self._set_profile_autostart(retry=False)
+        elif process.returncode == -15 and retry < 2:
+            retry += 1
+            return self._set_profile_autostart(retry=retry)
         elif process.returncode != 0:
             raise ProcessCallError(
                 'Pritunl polkit process returned error %s.' % (
                     process.returncode))
         return True
 
-    def _clear_profile_autostart(self, retry=True):
+    def _clear_profile_autostart(self, retry=0):
         process = subprocess.Popen(['pkexec',
             '/usr/bin/pritunl_client_pk', 'clear_autostart',
             self._get_profile_hash()], stdout=subprocess.PIPE,
@@ -146,8 +151,9 @@ class ProfileLinux(Profile):
         if process.returncode == 126:
             return False
         # Random error, retry
-        elif process.returncode == -15 and retry:
-            return self._clear_profile_autostart(retry=False)
+        elif process.returncode == -15 and retry < 2:
+            retry += 1
+            return self._clear_profile_autostart(retry=retry)
         elif process.returncode != 0:
             raise ProcessCallError(
                 'Pritunl polkit process returned error %s.' % (

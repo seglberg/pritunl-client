@@ -12,6 +12,7 @@ class App:
         self.icon = interface.StatusIconApp()
         self.icon.set_tooltip(APP_NAME_FORMATED)
         self.set_icon_state(False)
+        self.icon.set_callback(self.update_icon)
         self.update_menu()
 
     def set_icon_state(self, state):

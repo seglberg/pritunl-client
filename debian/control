@@ -1,0 +1,24 @@
+Source: pritunl-client
+Section: utils
+Priority: optional
+Maintainer: Zachary Huff <zach.huff.386@gmail.com>
+Build-Depends: debhelper (>= 8.0.0),
+               python-all (>= 2.7),
+               python-setuptools (>= 0.6b3),
+               python-gtk2
+Standards-Version: 3.9.4
+Homepage: http://pritunl.com/
+X-Python-Version: >= 2.7
+#Vcs-Git: https://github.com/pritunl/pritunl-client.git
+#Vcs-Browser: https://github.com/pritunl/pritunl-client
+
+Package: pritunl
+Architecture: all
+Depends: python-gtk2,
+         policykit-1,
+         openvpn,
+         iptables,
+         ${misc:Depends},
+         ${python:Depends}
+Description: Pritunl openvpn client
+ Pritunl client is a GUI interface to connect to a Pritunl vpn server.

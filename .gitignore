@@ -11,3 +11,4 @@ __pycache__
 /build
 /dist
 /pritunl_client.egg-info
+/tools/private_key.asc

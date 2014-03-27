@@ -332,5 +332,6 @@ class StatusIconApp:
         gtk.threads_leave()
 
     def destroy(self):
-        self._icon.set_visible(False)
+        if not HAS_APPINDICATOR:
+            self._icon.set_visible(False)
         gtk.main_quit()

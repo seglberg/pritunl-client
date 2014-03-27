@@ -287,6 +287,7 @@ class StatusIconApp:
         gtk.threads_init()
         gtk.threads_enter()
 
+        self._callback = None
         if HAS_APPINDICATOR:
             self._icon = None
         else:
@@ -295,11 +296,18 @@ class StatusIconApp:
             self._icon.connect('activate', self._on_activate)
             self._icon.connect('popup_menu', self._on_popup_menu)
 
+        icons = gtk.icon_theme_get_default()
+        icons.connect('changed', self._on_theme_change)
+
     def _on_activate(self, widget):
         self._show_menu(0, 0)
 
     def _on_popup_menu(self, widget, button, activate_time):
         self._show_menu(button, activate_time)
+
+    def _on_theme_change(self, widget):
+        if self._callback:
+            self._callback()
 
     def _show_menu(self, event_button, activate_time):
         self._menu._menu.show_all()
@@ -327,11 +335,13 @@ class StatusIconApp:
         else:
             self._menu = menu
 
+    def set_callback(self, callback):
+        self._callback = callback
+
     def run(self):
         gtk.main()
         gtk.threads_leave()
 
     def destroy(self):
-        if not HAS_APPINDICATOR:
-            self._icon.set_visible(False)
+        self._icon.set_visible(False)
         gtk.main_quit()

@@ -318,7 +318,9 @@ class StatusIconApp:
         self._icon_path = None
         self._callback = None
         self._app = _App(False)
-        self._icon = _TaskBarIcon(iconType=wx.TBI_DOCK)
+        # TODO
+        # self._icon = _TaskBarIcon(iconType=wx.TBI_DOCK)
+        self._icon = _TaskBarIcon()
         self._icon.Bind(wx.EVT_TASKBAR_LEFT_DOWN, self._on_activate)
 
     def _on_activate(self, event):

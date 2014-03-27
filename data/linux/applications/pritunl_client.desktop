@@ -4,6 +4,6 @@ Comment=Pritunl openvpn client
 Exec=pritunl_client
 Terminal=false
 Type=Application
-StartupNotify=true
+StartupNotify=false
 Icon=pritunl_client
 Categories=Network;TrayIcon;

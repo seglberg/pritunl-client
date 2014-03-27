@@ -7,3 +7,4 @@ else
         rm -f "${file}"[co] >/dev/null
     done
 fi
+killall pritunl_client || true

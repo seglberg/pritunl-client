@@ -316,8 +316,9 @@ class StatusIconApp:
     def __init__(self):
         self._tooltip = ''
         self._icon_path = None
+        self._callback = None
         self._app = _App(False)
-        self._icon = _TaskBarIcon()
+        self._icon = _TaskBarIcon(iconType=wx.TBI_DOCK)
         self._icon.Bind(wx.EVT_TASKBAR_LEFT_DOWN, self._on_activate)
 
     def _on_activate(self, event):
@@ -334,6 +335,9 @@ class StatusIconApp:
 
     def set_menu(self, menu):
         self._icon._menu = menu
+
+    def set_callback(self, callback):
+        self._callback = callback
 
     def run(self):
         self._app.MainLoop()

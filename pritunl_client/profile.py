@@ -35,8 +35,7 @@ class Profile:
         if id:
             self.load()
 
-        if self.status not in (CONNECTING, RECONNECTING, CONNECTED) \
-                and self.pid:
+        if self.status not in ACTIVE_STATES and self.pid:
             self._kill_pid(self.pid)
             self.pid = None
             self.commit()
@@ -144,13 +143,13 @@ class Profile:
             interface.add_idle_call(callback)
 
     def start(self, status_callback, connect_callback=None, passwd=None):
-        if self.status not in (DISCONNECTED, ENDED):
+        if self.status in ACTIVE_STATES:
             self._set_status(self.status)
             return
         self._start(status_callback, connect_callback, passwd)
 
     def start_autostart(self, status_callback, connect_callback=None):
-        if self.status not in (DISCONNECTED, ENDED):
+        if self.status in ACTIVE_STATES:
             return
         self._start_autostart(status_callback, connect_callback)
 

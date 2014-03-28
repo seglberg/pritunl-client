@@ -103,7 +103,7 @@ class ProfileLinux(Profile):
                     retry=retry)
                 return
             else:
-                self._set_status(DISCONNECTED)
+                self._set_status(ERROR)
 
         thread = threading.Thread(target=poll_thread)
         thread.daemon = True

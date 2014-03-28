@@ -35,7 +35,7 @@ class App:
 
         for profile in Profile.iter_profiles():
             profile_count += 1
-            active = profile.status in (CONNECTING, RECONNECTING, CONNECTED)
+            active = profile.status in ACTIVE_STATES
 
             profile_menu = interface.Menu()
             if active:
@@ -132,7 +132,7 @@ class App:
         for profile in Profile.iter_profiles():
             if profile.status == CONNECTED:
                 conn_count += 1
-            if profile.status in (CONNECTING, RECONNECTING, CONNECTED):
+            if profile.status in ACTIVE_STATES:
                 active_count += 1
 
         self.set_icon_state(bool(conn_count))
@@ -141,7 +141,7 @@ class App:
     def on_connect_profile(self, profile_id):
         passwd = None
         profile = Profile.get_profile(profile_id)
-        if profile.status not in (DISCONNECTED, ENDED):
+        if profile.status in ACTIVE_STATES:
             return
 
         if profile.auth_passwd:
@@ -178,7 +178,10 @@ class App:
             threading.Thread(target=profile.stop).start()
             return
 
-        if profile.status == DISCONNECTED:
+        # TODO
+        if profile.status == ERROR:
+            self.show_connect_error(profile)
+        elif profile.status == AUTH_ERROR:
             self.show_connect_error(profile)
 
     def on_disconnect_profile(self, profile_id):

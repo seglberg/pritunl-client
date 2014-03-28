@@ -61,12 +61,16 @@ for img_root in IMG_ROOTS:
     if os.path.exists(img_path) and not DISCONNECTED_LOGO_DEFAULT_PATH:
         DISCONNECTED_LOGO_DEFAULT_PATH = img_path
 
-SUDO_PASS_FAIL = 'sudo_pass_fail'
 CONNECTING = 'connecting'
 RECONNECTING = 'reconnecting'
 CONNECTED = 'connected'
 DISCONNECTED = 'disconnected'
 ENDED = 'ended'
+ERROR = 'error'
+AUTH_ERROR = 'auth_error'
+TIMEOUT_ERROR = 'timeout_error'
+ACTIVE_STATES = set([CONNECTING, RECONNECTING, CONNECTED])
+INACTIVE_STATES = set([DISCONNECTED, ENDED, ERROR, AUTH_ERROR])
 
 START = 'start'
 AUTOSTART = 'autostart'

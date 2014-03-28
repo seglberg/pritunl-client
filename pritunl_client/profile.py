@@ -5,6 +5,7 @@ import os
 import uuid
 import json
 import time
+import uuid
 
 _connections = {}
 
@@ -69,23 +70,32 @@ class Profile:
         return self.__dict__[name]
 
     def load(self):
-        if os.path.exists(self.conf_path):
-            with open(self.conf_path, 'r') as conf_file:
-                data = json.loads(conf_file.read())
-                self.profile_name = data.get('name')
-                self.user_name = data.get('user')
-                self.org_name = data.get('organization')
-                self.server_name = data.get('server')
-                self.autostart = data.get('autostart') or False
-                self.pid = data.get('pid')
-            with open(self.path, 'r') as ovpn_file:
-                self.auth_passwd = 'auth-user-pass' in ovpn_file.read()
-            if self.auth_passwd:
-                self.autostart = False
+        try:
+            if os.path.exists(self.conf_path):
+                with open(self.conf_path, 'r') as conf_file:
+                    data = json.loads(conf_file.read())
+                    self.profile_name = data.get('name')
+                    self.user_name = data.get('user')
+                    self.org_name = data.get('organization')
+                    self.server_name = data.get('server')
+                    self.autostart = data.get('autostart') or False
+                    self.pid = data.get('pid')
+                with open(self.path, 'r') as ovpn_file:
+                    self.auth_passwd = 'auth-user-pass' in ovpn_file.read()
+                if self.auth_passwd:
+                    self.autostart = False
+        except (OSError, ValueError):
+            pass
 
     def commit(self):
-        with open(self.conf_path, 'w') as conf_file:
-            conf_file.write(json.dumps(self.dict()))
+        temp_path = self.conf_path + '_%s.tmp' % uuid.uuid4().hex
+        try:
+            with open(temp_path, 'w') as conf_file:
+                conf_file.write(json.dumps(self.dict()))
+            os.rename(temp_path, self.conf_path)
+        finally:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
 
     def _parse_profile(self, data):
         conf_str = data.splitlines()[0].replace('#', '', 1).strip()

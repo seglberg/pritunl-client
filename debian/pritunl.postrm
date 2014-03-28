@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 if [ "$1" == "purge" ]; then
-    rm -rf rm -rf /home/*/.config/pritunl_client
+    rm -rf /home/*/.config/pritunl_client
 fi
 rm -rf /etc/pritunl_client
 gtk-update-icon-cache -q -t -f /usr/share/icons/hicolor || true

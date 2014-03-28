@@ -1,9 +1,8 @@
 #!/bin/bash
 set -e
-# TODO
-# if [ "$1" == "purge" ]; then
-#     rm -rf /etc/pritunl_client
-# fi
+if [ "$1" == "purge" ]; then
+    rm -rf rm -rf /home/*/.config/pritunl_client
+fi
 rm -rf /etc/pritunl_client
 gtk-update-icon-cache -q -t -f /usr/share/icons/hicolor || true
 gtk-update-icon-cache -q -t -f /usr/share/icons/ubuntu-mono-dark || true

@@ -53,6 +53,8 @@ class ProfileLinux(Profile):
         process = subprocess.Popen(args,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         data['process'] = process
+        self.pid = process.pid
+        self.commit()
 
         def connect_thread():
             time.sleep(CONNECT_TIMEOUT)
@@ -93,7 +95,8 @@ class ProfileLinux(Profile):
             if process.returncode == 126:
                 self._set_status(ENDED)
             # Random error, retry
-            elif process.returncode == -15 and not started and retry < 2:
+            elif process.returncode == -15 and not started and retry < 6:
+                time.sleep(0.1)
                 data['status_callback'] = None
                 data['connect_callback'] = None
                 self._start(status_callback, connect_callback, passwd, mode,
@@ -110,6 +113,7 @@ class ProfileLinux(Profile):
         self._start(status_callback, connect_callback, None, AUTOSTART)
 
     def _stop(self, retry=0):
+        retry += 1
         data = _connections.get(self.id)
         if data:
             process = data.get('process')
@@ -123,8 +127,8 @@ class ProfileLinux(Profile):
                 if stop_process.returncode == 126:
                     return
                 # Random error, retry
-                elif stop_process.returncode == -15 and retry < 2:
-                    retry += 1
+                elif stop_process.returncode == -15 and retry < 6:
+                    time.sleep(0.1)
                     self._stop(retry=retry)
                     return
                 elif stop_process.returncode != 0:
@@ -133,8 +137,11 @@ class ProfileLinux(Profile):
                             stop_process.returncode))
             data['process'] = None
         self._set_status(ENDED)
+        self.pid = None
+        self.commit()
 
     def _set_profile_autostart(self, retry=0):
+        retry += 1
         process = subprocess.Popen(['pkexec',
             '/usr/bin/pritunl_client_pk', 'set_autostart', self.path],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -144,8 +151,8 @@ class ProfileLinux(Profile):
         if process.returncode == 126:
             return False
         # Random error, retry
-        elif process.returncode == -15 and retry < 2:
-            retry += 1
+        elif process.returncode == -15 and retry < 6:
+            time.sleep(0.1)
             return self._set_profile_autostart(retry=retry)
         elif process.returncode != 0:
             raise ProcessCallError(
@@ -154,6 +161,7 @@ class ProfileLinux(Profile):
         return True
 
     def _clear_profile_autostart(self, retry=0):
+        retry += 1
         process = subprocess.Popen(['pkexec',
             '/usr/bin/pritunl_client_pk', 'clear_autostart',
             self._get_profile_hash()], stdout=subprocess.PIPE,
@@ -164,14 +172,26 @@ class ProfileLinux(Profile):
         if process.returncode == 126:
             return False
         # Random error, retry
-        elif process.returncode == -15 and retry < 2:
-            retry += 1
+        elif process.returncode == -15 and retry < 6:
+            time.sleep(0.1)
             return self._clear_profile_autostart(retry=retry)
         elif process.returncode != 0:
             raise ProcessCallError(
                 'Pritunl polkit process returned error %s.' % (
                     process.returncode))
         return True
+
+    def _kill_pid(self, pid, retry=0):
+        retry += 1
+        process = subprocess.Popen(['pkexec',
+            '/usr/bin/pritunl_client_pk', 'stop', str(pid)],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process.wait()
+
+        # Random error, retry
+        if process.returncode == -15 and retry < 6:
+            time.sleep(0.1)
+            self._kill_pid(pid, retry=retry)
 
     def commit(self):
         if os.path.exists(self._get_profile_hash_path()) != self.autostart:

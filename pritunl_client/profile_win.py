@@ -4,6 +4,7 @@ from profile import Profile, _connections
 import time
 import subprocess
 import threading
+import signal
 
 class ProfileWin(Profile):
     def _start(self, status_callback, connect_callback, passwd):
@@ -29,6 +30,8 @@ class ProfileWin(Profile):
         process = subprocess.Popen(args,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         data['process'] = process
+        self.pid = process.pid
+        self.commit()
 
         def connect_thread():
             time.sleep(CONNECT_TIMEOUT)
@@ -95,3 +98,12 @@ class ProfileWin(Profile):
                         return
                     process.kill()
         self._set_status(ENDED)
+        self.pid = None
+        self.commit()
+
+    def _kill_pid(self, pid):
+        for i in xrange(2):
+            try:
+                os.kill(pid, signal.SIGTERM)
+            except OSError:
+                pass

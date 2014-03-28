@@ -22,7 +22,6 @@ class Profile:
         self.server_name = None
         self.autostart = False
         self.auth_passwd = False
-        # TODO add pid
         self.pid = None
 
         if not os.path.isdir(PROFILES_DIR):
@@ -35,6 +34,22 @@ class Profile:
 
         if id:
             self.load()
+
+        if self.status not in (CONNECTING, RECONNECTING, CONNECTED) \
+                and self.pid:
+            self._kill_pid(self.pid)
+            self.pid = None
+            self.commit()
+
+    def dict(self):
+        return {
+            'name': self.profile_name,
+            'user': self.user_name,
+            'organization': self.org_name,
+            'server': self.server_name,
+            'autostart': self.autostart,
+            'pid': self.pid,
+        }
 
     def __getattr__(self, name):
         if name == 'name':
@@ -63,6 +78,7 @@ class Profile:
                 self.org_name = data.get('organization')
                 self.server_name = data.get('server')
                 self.autostart = data.get('autostart') or False
+                self.pid = data.get('pid')
             with open(self.path, 'r') as ovpn_file:
                 self.auth_passwd = 'auth-user-pass' in ovpn_file.read()
             if self.auth_passwd:
@@ -70,13 +86,7 @@ class Profile:
 
     def commit(self):
         with open(self.conf_path, 'w') as conf_file:
-            conf_file.write(json.dumps({
-                'name': self.profile_name,
-                'user': self.user_name,
-                'organization': self.org_name,
-                'server': self.server_name,
-                'autostart': self.autostart,
-            }))
+            conf_file.write(json.dumps(self.dict()))
 
     def _parse_profile(self, data):
         conf_str = data.splitlines()[0].replace('#', '', 1).strip()

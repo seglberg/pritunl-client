@@ -8,14 +8,9 @@ import signal
 
 class ProfileWin(Profile):
     def _start(self, status_callback, connect_callback, passwd):
-        data = {
-            'status': CONNECTING,
-            'process': None,
-            'status_callback': status_callback,
-            'connect_callback': connect_callback,
-        }
-        _connections[self.id] = data
-        self._set_status(CONNECTING, connect_event=False)
+        def on_exit(returncode):
+            if self.state in ACTIVE_STATES:
+                self._set_status(ERROR)
 
         args = ['openvpn.exe', '--config', self.path]
 
@@ -27,53 +22,8 @@ class ProfileWin(Profile):
             args.append('--auth-user-pass')
             args.append(self.passwd_path)
 
-        process = subprocess.Popen(args,
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        data['process'] = process
-        self.pid = process.pid
-        self.commit()
-
-        def connect_thread():
-            time.sleep(CONNECT_TIMEOUT)
-            if not data.get('connect_callback'):
-                return
-            self.stop()
-
-        def poll_thread():
-            started = False
-            with open(self.log_path, 'w') as log_file:
-                pass
-            while True:
-                line = process.stdout.readline()
-                if not line:
-                    if process.poll() is not None:
-                        break
-                    else:
-                        continue
-                # TODO
-                print line.strip()
-                with open(self.log_path, 'a') as log_file:
-                    log_file.write(line)
-                if not started:
-                    started = True
-                    thread = threading.Thread(target=connect_thread)
-                    thread.daemon = True
-                    thread.start()
-                if 'Initialization Sequence Completed' in line:
-                    self._set_status(CONNECTED)
-                elif 'Inactivity timeout' in line:
-                    self._set_status(RECONNECTING)
-            self._set_status(DISCONNECTED)
-
-            if passwd:
-                try:
-                    os.remove(self.passwd_path)
-                except:
-                    pass
-
-        thread = threading.Thread(target=poll_thread)
-        thread.daemon = True
-        thread.start()
+        self._run_ovpn(status_callback, connect_callback, passwd,
+            args, on_exit)
 
     def _start_autostart(self, status_callback, connect_callback):
         self._start(status_callback, connect_callback, None)
@@ -97,7 +47,8 @@ class ProfileWin(Profile):
                     if process.poll() is not None:
                         return
                     process.kill()
-        self._set_status(ENDED)
+        if self.state in ACTIVE_STATES:
+            self._set_status(ENDED)
         self.pid = None
         self.commit()
 

@@ -9,7 +9,7 @@ import signal
 class ProfileWin(Profile):
     def _start(self, status_callback, connect_callback, passwd):
         def on_exit(return_code):
-            if self.state in ACTIVE_STATES:
+            if self.status in ACTIVE_STATES:
                 self._set_status(ERROR)
 
         args = ['openvpn.exe', '--config', self.path]
@@ -47,7 +47,7 @@ class ProfileWin(Profile):
                     if process.poll() is not None:
                         return
                     process.kill()
-        if self.state in ACTIVE_STATES:
+        if self.status in ACTIVE_STATES:
             self._set_status(ENDED)
         self.pid = None
         self.commit()

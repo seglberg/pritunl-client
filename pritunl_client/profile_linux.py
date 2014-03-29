@@ -44,7 +44,7 @@ class ProfileLinux(Profile):
                 self._start(status_callback, connect_callback, passwd, mode,
                     retry=retry)
             else:
-                if self.state in ACTIVE_STATES:
+                if self.status in ACTIVE_STATES:
                     self._set_status(ERROR)
 
         args = ['pkexec', '/usr/bin/pritunl_client_pk', mode, self.path]
@@ -78,7 +78,7 @@ class ProfileLinux(Profile):
                         'Pritunl polkit process returned error %s.' % (
                             stop_process.returncode))
             data['process'] = None
-        if self.state in ACTIVE_STATES:
+        if self.status in ACTIVE_STATES:
             self._set_status(ENDED)
         self.pid = None
         self.commit()

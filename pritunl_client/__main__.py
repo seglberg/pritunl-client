@@ -51,17 +51,21 @@ def pk():
             if len(sys.argv) > 3:
                 os.remove(sys.argv[3])
     elif sys.argv[1] == 'stop':
+        pid = int(sys.argv[2])
+        cmdline_path = '/proc/%s/cmdline' % pid
         regex = r'/pritunl_client/profiles/[a-z0-9]+\.ovpn'
-        with open('/proc/%s/cmdline' % int(sys.argv[2]), 'r') as cmdline_file:
+        if not os.path.exists(cmdline_path):
+            return
+        with open('/proc/%s/cmdline' % pid, 'r') as cmdline_file:
             cmdline = cmdline_file.read().strip().strip('\x00')
             if not re.search(regex, cmdline):
                 raise ValueError('Not a pritunl client process')
-        os.kill(int(sys.argv[2]), signal.SIGTERM)
+        os.kill(pid, signal.SIGTERM)
         for i in xrange(int(5 / 0.1)):
             time.sleep(0.1)
-            if not os.path.exists('/proc/%s' % int(sys.argv[2])):
+            if not os.path.exists('/proc/%s' % pid):
                 break
-            os.kill(int(sys.argv[2]), signal.SIGTERM)
+            os.kill(pid, signal.SIGTERM)
     elif sys.argv[1] == 'set_autostart':
         regex = r'(?:/pritunl_client/profiles/[a-z0-9]+\.ovpn)$'
         if not re.search(regex, sys.argv[2]):

@@ -6,6 +6,8 @@ import uuid
 import json
 import time
 import uuid
+import subprocess
+import threading
 
 _connections = {}
 
@@ -165,6 +167,74 @@ class Profile:
 
     def _start(self, status_callback, connect_callback, passwd):
         raise NotImplementedError()
+
+    def _run_ovpn(self, status_callback, connect_callback, passwd,
+            args, on_exit):
+        data = {
+            'status': CONNECTING,
+            'process': None,
+            'status_callback': status_callback,
+            'connect_callback': connect_callback,
+        }
+        _connections[self.id] = data
+        self._set_status(CONNECTING, connect_event=False)
+
+        if passwd:
+            with open(self.passwd_path, 'w') as passwd_file:
+                os.chmod(self.passwd_path, 0600)
+                passwd_file.write('pritunl_client\n')
+                passwd_file.write('%s\n' % passwd)
+            args.append('--auth-user-pass')
+            args.append(self.passwd_path)
+
+        process = subprocess.Popen(args,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        data['process'] = process
+        self.pid = process.pid
+        self.commit()
+
+        def connect_thread():
+            time.sleep(CONNECT_TIMEOUT)
+            if not data.get('connect_callback'):
+                return
+            self._set_status(CONNECT_TIMEOUT)
+            self.stop()
+
+        def poll_thread():
+            started = False
+            with open(self.log_path, 'w') as log_file:
+                pass
+            while True:
+                line = process.stdout.readline()
+                if not line:
+                    if process.poll() is not None:
+                        break
+                    else:
+                        continue
+                print line.strip()
+                with open(self.log_path, 'a') as log_file:
+                    log_file.write(line)
+                if not started:
+                    started = True
+                    thread = threading.Thread(target=connect_thread)
+                    thread.daemon = True
+                    thread.start()
+                if 'Initialization Sequence Completed' in line:
+                    self._set_status(CONNECTED)
+                elif 'Inactivity timeout' in line:
+                    self._set_status(RECONNECTING)
+
+            if passwd:
+                try:
+                    os.remove(self.passwd_path)
+                except:
+                    pass
+
+            on_exit(process.returncode)
+
+        thread = threading.Thread(target=poll_thread)
+        thread.daemon = True
+        thread.start()
 
     def stop(self):
         self._stop()

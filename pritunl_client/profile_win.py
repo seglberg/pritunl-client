@@ -8,17 +8,13 @@ import signal
 
 class ProfileWin(Profile):
     def _start(self, status_callback, connect_callback, passwd):
-        def on_exit(return_code):
+        def on_exit(data, return_code):
             if self.status in ACTIVE_STATES:
                 self._set_status(ERROR)
 
         args = ['openvpn.exe', '--config', self.path]
 
         if passwd:
-            with open(self.passwd_path, 'w') as passwd_file:
-                os.chmod(self.passwd_path, 0600)
-                passwd_file.write('pritunl_client\n')
-                passwd_file.write('%s\n' % passwd)
             args.append('--auth-user-pass')
             args.append(self.passwd_path)
 
@@ -28,7 +24,7 @@ class ProfileWin(Profile):
     def _start_autostart(self, status_callback, connect_callback):
         self._start(status_callback, connect_callback, None)
 
-    def _stop(self):
+    def _stop(self, silent):
         data = _connections.get(self.id)
         if data:
             process = data.get('process')
@@ -47,7 +43,7 @@ class ProfileWin(Profile):
                     if process.poll() is not None:
                         return
                     process.kill()
-        if self.status in ACTIVE_STATES:
+        if not silent:
             self._set_status(ENDED)
         self.pid = None
         self.commit()

@@ -32,12 +32,12 @@ class ProfileLinux(Profile):
             else:
                 mode = AUTOSTART
 
-        def on_exit(return_code):
+        def on_exit(data, return_code):
             # Canceled
             if return_code == 126:
                 self._set_status(ENDED)
             # Random error, retry
-            elif return_code == -15 and retry < 6:
+            elif return_code == -15 and not data['started'] and retry < 10:
                 time.sleep(0.1)
                 data['status_callback'] = None
                 data['connect_callback'] = None
@@ -48,17 +48,22 @@ class ProfileLinux(Profile):
                     self._set_status(ERROR)
 
         args = ['pkexec', '/usr/bin/pritunl_client_pk', mode, self.path]
+
+        if passwd:
+            args.append(self.passwd_path)
+
         self._run_ovpn(status_callback, connect_callback, passwd,
             args, on_exit)
 
     def _start_autostart(self, status_callback, connect_callback):
         self._start(status_callback, connect_callback, None, AUTOSTART)
 
-    def _stop(self, retry=0):
+    def _stop(self, silent, retry=0):
         retry += 1
         data = _connections.get(self.id)
         if data:
             process = data.get('process')
+            data['process'] = None
             if process and not process.poll():
                 stop_process = subprocess.Popen(['pkexec',
                     '/usr/bin/pritunl_client_pk', 'stop', str(process.pid)],
@@ -69,16 +74,15 @@ class ProfileLinux(Profile):
                 if stop_process.returncode == 126:
                     return
                 # Random error, retry
-                elif stop_process.returncode == -15 and retry < 6:
+                elif stop_process.returncode == -15 and retry < 10:
                     time.sleep(0.1)
-                    self._stop(retry=retry)
+                    self._stop(silent=silent, retry=retry)
                     return
                 elif stop_process.returncode != 0:
                     raise ProcessCallError(
                         'Pritunl polkit process returned error %s.' % (
                             stop_process.returncode))
-            data['process'] = None
-        if self.status in ACTIVE_STATES:
+        if not silent:
             self._set_status(ENDED)
         self.pid = None
         self.commit()
@@ -94,7 +98,7 @@ class ProfileLinux(Profile):
         if process.returncode == 126:
             return False
         # Random error, retry
-        elif process.returncode == -15 and retry < 6:
+        elif process.returncode == -15 and retry < 10:
             time.sleep(0.1)
             return self._set_profile_autostart(retry=retry)
         elif process.returncode != 0:
@@ -115,7 +119,7 @@ class ProfileLinux(Profile):
         if process.returncode == 126:
             return False
         # Random error, retry
-        elif process.returncode == -15 and retry < 6:
+        elif process.returncode == -15 and retry < 10:
             time.sleep(0.1)
             return self._clear_profile_autostart(retry=retry)
         elif process.returncode != 0:
@@ -132,7 +136,7 @@ class ProfileLinux(Profile):
         process.wait()
 
         # Random error, retry
-        if process.returncode == -15 and retry < 6:
+        if process.returncode == -15 and retry < 10:
             time.sleep(0.1)
             self._kill_pid(pid, retry=retry)
 

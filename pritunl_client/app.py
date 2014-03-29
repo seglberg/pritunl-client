@@ -113,15 +113,20 @@ class App:
             self._cur_icon_path = icon_path
             self.set_icon_state(self.get_icon_state())
 
-    def show_connect_error(self, profile):
+    def show_connect_error(self, profile, status):
+        error_msgs = {
+            ERROR: 'An error occurred while connecting to server',
+            AUTH_ERROR: 'Failed to authenticate with server',
+            TIMEOUT_ERROR: 'Server connection timed out',
+        }
+
         dialog = interface.MessageDialog()
         dialog.set_type(MESSAGE_ERROR)
         dialog.set_buttons(BUTTONS_OK)
         dialog.set_title('%s - Connection Error' % APP_NAME_FORMATED)
         dialog.set_icon(utils.get_logo())
         dialog.set_message('Unable to connect to %s' % profile.server_name)
-        dialog.set_message_secondary(
-            'An error occurred while connecting to server')
+        dialog.set_message_secondary(error_msgs[status])
         dialog.run()
         dialog.destroy()
 
@@ -178,11 +183,8 @@ class App:
             threading.Thread(target=profile.stop).start()
             return
 
-        # TODO
-        if profile.status == ERROR:
-            self.show_connect_error(profile)
-        elif profile.status == AUTH_ERROR:
-            self.show_connect_error(profile)
+        if profile.status in ERROR_STATES:
+            self.show_connect_error(profile, profile.status)
 
     def on_disconnect_profile(self, profile_id):
         profile = Profile.get_profile(profile_id)

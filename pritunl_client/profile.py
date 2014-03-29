@@ -175,6 +175,7 @@ class Profile:
             'process': None,
             'status_callback': status_callback,
             'connect_callback': connect_callback,
+            'started': False,
         }
         _connections[self.id] = data
         self._set_status(CONNECTING, connect_event=False)
@@ -184,8 +185,6 @@ class Profile:
                 os.chmod(self.passwd_path, 0600)
                 passwd_file.write('pritunl_client\n')
                 passwd_file.write('%s\n' % passwd)
-            args.append('--auth-user-pass')
-            args.append(self.passwd_path)
 
         process = subprocess.Popen(args,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -197,8 +196,8 @@ class Profile:
             time.sleep(CONNECT_TIMEOUT)
             if not data.get('connect_callback'):
                 return
-            self._set_status(CONNECT_TIMEOUT)
-            self.stop()
+            self._set_status(TIMEOUT_ERROR)
+            self.stop(silent=True)
 
         def poll_thread():
             started = False
@@ -211,6 +210,7 @@ class Profile:
                         break
                     else:
                         continue
+                data['started'] = True
                 print line.strip()
                 with open(self.log_path, 'a') as log_file:
                     log_file.write(line)
@@ -223,6 +223,8 @@ class Profile:
                     self._set_status(CONNECTED)
                 elif 'Inactivity timeout' in line:
                     self._set_status(RECONNECTING)
+                elif 'AUTH_FAILED' in line or 'auth-failure' in line:
+                    self._set_status(AUTH_ERROR)
 
             if passwd:
                 try:
@@ -230,14 +232,14 @@ class Profile:
                 except:
                     pass
 
-            on_exit(process.returncode)
+            on_exit(data, process.returncode)
 
         thread = threading.Thread(target=poll_thread)
         thread.daemon = True
         thread.start()
 
-    def stop(self):
-        self._stop()
+    def stop(self, silent=False):
+        self._stop(silent)
 
     def _stop(self):
         raise NotImplementedError()

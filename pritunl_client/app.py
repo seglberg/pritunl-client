@@ -124,7 +124,7 @@ class App:
         dialog = interface.MessageDialog()
         dialog.set_type(MESSAGE_ERROR)
         dialog.set_buttons(BUTTONS_OK)
-        dialog.set_title('%s - Connection Error' % APP_NAME_FORMATED)
+        dialog.set_title(APP_NAME_FORMATED)
         dialog.set_icon(utils.get_logo())
         dialog.set_message('Unable to connect to %s' % profile.server_name)
         dialog.set_message_secondary(error_msgs[status])
@@ -152,7 +152,7 @@ class App:
 
         if profile.auth_passwd:
             dialog = interface.InputDialog()
-            dialog.set_title('%s - Profile Authenticator' % APP_NAME_FORMATED)
+            dialog.set_title(APP_NAME_FORMATED)
             dialog.set_icon(utils.get_logo())
             dialog.set_message('Profile Authenticator Required')
             dialog.set_message_secondary('Enter authenticator key for %s' % (
@@ -167,7 +167,7 @@ class App:
         dialog = interface.MessageDialog()
         dialog.set_type(MESSAGE_LOADING)
         dialog.set_buttons(BUTTONS_CANCEL)
-        dialog.set_title('%s - Connecting...' % APP_NAME_FORMATED)
+        dialog.set_title(APP_NAME_FORMATED)
         dialog.set_icon(utils.get_logo())
         dialog.set_message('Connecting to %s' % profile.server_name)
         dialog.set_message_secondary('Conecting to the server...')
@@ -194,7 +194,7 @@ class App:
     def on_rename_profile(self, profile_id):
         profile = Profile.get_profile(profile_id)
         dialog = interface.InputDialog()
-        dialog.set_title('%s - Rename Profile' % APP_NAME_FORMATED)
+        dialog.set_title(APP_NAME_FORMATED)
         dialog.set_icon(utils.get_logo())
         dialog.set_message('Rename Profile')
         dialog.set_message_secondary('Enter new name for profile %s' % (
@@ -212,7 +212,7 @@ class App:
         dialog = interface.MessageDialog()
         dialog.set_type(MESSAGE_ERROR)
         dialog.set_buttons(BUTTONS_OK_CANCEL)
-        dialog.set_title('%s - Delete Profile' % APP_NAME_FORMATED)
+        dialog.set_title(APP_NAME_FORMATED)
         dialog.set_icon(utils.get_logo())
         dialog.set_message('Delete profile')
         dialog.set_message_secondary(
@@ -238,7 +238,7 @@ class App:
         dialog = interface.MessageDialog()
         dialog.set_type(MESSAGE_INFO)
         dialog.set_buttons(BUTTONS_OK)
-        dialog.set_title('%s - About' % APP_NAME_FORMATED)
+        dialog.set_title(APP_NAME_FORMATED)
         dialog.set_icon(utils.get_logo())
         dialog.set_image(utils.get_logo())
         dialog.set_message(('<b>%s - v%s</b>\n\n' +
@@ -250,7 +250,7 @@ class App:
 
     def show_import_profile(self):
         dialog = interface.FileChooserDialog()
-        dialog.set_title('%s - Import Profile' % APP_NAME_FORMATED)
+        dialog.set_title(APP_NAME_FORMATED)
         dialog.set_icon(utils.get_logo())
         dialog.add_filter('Pritunl Profile', '*.ovpn')
         dialog.add_filter('Pritunl Profile', '*.conf')

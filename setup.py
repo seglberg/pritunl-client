@@ -41,26 +41,26 @@ if PLATFORM == LINUX:
     ]
 
 elif PLATFORM == WIN:
-    import gtk
+    import wx
     import py2exe
-    GTK_BASE_PATH = sys.modules['gtk'].__path__[0]
     data_files += [
         ('img', [
             os.path.join('img', 'logo.png'),
             os.path.join('img', 'logo_connected_win.png'),
             os.path.join('img', 'logo_disconnected_win.png'),
         ]),
-        (os.path.join('etc', 'gtk-2.0'), [
-            os.path.join('data', 'win', 'etc', 'gtkrc')]),
-        (os.path.join('share', 'themes', 'MS-Windows', 'gtk-2.0'), [
-            os.path.join('data', 'win', 'theme', 'gtkrc')]),
-        (os.path.join('lib', 'gtk-2.0', '2.10.0', 'engines'), [
-            os.path.join(GTK_BASE_PATH, '..', 'runtime', 'lib', 'gtk-2.0',
-                '2.10.0', 'engines', 'libpixmap.dll'),
-            os.path.join(GTK_BASE_PATH, '..', 'runtime', 'lib', 'gtk-2.0',
-                '2.10.0', 'engines', 'libsvg.dll'),
-            os.path.join(GTK_BASE_PATH, '..', 'runtime', 'lib', 'gtk-2.0',
-                '2.10.0', 'engines', 'libwimp.dll'),
+        ('tuntap', [
+            os.path.join('data', 'win', 'tuntap', 'devcon.exe'),
+            os.path.join('data', 'win', 'tuntap', 'OemWin2k.inf'),
+            os.path.join('data', 'win', 'tuntap', 'tap0901.cat'),
+            os.path.join('data', 'win', 'tuntap', 'tap0901.sys'),
+        ]),
+        ('tuntap', [
+            os.path.join('data', 'win', 'openvpn', 'libeay32.dll'),
+            os.path.join('data', 'win', 'openvpn', 'liblzo2-2.dll'),
+            os.path.join('data', 'win', 'openvpn', 'libpkcs11-helper-1.dll'),
+            os.path.join('data', 'win', 'openvpn', 'openvpn.exe'),
+            os.path.join('data', 'win', 'openvpn', 'ssleay32.dll'),
         ]),
     ]
 

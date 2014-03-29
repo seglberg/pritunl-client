@@ -64,13 +64,12 @@ for img_root in IMG_ROOTS:
 CONNECTING = 'connecting'
 RECONNECTING = 'reconnecting'
 CONNECTED = 'connected'
-DISCONNECTED = 'disconnected'
 ENDED = 'ended'
 ERROR = 'error'
 AUTH_ERROR = 'auth_error'
 TIMEOUT_ERROR = 'timeout_error'
 ACTIVE_STATES = set([CONNECTING, RECONNECTING, CONNECTED])
-INACTIVE_STATES = set([DISCONNECTED, ENDED, ERROR, AUTH_ERROR])
+INACTIVE_STATES = set([ENDED, ERROR, AUTH_ERROR])
 
 START = 'start'
 AUTOSTART = 'autostart'

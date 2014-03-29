@@ -37,7 +37,7 @@ class ProfileLinux(Profile):
             if return_code == 126:
                 self._set_status(ENDED)
             # Random error, retry
-            elif return_code == -15 and not started and retry < 6:
+            elif return_code == -15 and retry < 6:
                 time.sleep(0.1)
                 data['status_callback'] = None
                 data['connect_callback'] = None

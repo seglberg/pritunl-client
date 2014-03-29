@@ -287,6 +287,8 @@ class App:
 
     def exit(self):
         self.icon.destroy()
+        for profile in Profile.iter_profiles():
+            profile.stop()
         sys.exit(0)
 
     def main(self):

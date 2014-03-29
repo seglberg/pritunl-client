@@ -8,7 +8,7 @@ import signal
 
 class ProfileWin(Profile):
     def _start(self, status_callback, connect_callback, passwd):
-        def on_exit(returncode):
+        def on_exit(return_code):
             if self.state in ACTIVE_STATES:
                 self._set_status(ERROR)
 

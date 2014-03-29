@@ -32,7 +32,7 @@ class ProfileLinux(Profile):
             else:
                 mode = AUTOSTART
 
-        def on_exit(returncode):
+        def on_exit(return_code):
             # Canceled
             if return_code == 126:
                 self._set_status(ENDED)

@@ -4,6 +4,7 @@ import interface
 import utils
 import threading
 import time
+import sys
 
 class App:
     def __init__(self):
@@ -97,7 +98,7 @@ class App:
 
         menu_item = interface.MenuItem()
         menu_item.set_label('Exit')
-        menu_item.set_callback(self.icon.destroy)
+        menu_item.set_callback(self.exit)
         menu.add_item(menu_item)
 
         menu_item = interface.MenuItem()
@@ -283,6 +284,10 @@ class App:
                 continue
             threading.Thread(target=profile.start_autostart,
                 args=(self.on_status_change,)).start()
+
+    def exit(self):
+        self.icon.destroy()
+        sys.exit(0)
 
     def main(self):
         try:

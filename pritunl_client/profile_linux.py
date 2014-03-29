@@ -20,6 +20,9 @@ class ProfileLinux(Profile):
         return os.path.join(os.path.abspath(os.sep),
             'etc', 'pritunl_client', profile_hash)
 
+    def _get_ovpn_args(self):
+        return ['pkexec', '/usr/bin/pritunl_client_pk', mode, self.path]
+
     def _start(self, status_callback, connect_callback, passwd, mode=START,
             retry=0):
         if self.autostart or mode == AUTOSTART:
@@ -30,72 +33,12 @@ class ProfileLinux(Profile):
             else:
                 mode = AUTOSTART
 
-        data = {
-            'status': CONNECTING,
-            'process': None,
-            'status_callback': status_callback,
-            'connect_callback': connect_callback,
-            'passwd_path': None,
-        }
-        _connections[self.id] = data
-        retry += 1
-        self._set_status(CONNECTING, connect_event=False)
-
-        args = ['pkexec', '/usr/bin/pritunl_client_pk', mode, self.path]
-
-        if passwd:
-            with open(self.passwd_path, 'w') as passwd_file:
-                os.chmod(self.passwd_path, 0600)
-                passwd_file.write('pritunl_client\n')
-                passwd_file.write('%s\n' % passwd)
-            args.append(self.passwd_path)
-
-        process = subprocess.Popen(args,
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        data['process'] = process
-        self.pid = process.pid
-        self.commit()
-
-        def connect_thread():
-            time.sleep(CONNECT_TIMEOUT)
-            if not data.get('connect_callback'):
-                return
-            self.stop()
-
-        def poll_thread():
-            started = False
-            with open(self.log_path, 'w') as log_file:
-                pass
-            while True:
-                line = process.stdout.readline()
-                if not line:
-                    if process.poll() is not None:
-                        break
-                    else:
-                        continue
-                with open(self.log_path, 'a') as log_file:
-                    log_file.write(line)
-                if not started:
-                    started = True
-                    thread = threading.Thread(target=connect_thread)
-                    thread.daemon = True
-                    thread.start()
-                if 'Initialization Sequence Completed' in line:
-                    self._set_status(CONNECTED)
-                elif 'Inactivity timeout' in line:
-                    self._set_status(RECONNECTING)
-
-            if passwd:
-                try:
-                    os.remove(self.passwd_path)
-                except:
-                    pass
-
+        def on_exit(returncode):
             # Canceled
-            if process.returncode == 126:
+            if return_code == 126:
                 self._set_status(ENDED)
             # Random error, retry
-            elif process.returncode == -15 and not started and retry < 6:
+            elif return_code == -15 and not started and retry < 6:
                 time.sleep(0.1)
                 data['status_callback'] = None
                 data['connect_callback'] = None
@@ -103,11 +46,12 @@ class ProfileLinux(Profile):
                     retry=retry)
                 return
             else:
-                self._set_status(ERROR)
+                if self.state in ACTIVE_STATES:
+                    self._set_status(ERROR)
 
-        thread = threading.Thread(target=poll_thread)
-        thread.daemon = True
-        thread.start()
+        args = ['pkexec', '/usr/bin/pritunl_client_pk', mode, self.path]
+        self._run_ovpn(status_callback, connect_callback, passwd,
+            args, on_exit)
 
     def _start_autostart(self, status_callback, connect_callback):
         self._start(status_callback, connect_callback, None, AUTOSTART)
@@ -136,7 +80,8 @@ class ProfileLinux(Profile):
                         'Pritunl polkit process returned error %s.' % (
                             stop_process.returncode))
             data['process'] = None
-        self._set_status(ENDED)
+        if self.state in ACTIVE_STATES:
+            self._set_status(ENDED)
         self.pid = None
         self.commit()
 

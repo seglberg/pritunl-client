@@ -43,7 +43,6 @@ class ProfileLinux(Profile):
                 data['connect_callback'] = None
                 self._start(status_callback, connect_callback, passwd, mode,
                     retry=retry)
-                return
             else:
                 if self.state in ACTIVE_STATES:
                     self._set_status(ERROR)

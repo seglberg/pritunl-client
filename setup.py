@@ -55,7 +55,7 @@ elif PLATFORM == WIN:
             os.path.join('data', 'win', 'tuntap', 'tap0901.cat'),
             os.path.join('data', 'win', 'tuntap', 'tap0901.sys'),
         ]),
-        ('tuntap', [
+        ('openvpn', [
             os.path.join('data', 'win', 'openvpn', 'libeay32.dll'),
             os.path.join('data', 'win', 'openvpn', 'liblzo2-2.dll'),
             os.path.join('data', 'win', 'openvpn', 'libpkcs11-helper-1.dll'),

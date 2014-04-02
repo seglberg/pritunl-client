@@ -1,4 +1,4 @@
-Pritunl Client
+pritunl-client
 ==============
 
 In development

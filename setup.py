@@ -69,8 +69,8 @@ setup(
     version=pritunl_client.__version__,
     description='Pritunl openvpn client',
     long_description=open('README.rst').read(),
-    author='Zachary Huff',
-    author_email='zach.huff.386@gmail.com',
+    author='Pritunl',
+    author_email='contact@pritunl.com',
     url='https://github.com/pritunl/pritunl-client',
     download_url='https://github.com/pritunl/pritunl-client/archive/' + \
         '%s.tar.gz' % pritunl_client.__version__,

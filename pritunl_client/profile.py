@@ -94,7 +94,11 @@ class Profile:
         try:
             with open(temp_path, 'w') as conf_file:
                 conf_file.write(json.dumps(self.dict()))
-            os.rename(temp_path, self.conf_path)
+            try:
+                os.rename(temp_path, self.conf_path)
+            except:
+                os.remove(self.conf_path)
+                os.rename(temp_path, self.conf_path)
         finally:
             if os.path.exists(temp_path):
                 os.remove(temp_path)

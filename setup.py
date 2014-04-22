@@ -41,6 +41,22 @@ if PLATFORM == LINUX:
     ]
 
 elif PLATFORM == WIN:
+    try:
+        try:
+            import py2exe.mf as modulefinder
+        except ImportError:
+            import modulefinder
+        import sys
+        import win32com
+        for path in win32com.__path__[1:]:
+            modulefinder.AddPackagePath('win32com', path)
+        __import__('win32com.shell')
+        module = sys.modules['win32com.shell']
+        for path in module.__path__[1:]:
+            modulefinder.AddPackagePath('win32com.shell', path)
+    except ImportError:
+        pass
+
     import wx
     import py2exe
     data_files += [

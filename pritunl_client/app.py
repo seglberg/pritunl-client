@@ -286,9 +286,9 @@ class App:
                 args=(self.on_status_change,)).start()
 
     def exit(self):
-        self.icon.destroy()
         for profile in Profile.iter_profiles():
             profile.stop()
+        self.icon.destroy()
         sys.exit(0)
 
     def main(self):

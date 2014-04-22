@@ -102,9 +102,7 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Topic :: System :: Networking',
     ],
-    windows = [{
-        'script': 'win_main.py',
-    }],
+    windows=['win_main.py'],
     options = {
         'py2exe': {
             'packages':'encodings',

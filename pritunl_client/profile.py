@@ -173,7 +173,7 @@ class Profile:
         raise NotImplementedError()
 
     def _run_ovpn(self, status_callback, connect_callback, passwd,
-            args, on_exit):
+            args, on_exit, **kwargs):
         data = {
             'status': CONNECTING,
             'process': None,
@@ -191,7 +191,7 @@ class Profile:
                 passwd_file.write('%s\n' % passwd)
 
         process = subprocess.Popen(args,
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs)
         data['process'] = process
         self.pid = process.pid
         self.commit()

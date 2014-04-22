@@ -12,7 +12,8 @@ class ProfileWin(Profile):
     def _add_tap_adapter(self):
         devcon_path = os.path.join(WIN_TUNTAP_DIR, 'devcon.exe')
         subprocess.check_output([devcon_path, 'install',
-            'OemWin2k.inf', 'tap0901'], cwd=WIN_TUNTAP_DIR)
+            'OemWin2k.inf', 'tap0901'], cwd=WIN_TUNTAP_DIR,
+            creationflags=0x08000000)
 
     def _start(self, status_callback, connect_callback, passwd):
         global _available_tap_adapters
@@ -35,7 +36,7 @@ class ProfileWin(Profile):
             args.append(self.passwd_path)
 
         self._run_ovpn(status_callback, connect_callback, passwd,
-            args, on_exit)
+            args, on_exit, creationflags=0x08000000)
 
     def _start_autostart(self, status_callback, connect_callback):
         self._start(status_callback, connect_callback, None)
@@ -75,6 +76,6 @@ class ProfileWin(Profile):
     def _clear_tap_adapters(cls):
         devcon_path = os.path.join(WIN_TUNTAP_DIR, 'devcon.exe')
         subprocess.check_output([devcon_path, 'remove', 'tap0901'],
-            cwd=WIN_TUNTAP_DIR)
+            cwd=WIN_TUNTAP_DIR, creationflags=0x08000000)
 
 ProfileWin._clear_tap_adapters()

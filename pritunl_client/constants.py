@@ -61,6 +61,19 @@ for img_root in IMG_ROOTS:
     if os.path.exists(img_path) and not DISCONNECTED_LOGO_DEFAULT_PATH:
         DISCONNECTED_LOGO_DEFAULT_PATH = img_path
 
+if PLATFORM == WIN:
+    WIN_OPENVPN_PATH = None
+    for path in (
+                os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])),
+                    'openvpn', 'openvpn.exe'),
+                os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])),
+                    'data', 'win', 'openvpn', 'openvpn.exe'),
+            ):
+        if os.path.isfile(path):
+            WIN_OPENVPN_PATH = path
+    if not WIN_OPENVPN_PATH:
+        raise ValueError('Failed to find openvpn executable')
+
 CONNECTING = 'connecting'
 RECONNECTING = 'reconnecting'
 CONNECTED = 'connected'

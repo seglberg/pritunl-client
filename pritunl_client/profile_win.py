@@ -12,7 +12,7 @@ class ProfileWin(Profile):
             if self.status in ACTIVE_STATES:
                 self._set_status(ERROR)
 
-        args = ['openvpn.exe', '--config', self.path]
+        args = [WIN_OPENVPN_PATH, '--config', self.path]
 
         if passwd:
             args.append('--auth-user-pass')

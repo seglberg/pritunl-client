@@ -74,6 +74,18 @@ if PLATFORM == WIN:
     if not WIN_OPENVPN_PATH:
         raise ValueError('Failed to find openvpn executable')
 
+    WIN_TUNTAP_DIR = None
+    for path in (
+                os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])),
+                    'tuntap'),
+                os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])),
+                    'data', 'win', 'tuntap'),
+            ):
+        if os.path.exists(path):
+            WIN_TUNTAP_DIR = path
+    if not WIN_TUNTAP_DIR:
+        raise ValueError('Failed to find tuntap directory')
+
 CONNECTING = 'connecting'
 RECONNECTING = 'reconnecting'
 CONNECTED = 'connected'

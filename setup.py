@@ -118,12 +118,17 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Topic :: System :: Networking',
     ],
-    windows=['win_main.py'],
+    windows=[{
+        'script': 'win_main.py',
+        'dest_base': 'pritunl_client',
+    }],
     options = {
         'py2exe': {
+            'bundle_files': 1,
             'packages':'encodings',
             'includes': 'cairo, pango, pangocairo, atk, gobject, ' + \
                 'gio, gtk.keysyms, rsvg',
+            'dll_excludes': ['w9xpopen.exe'],
         },
     },
 )

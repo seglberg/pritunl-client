@@ -300,3 +300,4 @@ class App:
         finally:
             for profile in Profile.iter_profiles():
                 profile.stop()
+            self.icon.destroy()

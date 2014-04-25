@@ -121,6 +121,7 @@ setup(
     windows=[{
         'script': 'win_main.py',
         'dest_base': 'pritunl_client',
+        'icon_resources': [(1, 'img/logo.ico')],
     }],
     options = {
         'py2exe': {

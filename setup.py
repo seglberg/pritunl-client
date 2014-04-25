@@ -125,7 +125,6 @@ setup(
     }],
     options = {
         'py2exe': {
-            'bundle_files': 1,
             'packages':'encodings',
             'includes': 'cairo, pango, pangocairo, atk, gobject, ' + \
                 'gio, gtk.keysyms, rsvg',

@@ -5,6 +5,7 @@ import utils
 import threading
 import time
 import sys
+import tarfile
 
 class App:
     def __init__(self):
@@ -259,10 +260,16 @@ class App:
         response = dialog.run()
         dialog.destroy()
         if response:
-            with open(response, 'r') as profile_file:
-                profile = Profile.get_profile()
-                profile.write_profile(profile_file.read())
-                self.update_menu()
+            if os.path.splitext(response)[1] == '.tar':
+                tar = tarfile.open(response)
+                for member in tar:
+                    profile = Profile.get_profile()
+                    profile.write_profile(tar.extractfile(member).read())
+            else:
+                with open(response, 'r') as profile_file:
+                    profile = Profile.get_profile()
+                    profile.write_profile(profile_file.read())
+            self.update_menu()
 
     def show_import_profile_uri(self):
         dialog = interface.InputDialog()

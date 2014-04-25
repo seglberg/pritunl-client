@@ -129,11 +129,6 @@ class App:
         menu_item.set_callback(self.exit)
         menu.add_item(menu_item)
 
-        menu_item = interface.MenuItem()
-        menu_item.set_label('Toggle Icon State (Debug)')
-        menu_item.set_callback(self.toggle_icon_state)
-        menu.add_item(menu_item)
-
         self.icon.set_menu(menu)
 
     def update_icon(self):

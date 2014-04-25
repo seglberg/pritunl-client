@@ -29,11 +29,6 @@ class App:
                 proc_info = shell.ShellExecuteEx(nShow=win32con.SW_SHOWNORMAL,
                     fMask=shellcon.SEE_MASK_NOCLOSEPROCESS,
                     lpVerb='runas', lpFile=cmd, lpParameters=params)
-
-                proc_handle = proc_info['hProcess']
-                obj = win32event.WaitForSingleObject(proc_handle,
-                    win32event.INFINITE)
-                rc = win32process.GetExitCodeProcess(proc_handle)
                 sys.exit(0)
 
         self._icon_state = None

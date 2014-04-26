@@ -39,7 +39,6 @@ for dest_dir, files in data_files:
 
 a = Analysis(
     ['win_main.py'],
-    pathex=['C:\\Users\\windows\\Desktop\\pritunl-client'],
     hiddenimports=[],
     hookspath=None,
     runtime_hooks=None,

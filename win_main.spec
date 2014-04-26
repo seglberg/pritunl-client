@@ -86,7 +86,7 @@ else:
         a.datas,
         strip=None,
         upx=True,
-        name='pritunl_client',
+        name='',
     )
 
 for dest_dir, files in data_files:

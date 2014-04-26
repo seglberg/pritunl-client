@@ -3,6 +3,7 @@ import os
 import subprocess
 import shutil
 
+ONE_FILE = False
 DIST_PATH = 'dist'
 
 data_files = [
@@ -26,40 +27,70 @@ data_files = [
     ]),
 ]
 
-if os.path.exists(DIST_PATH):
-    shutil.rmtree(DIST_PATH)
-os.makedirs(DIST_PATH)
+if ONE_FILE:
+    a = Analysis(
+        ['win_main.py'],
+        hiddenimports=[],
+        hookspath=None,
+        runtime_hooks=None,
+    )
+    for data in a.datas:
+        if 'pyconfig' in data[0]:
+            a.datas.remove(data)
+            break
+    pyz = PYZ(
+        a.pure,
+    )
+    exe = EXE(
+        pyz,
+        a.scripts,
+        a.binaries,
+        a.zipfiles,
+        a.datas,
+        name='pritunl_client.exe',
+        debug=False,
+        strip=None,
+        upx=True,
+        console=False,
+        icon='img\\logo.ico',
+    )
+else:
+    a = Analysis(
+        ['win_main.py'],
+        hiddenimports=[],
+        hookspath=None,
+        runtime_hooks=None,
+    )
+    for data in a.datas:
+        if 'pyconfig' in data[0]:
+            a.datas.remove(data)
+            break
+    pyz = PYZ(
+        a.pure,
+    )
+    exe = EXE(
+        pyz,
+        a.scripts,
+        exclude_binaries=True,
+        name='pritunl_client.exe',
+        debug=False,
+        strip=None,
+        upx=True,
+        console=False,
+        icon='img\\logo.ico',
+    )
+    coll = COLLECT(
+        exe,
+        a.binaries,
+        a.zipfiles,
+        a.datas,
+        strip=None,
+        upx=True,
+        name='pritunl_client',
+    )
 
 for dest_dir, files in data_files:
     os.makedirs(os.path.join(DIST_PATH, dest_dir))
     for file_path in files:
         shutil.copy(file_path, os.path.join(DIST_PATH, dest_dir,
             os.path.basename(file_path)))
-
-
-a = Analysis(
-    ['win_main.py'],
-    hiddenimports=[],
-    hookspath=None,
-    runtime_hooks=None,
-)
-for data in a.datas:
-    if 'pyconfig' in data[0]:
-        a.datas.remove(data)
-        break
-pyz = PYZ(
-    a.pure,
-)
-exe = EXE(
-    pyz,
-    a.scripts,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
-    name='pritunl_client.exe',
-    debug=False,
-    strip=None,
-    upx=True,
-    console=False,
-    icon='img\\logo.ico',
-)

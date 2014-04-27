@@ -19,9 +19,6 @@ class ProfileLinux(Profile):
         return os.path.join(os.path.abspath(os.sep),
             'etc', 'pritunl_client', self._get_profile_hash())
 
-    def _get_ovpn_args(self):
-        return ['pkexec', '/usr/bin/pritunl_client_pk', mode, self.path]
-
     def _start(self, status_callback, connect_callback, passwd, mode=START,
             retry=0):
         if self.autostart or mode == AUTOSTART:

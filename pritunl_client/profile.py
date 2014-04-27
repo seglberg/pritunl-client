@@ -258,12 +258,12 @@ class Profile:
 
     @classmethod
     def get_profile(cls, id=None):
-        from profile_linux import ProfileLinux
-        from profile_win import ProfileWin
-        from profile_osx import ProfileOsx
         if PLATFORM == LINUX:
+            from profile_linux import ProfileLinux
             return ProfileLinux(id)
         elif PLATFORM == WIN:
+            from profile_win import ProfileWin
             return ProfileWin(id)
         elif PLATFORM == OSX:
+            from profile_osx import ProfileOsx
             return ProfileOsx(id)

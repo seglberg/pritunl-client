@@ -27,12 +27,12 @@ sha256sums=("CHANGE_ME")
 options=("emptydirs")
 
 build() {
-    cd "${srcdir}/${pkgname}"
+    cd "${srcdir}/${pkgname}-${pkgver}"
     python2 setup.py build
 }
 
 package() {
-    cd "${srcdir}/${pkgname}"
+    cd "${srcdir}/${pkgname}-${pkgver}"
     mkdir -p "${pkgdir}/etc/pritunl_client"
     python2 setup.py install --root="${pkgdir}" --prefix=/usr
 }

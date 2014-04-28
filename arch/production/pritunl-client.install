@@ -6,7 +6,7 @@ post_install() {
     xdg-icon-resource forceupdate --theme ubuntu-mono-dark &> /dev/null || true
     xdg-icon-resource forceupdate --theme ubuntu-mono-light &> /dev/null || true
     update-desktop-database -q || true
-    pritunl_client || true&
+    nohup pritunl_client || true&
 }
 
 pre_remove() {

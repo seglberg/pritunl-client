@@ -72,8 +72,11 @@ def pk():
             raise ValueError('Profile must be in home directory')
         with open(sys.argv[2], 'r') as profile_file:
             profile_hash = hashlib.sha1(profile_file.read()).hexdigest()
-        profile_hash_path = os.path.join(os.path.abspath(os.sep),
-            'etc', 'pritunl_client', profile_hash)
+        etc_dir = os.path.join(os.path.abspath(os.sep),
+            'etc', 'pritunl_client')
+        if not os.path.exists(etc_dir):
+            os.makedirs(etc_dir)
+        profile_hash_path = os.path.join(etc_dir, profile_hash)
         with open(profile_hash_path, 'w') as profile_hash_file:
             pass
     elif sys.argv[1] == 'clear_autostart':

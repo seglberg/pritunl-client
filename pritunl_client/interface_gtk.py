@@ -47,6 +47,7 @@ class MessageDialog:
         self._dialog = gtk.MessageDialog(
             type=_mappings[self._type],
             buttons=_mappings[self._buttons])
+        self._dialog.set_position(gtk.WIN_POS_CENTER)
         self._dialog.set_skip_taskbar_hint(False)
         self._dialog.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
 
@@ -137,6 +138,7 @@ class InputDialog:
         self._dialog = gtk.MessageDialog(
             type=gtk.MESSAGE_QUESTION,
             buttons=gtk.BUTTONS_OK_CANCEL)
+        self._dialog.set_position(gtk.WIN_POS_CENTER)
         self._dialog.set_skip_taskbar_hint(False)
         self._dialog.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
         self._label = gtk.Label()
@@ -181,6 +183,7 @@ class FileChooserDialog:
         self._filters = {}
         self._dialog = gtk.FileChooserDialog(buttons=(gtk.STOCK_CANCEL,
             gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+        self._dialog.set_position(gtk.WIN_POS_CENTER)
         self._dialog.set_skip_taskbar_hint(False)
         self._dialog.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
 

@@ -4,7 +4,7 @@
   <vendor>Pritunl</vendor>
   <vendor_url>http://pritunl.com/</vendor_url>
 
-  <action id="com.pritunl.client.start">
+  <action id="com.pritunl.client.profile_start">
     <description>Start pritunl connection</description>
     <message>Authentication is required to start a connection</message>
     <defaults>
@@ -17,7 +17,7 @@
     <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
   </action>
 
-  <action id="com.pritunl.client.autostart">
+  <action id="com.pritunl.client.profile_autostart">
     <description>Start pritunl connection</description>
     <message>Authentication is required to start a connection</message>
     <defaults>
@@ -30,7 +30,7 @@
     <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
   </action>
 
-  <action id="com.pritunl.client.stop">
+  <action id="com.pritunl.client.profile_stop">
     <description>Stop pritunl connection</description>
     <message>Authentication is required to stop a connection</message>
     <defaults>
@@ -43,7 +43,7 @@
     <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
   </action>
 
-  <action id="com.pritunl.client.set_autostart">
+  <action id="com.pritunl.client.profile_set_autostart">
     <description>Enable autostart pritunl connection</description>
     <message>Authentication is required to modify a connection</message>
     <defaults>
@@ -56,7 +56,7 @@
     <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
   </action>
 
-  <action id="com.pritunl.client.clear_autostart">
+  <action id="com.pritunl.client.profile_clear_autostart">
     <description>Disable autostart pritunl connection</description>
     <message>Authentication is required to modify a connection</message>
     <defaults>

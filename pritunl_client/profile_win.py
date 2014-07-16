@@ -51,14 +51,13 @@ class ProfileWin(Profile):
                 for i in xrange(int(5 / 0.1)):
                     time.sleep(0.1)
                     if process.poll() is not None:
-                        return
+                        break
                     process.terminate()
 
-                process.kill()
                 for i in xrange(int(5 / 0.1)):
                     time.sleep(0.1)
                     if process.poll() is not None:
-                        return
+                        break
                     process.kill()
         self._reset_networking()
         if not silent:

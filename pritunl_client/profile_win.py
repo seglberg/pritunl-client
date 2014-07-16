@@ -60,6 +60,7 @@ class ProfileWin(Profile):
                     if process.poll() is not None:
                         return
                     process.kill()
+        self._reset_networking()
         if not silent:
             self._set_status(ENDED)
         self.pid = None
@@ -70,6 +71,22 @@ class ProfileWin(Profile):
             try:
                 os.kill(pid, signal.SIGTERM)
             except OSError:
+                pass
+
+    def _reset_networking(self):
+        for command in (
+                    ['route', '-f'],
+                    ['ipconfig', '/release'],
+                    ['ipconfig', '/renew'],
+                    ['arp', '-d', '*'],
+                    ['nbtstat', '-R'],
+                    ['nbtstat', '-RR'],
+                    ['ipconfig', '/flushdns'],
+                    ['nbtstat', '/registerdns'],
+                ):
+            try:
+                subprocess.check_output(command, creationflags=0x08000000)
+            except:
                 pass
 
     @classmethod

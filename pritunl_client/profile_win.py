@@ -6,7 +6,11 @@ import subprocess
 import threading
 import signal
 
-_available_tap_adapters = 0
+try:
+    _available_tap_adapters = subprocess.check_output(
+        ['ipconfig', '/all']).count('TAP-Windows Adapter V9')
+except:
+    _available_tap_adapters = 0
 
 class ProfileWin(Profile):
     def _add_tap_adapter(self):
@@ -93,5 +97,3 @@ class ProfileWin(Profile):
         devcon_path = os.path.join(WIN_TUNTAP_DIR, 'devcon.exe')
         subprocess.check_output([devcon_path, 'remove', 'tap0901'],
             cwd=WIN_TUNTAP_DIR, creationflags=0x08000000)
-
-ProfileWin._clear_tap_adapters()

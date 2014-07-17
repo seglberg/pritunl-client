@@ -59,7 +59,7 @@ class ProfileWin(Profile):
                     if process.poll() is not None:
                         break
                     process.kill()
-        self._reset_networking()
+                self._reset_networking()
         if not silent:
             self._set_status(ENDED)
         self.pid = None

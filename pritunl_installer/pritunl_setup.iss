@@ -50,3 +50,5 @@ Filename: "timeout.exe"; Parameters: "/t 3"; Flags: runascurrentuser runhidden s
 Filename: "taskkill.exe"; Parameters: "/F /IM openvpn.exe"; Flags: runascurrentuser runhidden skipifdoesntexist
 Filename: "taskkill.exe"; Parameters: "/F /IM openvpn.exe"; Flags: runascurrentuser runhidden skipifdoesntexist
 Filename: "taskkill.exe"; Parameters: "/F /IM openvpn.exe"; Flags: runascurrentuser runhidden skipifdoesntexist
+Filename: "timeout.exe"; Parameters: "/t 3"; Flags: runascurrentuser runhidden skipifdoesntexist
+Filename: "{app}\pritunl_client_clean.exe"; Flags: runascurrentuser runhidden skipifdoesntexist

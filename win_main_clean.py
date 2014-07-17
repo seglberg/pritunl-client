@@ -1,0 +1,2 @@
+import pritunl_client.profile_win
+pritunl_client.profile_win.ProfileWin.clear_tap_adapters()

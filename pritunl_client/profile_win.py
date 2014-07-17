@@ -15,7 +15,8 @@ class ProfileWin(Profile):
     def _start(self, status_callback, connect_callback, passwd):
         try:
             tap_adapters['available'] = subprocess.check_output(
-                ['ipconfig', '/all']).count('TAP-Windows Adapter V9')
+                ['ipconfig', '/all'], creationflags=0x08000000).count(
+                'TAP-Windows Adapter V9')
         except:
             pass
 

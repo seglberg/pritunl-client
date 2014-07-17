@@ -46,3 +46,7 @@ Filename: "{app}\{#MyAppExeName}"; Flags: nowait
 Filename: "taskkill.exe"; Parameters: "/F /IM {#MyAppExeName}"; Flags: runascurrentuser runhidden skipifdoesntexist
 Filename: "taskkill.exe"; Parameters: "/F /IM {#MyAppExeName}"; Flags: runascurrentuser runhidden skipifdoesntexist
 Filename: "taskkill.exe"; Parameters: "/F /IM {#MyAppExeName}"; Flags: runascurrentuser runhidden skipifdoesntexist
+Filename: "timeout.exe"; Parameters: "/t 3"; Flags: runascurrentuser runhidden skipifdoesntexist
+Filename: "taskkill.exe"; Parameters: "/F /IM openvpn.exe"; Flags: runascurrentuser runhidden skipifdoesntexist
+Filename: "taskkill.exe"; Parameters: "/F /IM openvpn.exe"; Flags: runascurrentuser runhidden skipifdoesntexist
+Filename: "taskkill.exe"; Parameters: "/F /IM openvpn.exe"; Flags: runascurrentuser runhidden skipifdoesntexist

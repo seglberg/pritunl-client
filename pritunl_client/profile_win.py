@@ -72,7 +72,8 @@ class ProfileWin(Profile):
             except OSError:
                 pass
 
-    def _reset_networking(self):
+    @classmethod
+    def _reset_networking(cls):
         for command in (
                     ['route', '-f'],
                     ['ipconfig', '/release'],
@@ -89,7 +90,7 @@ class ProfileWin(Profile):
                 pass
 
     @classmethod
-    def add_tap_adapter(self):
+    def add_tap_adapter(cls):
         devcon_path = os.path.join(WIN_TUNTAP_DIR, 'devcon.exe')
         subprocess.check_output([devcon_path, 'install',
             'OemWin2k.inf', 'tap0901'], cwd=WIN_TUNTAP_DIR,
@@ -100,3 +101,4 @@ class ProfileWin(Profile):
         devcon_path = os.path.join(WIN_TUNTAP_DIR, 'devcon.exe')
         subprocess.check_output([devcon_path, 'remove', 'tap0901'],
             cwd=WIN_TUNTAP_DIR, creationflags=0x08000000)
+        cls._reset_networking()

@@ -6,32 +6,27 @@ import subprocess
 import threading
 import signal
 
-try:
-    _available_tap_adapters = subprocess.check_output(
-        ['ipconfig', '/all']).count('TAP-Windows Adapter V9')
-except:
-    _available_tap_adapters = 0
+tap_adapters = {
+    'in_use': 0,
+    'available': 0,
+}
 
 class ProfileWin(Profile):
-    def _add_tap_adapter(self):
-        devcon_path = os.path.join(WIN_TUNTAP_DIR, 'devcon.exe')
-        subprocess.check_output([devcon_path, 'install',
-            'OemWin2k.inf', 'tap0901'], cwd=WIN_TUNTAP_DIR,
-            creationflags=0x08000000)
-
     def _start(self, status_callback, connect_callback, passwd):
-        global _available_tap_adapters
+        try:
+            tap_adapters['available'] = subprocess.check_output(
+                ['ipconfig', '/all']).count('TAP-Windows Adapter V9')
+        except:
+            pass
 
         def on_exit(data, return_code):
-            global _available_tap_adapters
-            _available_tap_adapters += 1
+            tap_adapters['in_use'] -= 1
             if self.status in ACTIVE_STATES:
                 self._set_status(ERROR)
 
-        if not _available_tap_adapters:
-            self._add_tap_adapter()
-        else:
-            _available_tap_adapters -= 1
+        if not tap_adapters['available'] - tap_adapters['in_use']:
+            self.add_tap_adapter()
+        tap_adapters['in_use'] += 1
 
         args = [WIN_OPENVPN_PATH, '--config', self.path]
 
@@ -93,7 +88,14 @@ class ProfileWin(Profile):
                 pass
 
     @classmethod
-    def _clear_tap_adapters(cls):
+    def add_tap_adapter(self):
+        devcon_path = os.path.join(WIN_TUNTAP_DIR, 'devcon.exe')
+        subprocess.check_output([devcon_path, 'install',
+            'OemWin2k.inf', 'tap0901'], cwd=WIN_TUNTAP_DIR,
+            creationflags=0x08000000)
+
+    @classmethod
+    def clear_tap_adapters(cls):
         devcon_path = os.path.join(WIN_TUNTAP_DIR, 'devcon.exe')
         subprocess.check_output([devcon_path, 'remove', 'tap0901'],
             cwd=WIN_TUNTAP_DIR, creationflags=0x08000000)

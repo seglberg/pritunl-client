@@ -14,10 +14,25 @@ tap_adapters = {
 class ProfileWin(Profile):
     def _start(self, status_callback, connect_callback, passwd):
         try:
-            tap_adapters['available'] = subprocess.check_output(
-                ['ipconfig', '/all'], creationflags=0x08000000).count(
-                'TAP-Windows Adapter V9')
-        except:
+            ipconfig = subprocess.check_output(['ipconfig', '/all'])
+            tap_adapters['in_use'] = 0
+            tap_adapters['available'] = 0
+            tap_adapter = False
+            tap_disconnected = False
+            for line in ipconfig.split('\n'):
+                line = line.strip()
+                if line == '':
+                    if tap_adapter:
+                        tap_adapters['available'] += 1
+                        if not disconnected:
+                            tap_adapters['in_use'] += 1
+                    tap_adapter = False
+                    disconnected = False
+                elif 'TAP-Windows Adapter V9' in line:
+                    tap_adapter = True
+                elif 'Media disconnected' in line:
+                    disconnected = True
+        except (WindowsError, subprocess.CalledProcessError):
             pass
 
         def on_exit(data, return_code):

@@ -1,5 +1,5 @@
 #define MyAppName "Pritunl"
-#define MyAppVersion "0.1.0"
+#define MyAppVersion "0.10.0"
 #define MyAppPublisher "Pritunl"
 #define MyAppURL "http://pritunl.com/"
 #define MyAppExeName "pritunl_client.exe"
@@ -15,9 +15,10 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
+PrivilegesRequired=admin
 DisableProgramGroupPage=yes
 OutputDir=.\
-OutputBaseFilename=pritunl_client
+OutputBaseFilename=pritunl_client-setup
 SetupIconFile=logo.ico
 Compression=lzma
 SolidCompression=yes
@@ -28,7 +29,7 @@ CloseApplicationsFilter=*.exe,*.dll,*.chm
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: checkedonce
 
 [Files]
 Source: "..\pritunl_client\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -42,6 +43,6 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 Filename: "{app}\{#MyAppExeName}"; Flags: nowait
 
 [UninstallRun]
-Filename: "TASKKILL.EXE"; Parameters: "/F /IM {#MyAppExeName}"; Flags: runhidden
-Filename: "TASKKILL.EXE"; Parameters: "/F /IM {#MyAppExeName}"; Flags: runhidden
-Filename: "TASKKILL.EXE"; Parameters: "/F /IM {#MyAppExeName}"; Flags: runhidden
+Filename: "taskkill.exe"; Parameters: "/F /IM {#MyAppExeName}"; Flags: runhidden
+Filename: "taskkill.exe"; Parameters: "/F /IM {#MyAppExeName}"; Flags: runhidden
+Filename: "taskkill.exe"; Parameters: "/F /IM {#MyAppExeName}"; Flags: runhidden

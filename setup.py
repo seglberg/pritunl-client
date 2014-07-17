@@ -122,6 +122,11 @@ setup(
         'script': 'win_main.py',
         'dest_base': 'pritunl_client',
         'icon_resources': [(1, 'img/logo.ico')],
+    },
+    {
+        'script': 'win_main_clean.py',
+        'dest_base': 'pritunl_client_clean',
+        'icon_resources': [(1, 'img/logo.ico')],
     }],
     options = {
         'py2exe': {

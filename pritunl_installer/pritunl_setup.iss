@@ -56,5 +56,4 @@ Filename: "timeout.exe"; Parameters: "/t 1"; Flags: runascurrentuser runhidden s
 Filename: "cmd.exe"; Parameters: "/C ""del """"{app}/MPR.dll"""""""; Flags: runascurrentuser runhidden skipifdoesntexist
 
 [UninstallDelete]
-Type: files; Name: "{app}/MPR.dll"
-Type: dirifempty; Name: "{app}"
+Type: filesandordirs; Name: "{app}"

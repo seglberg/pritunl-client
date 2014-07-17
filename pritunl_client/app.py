@@ -144,7 +144,7 @@ class App:
         dialog.set_buttons(BUTTONS_OK)
         dialog.set_title(APP_NAME_FORMATED)
         dialog.set_icon(utils.get_logo())
-        dialog.set_message('Unable to connect to %s' % profile.server_name)
+        dialog.set_message('Unable to connect to %s' % profile.name)
         dialog.set_message_secondary(error_msgs[status])
         dialog.run()
         dialog.destroy()
@@ -187,7 +187,7 @@ class App:
         dialog.set_buttons(BUTTONS_CANCEL)
         dialog.set_title(APP_NAME_FORMATED)
         dialog.set_icon(utils.get_logo())
-        dialog.set_message('Connecting to %s' % profile.server_name)
+        dialog.set_message('Connecting to %s' % profile.name)
         dialog.set_message_secondary('Conecting to the server...')
 
         def connect_callback():

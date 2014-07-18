@@ -1,5 +1,12 @@
 pritunl-client (0.1.0-0ubuntu1) trusty; urgency=low
 
+  * Changes to interface
+  * Improvements to windows VPN connections
+
+ -- Zachary Huff <zach.huff.386@gmail.com>  Fri, 18 Jul 2014 01:07:32 -0400
+
+pritunl-client (0.1.0-0ubuntu1) trusty; urgency=low
+
   * Initial beta release
 
  -- Zachary Huff <zach.huff.386@gmail.com>  Sun, 27 Apr 2014 17:58:49 -0400

@@ -107,7 +107,7 @@ setup(
         'MacOS',
     ],
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: X11 Applications :: GTK',
         'Intended Audience :: End Users/Desktop',
         'License :: OSI Approved :: GNU Affero General Public License v3',

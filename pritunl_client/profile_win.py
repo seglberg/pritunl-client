@@ -14,7 +14,8 @@ tap_adapters = {
 class ProfileWin(Profile):
     def _start(self, status_callback, connect_callback, passwd):
         try:
-            ipconfig = subprocess.check_output(['ipconfig', '/all'])
+            ipconfig = subprocess.check_output(['ipconfig', '/all'],
+                creationflags=0x08000000)
             tap_adapters['in_use'] = 0
             tap_adapters['available'] = 0
             tap_adapter = False

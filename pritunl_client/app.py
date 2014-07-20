@@ -315,7 +315,7 @@ class App:
         dialog.destroy()
         if response:
             try:
-                url = response.replace('pt', 'http')
+                url = response.replace('pt', 'http', 1)
                 response = utils.request.get(url)
 
                 if response.status_code != 200:

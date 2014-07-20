@@ -109,10 +109,10 @@ class App:
         menu_item.set_callback(self.show_import_profile)
         menu.add_item(menu_item)
 
-        # menu_item = interface.MenuItem()
-        # menu_item.set_label('Import Profile URI')
-        # menu_item.set_callback(self.show_import_profile_uri)
-        # menu.add_item(menu_item)
+        menu_item = interface.MenuItem()
+        menu_item.set_label('Import Profile URI')
+        menu_item.set_callback(self.show_import_profile_uri)
+        menu.add_item(menu_item)
 
         menu_item = interface.MenuItem()
         menu_item.set_label('About')
@@ -299,6 +299,20 @@ class App:
         response = dialog.run()
         dialog.destroy()
         if response:
+            url = response.replace('pt', 'http')
+            try:
+                response = utils.request.get(url)
+            except httplib.HTTPException:
+                raise Exception('TODO')
+
+            if response.status_code != 200:
+                raise Exception('TODO')
+            data = response.json()
+
+            for key in data:
+                profile = Profile.get_profile()
+                profile.write_profile(data[key])
+
             self.update_menu()
 
     def autostart(self):

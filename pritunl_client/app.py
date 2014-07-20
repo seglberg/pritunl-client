@@ -314,12 +314,30 @@ class App:
         response = dialog.run()
         dialog.destroy()
         if response:
+            url = response
+            if url[:2] == 'pt':
+                url = url.replace('pt', 'http', 1)
+            if url[:4] != 'http':
+                url = 'http://' + url
             try:
-                url = response.replace('pt', 'http', 1)
-                response = utils.request.get(url)
-
-                if response.status_code != 200:
-                    raise Exception('Pritunl server returned error')
+                for i in xrange(2):
+                    try:
+                        response = utils.request.get(url)
+                        if response.status_code != 400:
+                            break
+                    except httplib.HTTPException:
+                        if i == 1:
+                            raise
+                    if url[:5] == 'https':
+                        url = url.replace('https', 'http', 1)
+                    else:
+                        url = url.replace('http', 'https', 1)
+                if response.status_code == 200:
+                    pass
+                elif response.status_code == 404:
+                    raise Exception('Key link is not valid')
+                else:
+                    raise Exception('Pritunl server returned error code %s' % (response.status_code))
                 data = response.json()
 
                 for key in data:

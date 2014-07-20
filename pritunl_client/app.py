@@ -6,6 +6,7 @@ import threading
 import time
 import sys
 import tarfile
+import httplib
 
 class App:
     def __init__(self):
@@ -313,19 +314,19 @@ class App:
         response = dialog.run()
         dialog.destroy()
         if response:
-            url = response.replace('pt', 'http')
             try:
+                url = response.replace('pt', 'http')
                 response = utils.request.get(url)
-            except httplib.HTTPException:
-                raise Exception('TODO')
 
-            if response.status_code != 200:
-                raise Exception('TODO')
-            data = response.json()
+                if response.status_code != 200:
+                    raise Exception('Pritunl server returned error')
+                data = response.json()
 
-            for key in data:
-                profile = Profile.get_profile()
-                profile.write_profile(data[key])
+                for key in data:
+                    profile = Profile.get_profile()
+                    profile.write_profile(data[key])
+            except Exception as exception:
+                self.show_import_profile_error(exception)
 
             self.update_menu()
 

@@ -327,7 +327,6 @@ class App:
                     profile.write_profile(data[key])
             except Exception as exception:
                 self.show_import_profile_error(exception)
-
             self.update_menu()
 
     def autostart(self):

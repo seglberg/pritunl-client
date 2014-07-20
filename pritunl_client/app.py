@@ -266,6 +266,17 @@ class App:
         dialog.run()
         dialog.destroy()
 
+    def show_import_profile_error(self, message):
+        dialog = interface.MessageDialog()
+        dialog.set_type(MESSAGE_ERROR)
+        dialog.set_buttons(BUTTONS_OK)
+        dialog.set_title(APP_NAME_FORMATED)
+        dialog.set_icon(utils.get_logo())
+        dialog.set_message('Failed to import profile:')
+        dialog.set_message_secondary(str(message).capitalize())
+        dialog.run()
+        dialog.destroy()
+
     def show_import_profile(self):
         dialog = interface.FileChooserDialog()
         dialog.set_title(APP_NAME_FORMATED)
@@ -277,15 +288,18 @@ class App:
         response = dialog.run()
         dialog.destroy()
         if response:
-            if os.path.splitext(response)[1] == '.tar':
-                tar = tarfile.open(response)
-                for member in tar:
-                    profile = Profile.get_profile()
-                    profile.write_profile(tar.extractfile(member).read())
-            else:
-                with open(response, 'r') as profile_file:
-                    profile = Profile.get_profile()
-                    profile.write_profile(profile_file.read())
+            try:
+                if os.path.splitext(response)[1] == '.tar':
+                    tar = tarfile.open(response)
+                    for member in tar:
+                        profile = Profile.get_profile()
+                        profile.write_profile(tar.extractfile(member).read())
+                else:
+                    with open(response, 'r') as profile_file:
+                        profile = Profile.get_profile()
+                        profile.write_profile(profile_file.read())
+            except Exception as exception:
+                self.show_import_profile_error(exception)
             self.update_menu()
 
     def show_import_profile_uri(self):

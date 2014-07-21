@@ -153,6 +153,8 @@ class InputDialog:
             message=self._message_secondary + (
                 '\n\n' + self._label if self._label else ''),
             caption=self._title)
+        self._dialog.SetMinSize(self._dialog.GetSize())
+        self._dialog.SetMaxSize(self._dialog.GetSize())
         response = self._dialog.ShowModal()
         if response == wx.ID_OK:
             return self._dialog.GetValue()

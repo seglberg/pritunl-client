@@ -1,3 +1,10 @@
+pritunl-client (0.10.1-0ubuntu1) trusty; urgency=low
+
+  * Add support for uri profile links
+  * Change windows status icon
+
+ -- Zachary Huff <zach.huff.386@gmail.com>  Thu, 24 Jul 2014 18:41:40 -0400
+
 pritunl-client (0.10.0-0ubuntu1) trusty; urgency=low
 
   * Changes to interface

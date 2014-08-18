@@ -3,11 +3,13 @@ import gobject
 import pygtk
 pygtk.require('2.0')
 import gtk
+import os
 
 HAS_APPINDICATOR = False
 try:
     import appindicator
-    HAS_APPINDICATOR = True
+    HAS_APPINDICATOR = os.environ.get(
+        'XDG_CURRENT_DESKTOP', '').lower() == 'unity'
 except ImportError:
     pass
 

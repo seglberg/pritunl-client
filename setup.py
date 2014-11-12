@@ -110,7 +110,7 @@ setup(
         'Development Status :: 5 - Production/Stable',
         'Environment :: X11 Applications :: GTK',
         'Intended Audience :: End Users/Desktop',
-        'License :: OSI Approved :: GNU Affero General Public License v3',
+        'License :: OSI Approved',
         'Natural Language :: English',
         'Operating System :: POSIX :: Linux',
         'Operating System :: Microsoft :: Windows',

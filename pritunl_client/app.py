@@ -171,7 +171,9 @@ class App:
         if prfl.status in ACTIVE_STATES:
             return
 
-        if profile.auth_passwd:
+        prfl.sync_conf()
+
+        if prfl.auth_passwd:
             dialog = interface.InputDialog()
             dialog.set_title(APP_NAME_FORMATED)
             dialog.set_icon(utils.get_logo())
@@ -237,25 +239,25 @@ class App:
         dialog.set_icon(utils.get_logo())
         dialog.set_message('Delete profile')
         dialog.set_message_secondary(
-            'Are you sure you want to delete the profile %s' % profile.name)
+            'Are you sure you want to delete the profile %s' % prfl.name)
         response = dialog.run()
         dialog.destroy()
         if response:
-            profile.delete()
+            prfl.delete()
             self.update_menu()
 
     def on_autostart_profile(self, profile_id):
-        profile = Profile.get_profile(profile_id)
-        profile.set_autostart(True)
+        prfl = profile.Profile.get_profile(profile_id)
+        prfl.set_autostart(True)
         self.update_menu()
 
     def on_no_autostart_profile(self, profile_id):
-        profile = Profile.get_profile(profile_id)
-        profile.set_autostart(False)
+        prfl = profile.Profile.get_profile(profile_id)
+        prfl.set_autostart(False)
         self.update_menu()
 
     def show_about(self):
-        import pritunl_client
+        from pritunl_client import __version__
         dialog = interface.MessageDialog()
         dialog.set_type(MESSAGE_INFO)
         dialog.set_buttons(BUTTONS_OK)

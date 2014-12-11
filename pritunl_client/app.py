@@ -266,8 +266,10 @@ class App:
         dialog.set_image(utils.get_logo())
         dialog.set_message(('<b>%s - v%s</b>\n\n' +
             'Copyright (c) 2013-2014 Pritunl\n\n' +
-            'http://pritunl.com/') % (APP_NAME_FORMATED,
-            pritunl_client.__version__))
+            'http://pritunl.com/') % (
+                APP_NAME_FORMATED,
+                __version__,
+            ))
         dialog.run()
         dialog.destroy()
 

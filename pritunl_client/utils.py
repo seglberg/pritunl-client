@@ -1,4 +1,6 @@
-from constants import *
+from pritunl_client.constants import *
+from pritunl_client.exceptions import *
+
 import interface
 import urllib2
 import httplib
@@ -23,9 +25,11 @@ class Response:
 
 class request:
     @classmethod
-    def _request(cls, method, url, json_data=None, headers={},
-            timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
-        data = None
+    def _request(cls, method, url, data=None, json_data=None, headers=None, timeout=None):
+        if headers is None:
+            headers = {}
+        if timeout is None:
+            timeout = socket._GLOBAL_DEFAULT_TIMEOUT
         request = urllib2.Request(url, headers=headers)
         request.get_method = lambda: method
 

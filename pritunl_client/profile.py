@@ -116,6 +116,7 @@ class Profile:
         temp_path = self.conf_path + '_%s.tmp' % uuid.uuid4().hex
         try:
             with open(temp_path, 'w') as conf_file:
+                os.chmod(temp_path, 0600)
                 conf_file.write(json.dumps(self.dict()))
             try:
                 os.rename(temp_path, self.conf_path)

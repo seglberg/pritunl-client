@@ -332,11 +332,11 @@ class Profile:
     @classmethod
     def get_profile(cls, id=None):
         if PLATFORM == LINUX:
-            from profile_linux import ProfileLinux
-            return ProfileLinux(id)
+            from pritunl_client import profile_linux
+            return profile_linux.ProfileLinux(id)
         elif PLATFORM == WIN:
-            from profile_win import ProfileWin
-            return ProfileWin(id)
+            from pritunl_client import profile_win
+            return profile_win.ProfileWin(id)
         elif PLATFORM == OSX:
-            from profile_osx import ProfileOsx
-            return ProfileOsx(id)
+            from pritunl_client import profile_osx
+            return profile_osx.ProfileOsx(id)

@@ -1,5 +1,7 @@
-from constants import *
-from exceptions import *
+from pritunl_client.constants import *
+from pritunl_client.exceptions import *
+from pritunl_client import utils
+
 import interface
 import os
 import uuid
@@ -23,6 +25,13 @@ class Profile:
         self.user_name = None
         self.org_name = None
         self.server_name = None
+        self.user_id = None
+        self.org_id = None
+        self.server_id = None
+        self.sync_hash = None
+        self.sync_token = None
+        self.sync_secret = None
+        self.sync_hosts = []
         self.autostart = False
         self.auth_passwd = False
         self.pid = None
@@ -49,6 +58,13 @@ class Profile:
             'user': self.user_name,
             'organization': self.org_name,
             'server': self.server_name,
+            'user_id': self.user_id,
+            'org_id': self.org_id,
+            'server_id': self.server_id,
+            'sync_hash': self.sync_hash,
+            'sync_token': self.sync_token,
+            'sync_secret': self.sync_secret,
+            'sync_hosts': self.sync_hosts,
             'autostart': self.autostart,
             'pid': self.pid,
         }
@@ -80,7 +96,14 @@ class Profile:
                     self.user_name = data.get('user')
                     self.org_name = data.get('organization')
                     self.server_name = data.get('server')
-                    self.autostart = data.get('autostart') or False
+                    self.user_id = data.get('user_id')
+                    self.org_id = data.get('org_id')
+                    self.server_id = data.get('server_id')
+                    self.sync_hash = data.get('sync_hash')
+                    self.sync_token = data.get('sync_token')
+                    self.sync_secret = data.get('sync_secret')
+                    self.sync_hosts = data.get('sync_hosts', [])
+                    self.autostart = data.get('autostart', False)
                     self.pid = data.get('pid')
                 with open(self.path, 'r') as ovpn_file:
                     self.auth_passwd = 'auth-user-pass' in ovpn_file.read()
@@ -113,17 +136,48 @@ class Profile:
             conf_data = {}
         return conf_data, profile_data
 
-    def write_profile(self, data, default_name='Unknown Profile'):
+    def write_profile(self, data):
         conf_data, profile_data = self._parse_profile(data)
         with open(self.path, 'w') as profile_file:
             os.chmod(self.path, 0600)
             profile_file.write(profile_data)
-        self.profile_name = conf_data.get('name')
         self.user_name = conf_data.get('user')
         self.org_name = conf_data.get('organization')
         self.server_name = conf_data.get('server')
-        self.autostart = conf_data.get('autostart') or False
+        self.user_id = conf_data.get('user_id')
+        self.org_id = conf_data.get('organization_id')
+        self.server_id = conf_data.get('server_id')
+        self.sync_hash = conf_data.get('sync_hash')
+        self.sync_token = conf_data.get('sync_token')
+        self.sync_secret = conf_data.get('sync_secret')
+        self.sync_hosts = conf_data.get('sync_hosts', [])
+        self.auth_passwd = 'auth-user-pass' in data
         self.commit()
+
+    def update_profile(self, data):
+        with open(self.path, 'r') as profile_file:
+            profile_data = profile_file.read()
+
+        s_index = profile_data.find('<tls-auth>')
+        e_index = profile_data.find('</tls-auth>')
+        if s_index < 0 or e_index < 0:
+            tls_auth = ''
+        else:
+            tls_auth = profile_data[s_index:e_index + 11] + '\n'
+
+        s_index = profile_data.find('<cert>')
+        e_index = profile_data.find('</cert>')
+        if s_index < 0 or e_index < 0:
+            raise ValueError('Cant find cert')
+        cert = profile_data[s_index:e_index + 7] + '\n'
+
+        s_index = profile_data.find('<key>')
+        e_index = profile_data.find('</key>')
+        if s_index < 0 or e_index < 0:
+            raise ValueError('Cant find key')
+        key = profile_data[s_index:e_index + 6] + '\n'
+
+        self.write_profile(data + tls_auth + cert + key)
 
     def set_name(self, name):
         self.profile_name = name
@@ -171,6 +225,24 @@ class Profile:
 
     def _start(self, status_callback, connect_callback, passwd):
         raise NotImplementedError()
+
+    def sync_conf(self):
+        try:
+            response = utils.auth_request('get', self.sync_hosts[0],
+                '/key/%s/%s/%s/%s' % (
+                    self.org_id,
+                    self.user_id,
+                    self.server_id,
+                    self.sync_hash,
+                ),
+                token=self.sync_token,
+                secret=self.sync_secret,
+            )
+            conf_data = response.content
+            if conf_data:
+                self.update_profile(conf_data)
+        except:
+            raise
 
     def _run_ovpn(self, status_callback, connect_callback, passwd,
             args, on_exit, **kwargs):

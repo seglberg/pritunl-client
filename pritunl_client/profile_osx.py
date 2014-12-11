@@ -1,9 +1,10 @@
 from constants import *
 from exceptions import *
-from profile import Profile, _connections
+from pritunl_client import profile
+
 import time
 import subprocess
 import threading
 
-class ProfileOsx(Profile):
+class ProfileOsx(profile.Profile):
     pass

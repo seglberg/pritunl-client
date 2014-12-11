@@ -1,15 +1,16 @@
 from constants import *
 from exceptions import *
-from profile import Profile, _connections
+from pritunl_client import profile
+
 import os
 import time
 import subprocess
 import threading
 import hashlib
 
-class ProfileLinux(Profile):
+class ProfileLinux(profile.Profile):
     def __init__(self, *args, **kwargs):
-        Profile.__init__(self, *args, **kwargs)
+        profile.Profile.__init__(self, *args, **kwargs)
 
     def _get_profile_hash(self):
         with open(self.path, 'r') as profile_file:
@@ -57,7 +58,7 @@ class ProfileLinux(Profile):
 
     def _stop(self, silent, retry=0):
         retry += 1
-        data = _connections.get(self.id)
+        data = profile._connections.get(self.id)
         if data:
             process = data.get('process')
             data['process'] = None
@@ -145,10 +146,10 @@ class ProfileLinux(Profile):
             else:
                 if not self._clear_profile_autostart():
                     return
-        Profile.commit(self)
+        profile.Profile.commit(self)
 
     def delete(self):
         if os.path.exists(self._get_profile_hash_path()):
             if not self._clear_profile_autostart():
                 return
-        Profile.delete(self)
+        profile.Profile.delete(self)

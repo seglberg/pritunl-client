@@ -1,6 +1,7 @@
 from constants import *
 from exceptions import *
-from profile import Profile, _connections
+from pritunl_client import profile
+
 import time
 import subprocess
 import threading
@@ -11,7 +12,7 @@ tap_adapters = {
     'available': 0,
 }
 
-class ProfileWin(Profile):
+class ProfileWin(profile.Profile):
     def _start(self, status_callback, connect_callback, passwd):
         try:
             ipconfig = subprocess.check_output(['ipconfig', '/all'],
@@ -58,7 +59,7 @@ class ProfileWin(Profile):
         self._start(status_callback, connect_callback, None)
 
     def _stop(self, silent):
-        data = _connections.get(self.id)
+        data = profile._connections.get(self.id)
         if data:
             process = data.get('process')
             data['process'] = None

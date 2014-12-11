@@ -4,6 +4,11 @@ import urllib2
 import httplib
 import socket
 import json
+import time
+import uuid
+import hmac
+import hashlib
+import base64
 
 class Response:
     def __init__(self, url, headers, status_code, reason, content):
@@ -73,6 +78,36 @@ class request:
     @classmethod
     def delete(cls, url, **kwargs):
         return cls._request('DELETE', url, **kwargs)
+
+def auth_request(method, host, path, token, secret,
+        json_data=None, timeout=None):
+    if json_data:
+        headers = {'Content-Type', 'application/json'}
+        data = json.dumps(json_data)
+    else:
+        headers = None
+        data = None
+    auth_timestamp = str(int(time.time()))
+    auth_nonce = uuid.uuid4().hex
+    auth_string = '&'.join([token, auth_timestamp, auth_nonce,
+        method.upper(), path] + ([data] if data else []))
+
+    auth_signature = base64.b64encode(hmac.new(
+        secret.encode(), auth_string, hashlib.sha256).digest())
+    auth_headers = {
+        'Auth-Token': token,
+        'Auth-Timestamp': auth_timestamp,
+        'Auth-Nonce': auth_nonce,
+        'Auth-Signature': auth_signature,
+    }
+    if headers:
+        auth_headers.update(headers)
+    return getattr(request, method.lower())(
+        host + path,
+        headers=auth_headers,
+        data=data,
+        timeout=timeout,
+    )
 
 def get_logo():
     if PLATFORM == LINUX:

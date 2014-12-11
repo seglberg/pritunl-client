@@ -1,6 +1,7 @@
 from constants import *
 __title__ = 'pritunl_client'
-__version__ = '0.10.1'
+__version__ = '1.0.0'
 __author__ = 'Pritunl'
+__email__ = 'contact@pritunl.com'
 __license__ = 'Custom'
-__copyright__ = 'Copyright 2013-2014 Pritunl'
+__copyright__ = 'Copyright 2013-2014 Pritunl <contact@pritunl.com>'

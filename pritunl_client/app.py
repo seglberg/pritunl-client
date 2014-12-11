@@ -1,7 +1,9 @@
-from constants import *
-from profile import Profile
+from pritunl_client.constants import *
+from pritunl_client.exceptions import *
+from pritunl_client import profile
+from pritunl_client import utils
+
 import interface
-import utils
 import threading
 import time
 import sys
@@ -58,40 +60,40 @@ class App:
         menu = interface.Menu()
         profile_count = 0
 
-        for profile in Profile.iter_profiles():
+        for prfl in profile.Profile.iter_profiles():
             profile_count += 1
-            active = profile.status in ACTIVE_STATES
+            active = prfl.status in ACTIVE_STATES
 
             profile_menu = interface.Menu()
             if active:
                 profile_menu.set_label(
-                    profile.name + ' - %s' % profile.status.capitalize())
+                    prfl.name + ' - %s' % prfl.status.capitalize())
             else:
-                profile_menu.set_label(profile.name)
+                profile_menu.set_label(prfl.name)
 
             menu_item = interface.MenuItem()
             menu_item.set_label('Disconnect' if active else 'Connect')
             menu_item.set_callback(self.on_disconnect_profile if
-                active else self.on_connect_profile, profile.id)
+                active else self.on_connect_profile, prfl.id)
             profile_menu.add_item(menu_item)
 
             menu_item = interface.MenuItem()
             menu_item.set_label('Rename')
-            menu_item.set_callback(self.on_rename_profile, profile.id)
+            menu_item.set_callback(self.on_rename_profile, prfl.id)
             profile_menu.add_item(menu_item)
 
             menu_item = interface.MenuItem()
             menu_item.set_label('Delete')
-            menu_item.set_callback(self.on_delete_profile, profile.id)
+            menu_item.set_callback(self.on_delete_profile, prfl.id)
             profile_menu.add_item(menu_item)
 
-            if not profile.auth_passwd:
+            if not prfl.auth_passwd:
                 menu_item = interface.CheckMenuItem()
                 menu_item.set_label('Autostart')
-                menu_item.set_active(profile.autostart)
+                menu_item.set_active(prfl.autostart)
                 menu_item.set_callback(self.on_no_autostart_profile if
-                    profile.autostart else self.on_autostart_profile,
-                    profile.id)
+                    prfl.autostart else self.on_autostart_profile,
+                    prfl.id)
                 profile_menu.add_item(menu_item)
 
             menu.add_item(profile_menu)
@@ -133,7 +135,7 @@ class App:
             self._cur_icon_path = icon_path
             self.set_icon_state(self.get_icon_state())
 
-    def show_connect_error(self, profile, status):
+    def show_connect_error(self, prfl, status):
         error_msgs = {
             ERROR: 'An error occurred while connecting to server',
             AUTH_ERROR: 'Failed to authenticate with server',
@@ -145,7 +147,7 @@ class App:
         dialog.set_buttons(BUTTONS_OK)
         dialog.set_title(APP_NAME_FORMATED)
         dialog.set_icon(utils.get_logo())
-        dialog.set_message('Unable to connect to %s' % profile.name)
+        dialog.set_message('Unable to connect to %s' % prfl.name)
         dialog.set_message_secondary(error_msgs[status])
         dialog.run()
         dialog.destroy()
@@ -154,10 +156,10 @@ class App:
         conn_count = 0
         active_count = 0
 
-        for profile in Profile.iter_profiles():
-            if profile.status == CONNECTED:
+        for prfl in profile.Profile.iter_profiles():
+            if prfl.status == CONNECTED:
                 conn_count += 1
-            if profile.status in ACTIVE_STATES:
+            if prfl.status in ACTIVE_STATES:
                 active_count += 1
 
         self.set_icon_state(bool(conn_count))
@@ -165,8 +167,8 @@ class App:
 
     def on_connect_profile(self, profile_id):
         passwd = None
-        profile = Profile.get_profile(profile_id)
-        if profile.status in ACTIVE_STATES:
+        prfl = profile.Profile.get_profile(profile_id)
+        if prfl.status in ACTIVE_STATES:
             return
 
         if profile.auth_passwd:
@@ -175,7 +177,7 @@ class App:
             dialog.set_icon(utils.get_logo())
             dialog.set_message('Profile Authenticator Required')
             dialog.set_message_secondary('Enter authenticator key for %s' % (
-                profile.name))
+                prfl.name))
             dialog.set_input_label('Authenticator Key:')
             dialog.set_input_width(16)
             passwd = dialog.run()
@@ -188,46 +190,46 @@ class App:
         dialog.set_buttons(BUTTONS_CANCEL)
         dialog.set_title(APP_NAME_FORMATED)
         dialog.set_icon(utils.get_logo())
-        dialog.set_message('Connecting to %s' % profile.name)
+        dialog.set_message('Connecting to %s' % prfl.name)
         dialog.set_message_secondary('Conecting to the server...')
 
         def connect_callback():
             dialog.close()
 
-        threading.Thread(target=profile.start,
+        threading.Thread(target=prfl.start,
             args=(self.on_status_change, connect_callback, passwd)).start()
 
         response = dialog.run()
         dialog.destroy()
         if response is False:
-            threading.Thread(target=profile.stop).start()
+            threading.Thread(target=prfl.stop).start()
             return
 
-        if profile.status in ERROR_STATES:
-            self.show_connect_error(profile, profile.status)
+        if prfl.status in ERROR_STATES:
+            self.show_connect_error(prfl, prfl.status)
 
     def on_disconnect_profile(self, profile_id):
-        profile = Profile.get_profile(profile_id)
-        profile.stop()
+        prfl = profile.Profile.get_profile(profile_id)
+        prfl.stop()
 
     def on_rename_profile(self, profile_id):
-        profile = Profile.get_profile(profile_id)
+        prfl = profile.Profile.get_profile(profile_id)
         dialog = interface.InputDialog()
         dialog.set_title(APP_NAME_FORMATED)
         dialog.set_icon(utils.get_logo())
         dialog.set_message('Rename Profile')
         dialog.set_message_secondary('Enter new name for profile %s' % (
-            profile.name))
+            prfl.name))
         dialog.set_input_label('Profile Name:')
         dialog.set_input_width(32)
         response = dialog.run()
         dialog.destroy()
         if response is not None:
-            profile.set_name(response[:32])
+            prfl.set_name(response[:32])
             self.update_menu()
 
     def on_delete_profile(self, profile_id):
-        profile = Profile.get_profile(profile_id)
+        prfl = profile.Profile.get_profile(profile_id)
         dialog = interface.MessageDialog()
         dialog.set_type(MESSAGE_ERROR)
         dialog.set_buttons(BUTTONS_OK_CANCEL)
@@ -293,12 +295,12 @@ class App:
                 if os.path.splitext(response)[1] == '.tar':
                     tar = tarfile.open(response)
                     for member in tar:
-                        profile = Profile.get_profile()
-                        profile.write_profile(tar.extractfile(member).read())
+                        prfl = profile.Profile.get_profile()
+                        prfl.write_profile(tar.extractfile(member).read())
                 else:
                     with open(response, 'r') as profile_file:
-                        profile = Profile.get_profile()
-                        profile.write_profile(profile_file.read())
+                        prfl = profile.Profile.get_profile()
+                        prfl.write_profile(profile_file.read())
             except Exception as exception:
                 self.show_import_profile_error(exception)
             self.update_menu()
@@ -341,23 +343,23 @@ class App:
                 data = response.json()
 
                 for key in data:
-                    profile = Profile.get_profile()
-                    profile.write_profile(data[key])
+                    prfl = profile.Profile.get_profile()
+                    prfl.write_profile(data[key])
             except Exception as exception:
                 self.show_import_profile_error(exception)
             self.update_menu()
 
     def autostart(self):
         time.sleep(0.3)
-        for profile in Profile.iter_profiles():
-            if not profile.autostart:
+        for prfl in profile.Profile.iter_profiles():
+            if not prfl.autostart:
                 continue
-            threading.Thread(target=profile.start_autostart,
+            threading.Thread(target=prfl.start_autostart,
                 args=(self.on_status_change,)).start()
 
     def exit(self):
-        for profile in Profile.iter_profiles():
-            profile.stop()
+        for prfl in profile.Profile.iter_profiles():
+            prfl.stop()
         self.icon.destroy()
         sys.exit(0)
 
@@ -368,6 +370,6 @@ class App:
             thread.start()
             self.icon.run()
         finally:
-            for profile in Profile.iter_profiles():
-                profile.stop()
+            for prfl in profile.Profile.iter_profiles():
+                prfl.stop()
             self.icon.destroy()

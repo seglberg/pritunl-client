@@ -20,6 +20,7 @@ else:
     raise ValueError('Unknown platform %s' % sys.platform)
 
 CONF_DIR = os.path.expanduser(os.path.join('~', '.config', APP_NAME))
+LOG_PATH = os.path.join(CONF_DIR, 'pritunl_client.log')
 PROFILES_DIR = os.path.join(CONF_DIR, 'profiles')
 LINUX_ETC_DIR = os.path.join(os.path.abspath(os.sep), 'etc', APP_NAME)
 TMP_DIR = os.path.join(os.path.abspath(os.sep), 'tmp')
@@ -28,6 +29,7 @@ CONNECT_TIMEOUT = 30
 OVPN_START_TIMEOUT = 5
 OVPN_STOP_TIMEOUT = 5
 DAEMON_SOCKET_TIMEOUT = 10
+LOG_DEBUG_TYPES = set()
 
 LOGO_DEFAULT_PATH = None
 CONNECTED_LOGO_DEFAULT_PATH = None

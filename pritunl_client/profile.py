@@ -1,6 +1,7 @@
 from pritunl_client.constants import *
 from pritunl_client.exceptions import *
 from pritunl_client import utils
+from pritunl_client import logger
 
 import interface
 import os
@@ -228,22 +229,75 @@ class Profile:
         raise NotImplementedError()
 
     def sync_conf(self):
-        try:
-            response = utils.auth_request('get', self.sync_hosts[0],
-                '/key/%s/%s/%s/%s' % (
-                    self.org_id,
-                    self.user_id,
-                    self.server_id,
-                    self.sync_hash,
-                ),
-                token=self.sync_token,
-                secret=self.sync_secret,
+        status_code = None
+        for i, sync_host in enumerate(self.sync_hosts):
+            try:
+                response = utils.auth_request('get', sync_host,
+                    '/key/%s/%s/%s/%s' % (
+                        self.org_id,
+                        self.user_id,
+                        self.server_id,
+                        self.sync_hash,
+                    ),
+                    token=self.sync_token,
+                    secret=self.sync_secret,
+                    timeout=SYNC_CONF_TIMEOUT,
+                )
+                status_code = response.status_code
+            except:
+                if i >= len(self.sync_hosts) - 1:
+                    logger.exception('Failed to sync conf', 'profile',
+                        sync_host=sync_host,
+                        sync_hosts=self.sync_hosts,
+                        org_id=self.org_id,
+                        user_id=self.user_id,
+                        server_id=self.server_id,
+                        sync_hash=self.sync_hash,
+                    )
+                    return
+                else:
+                    continue
+
+            if status_code == 480:
+                logger.info('Failed to sync conf, no subscription',
+                    'profile',
+                    status_code=status_code,
+                    sync_host=sync_host,
+                    sync_hosts=self.sync_hosts,
+                    org_id=self.org_id,
+                    user_id=self.user_id,
+                    server_id=self.server_id,
+                    sync_hash=self.sync_hash,
+                )
+                return
+            elif status_code == 404:
+                logger.warning('Failed to sync conf, user not found',
+                    'profile',
+                    status_code=status_code,
+                    sync_host=sync_host,
+                    sync_hosts=self.sync_hosts,
+                    org_id=self.org_id,
+                    user_id=self.user_id,
+                    server_id=self.server_id,
+                    sync_hash=self.sync_hash,
+                )
+                return
+            elif status_code == 200 and response.content:
+                print response.content
+                self.update_profile(response.content)
+                return
+
+        if status_code is not None and status_code != 200:
+            logger.error('Failed to sync conf, unknown error',
+                'profile',
+                status_code=status_code,
+                sync_host=sync_host,
+                sync_hosts=self.sync_hosts,
+                org_id=self.org_id,
+                user_id=self.user_id,
+                server_id=self.server_id,
+                sync_hash=self.sync_hash,
             )
-            conf_data = response.content
-            if conf_data:
-                self.update_profile(conf_data)
-        except:
-            raise
 
     def _run_ovpn(self, status_callback, connect_callback, passwd,
             args, on_exit, **kwargs):

@@ -13,12 +13,15 @@ class ProfileLinux(profile.Profile):
         profile.Profile.__init__(self, *args, **kwargs)
 
     def _get_profile_hash(self):
-        with open(self.path, 'r') as profile_file:
-            return hashlib.sha1(profile_file.read()).hexdigest()
+        if os.path.exists(self.path):
+            with open(self.path, 'r') as profile_file:
+                return hashlib.sha1(profile_file.read()).hexdigest()
 
     def _get_profile_hash_path(self):
-        return os.path.join(os.path.abspath(os.sep),
-            'etc', 'pritunl_client', self._get_profile_hash())
+        profile_hash = self._get_profile_hash()
+        if profile_hash:
+            return os.path.join(os.path.abspath(os.sep),
+                'etc', 'pritunl_client', profile_hash)
 
     def _start(self, status_callback, connect_callback, passwd, mode=START,
             retry=0):
@@ -139,7 +142,9 @@ class ProfileLinux(profile.Profile):
             self._kill_pid(pid, retry=retry)
 
     def commit(self):
-        if os.path.exists(self._get_profile_hash_path()) != self.autostart:
+        profile_hash_path = self._get_profile_hash_path()
+        if profile_hash_path and \
+                os.path.exists(profile_hash_path) != self.autostart:
             if self.autostart:
                 if not self._set_profile_autostart():
                     return
@@ -149,7 +154,8 @@ class ProfileLinux(profile.Profile):
         profile.Profile.commit(self)
 
     def delete(self):
-        if os.path.exists(self._get_profile_hash_path()):
+        profile_hash_path = self._get_profile_hash_path()
+        if profile_hash_path and os.path.exists(profile_hash_path):
             if not self._clear_profile_autostart():
                 return
         profile.Profile.delete(self)

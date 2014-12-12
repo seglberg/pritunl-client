@@ -14,7 +14,7 @@ import threading
 
 _connections = {}
 
-class Profile:
+class Profile(object):
     def __init__(self, id=None):
         if id:
             self.id = id

@@ -10,7 +10,7 @@ import sys
 import tarfile
 import httplib
 
-class App:
+class App(object):
     def __init__(self):
         if PLATFORM == WIN:
             import ctypes

@@ -221,12 +221,15 @@ class FileChooserDialog:
 class Menu:
     def __init__(self):
         self._label = None
+        self._items = []
         self._menu = gtk.Menu()
 
     def set_label(self, label):
         self._label = label
 
     def add_item(self, item):
+        self._items.append(item)
+
         if isinstance(item, Menu):
             sub_menu = gtk.MenuItem(item._label)
             sub_menu.set_submenu(item._menu)

@@ -7,11 +7,15 @@ APP_NAME = 'pritunl_client'
 APP_NAME_FORMATED = 'Pritunl Client'
 
 LINUX = 'linux'
+SHELL = 'shell'
 WIN = 'win'
 OSX = 'osx'
 
 if sys.platform == 'linux2':
-    PLATFORM = LINUX
+    if os.environ.get('LINUX_SHELL') == 't':
+        PLATFORM = SHELL
+    else:
+        PLATFORM = LINUX
 elif sys.platform == 'win32':
     PLATFORM = WIN
 elif sys.platform == 'darwin':

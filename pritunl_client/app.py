@@ -67,7 +67,7 @@ class App(object):
             profile_menu = interface.Menu()
             if active:
                 profile_menu.set_label(
-                    prfl.name + ' - %s' % prfl.status.capitalize())
+                    '%s - %s' % (prfl.name, prfl.status.capitalize()))
             else:
                 profile_menu.set_label(prfl.name)
 

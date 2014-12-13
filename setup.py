@@ -31,7 +31,7 @@ if PLATFORM == LINUX:
         ]),
         (os.path.join(os.path.abspath(os.sep), 'usr', 'share',
             'applications'), [os.path.join(
-            'data', 'linux', 'applications', 'pritunl_client.desktop')]),
+            'data', 'linux', 'applications', 'pritunl-client.desktop')]),
         (os.path.join(os.path.abspath(os.sep), 'etc', 'xdg', 'autostart'),
             [os.path.join('data', 'linux', 'applications',
                 'pritunl_client.desktop')]),

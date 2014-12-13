@@ -109,8 +109,10 @@ class Profile(object):
                     self.sync_hosts = data.get('sync_hosts', [])
                     self.autostart = data.get('autostart', False)
                     self.pid = data.get('pid')
+
                 with open(self.path, 'r') as ovpn_file:
                     self.auth_passwd = 'auth-user-pass' in ovpn_file.read()
+
                 if self.auth_passwd:
                     self.autostart = False
         except (OSError, ValueError):

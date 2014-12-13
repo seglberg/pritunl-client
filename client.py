@@ -1,5 +1,3 @@
-import pritunl_client.app
-
 print '##############################################################'
 print '#                                                            #'
 print '#                      /$$   /$$                         /$$ #'
@@ -22,5 +20,5 @@ print '#            \_______/|__/|__/ \_______/|__/  |__/   \___/   #'
 print '#                                                            #'
 print '##############################################################'
 
-app = pritunl_client.app.App()
-app.main()
+from pritunl_client import __main__
+__main__.client()

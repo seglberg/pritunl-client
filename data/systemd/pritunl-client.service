@@ -1,0 +1,10 @@
+[Unit]
+Description=Pritunl Client Daemon
+
+[Service]
+Type=forking
+PIDFile=/var/run/pritunl-client.pid
+ExecStart=%PREFIX%/bin/pritunl-client daemon --pidfile /var/run/pritunl-client.pid
+
+[Install]
+WantedBy=multi-user.target

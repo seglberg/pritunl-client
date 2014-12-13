@@ -1,7 +1,9 @@
 from pritunl_client.constants import *
 from pritunl_client.exceptions import *
 
-import interface
+if PLATFORM != SHELL:
+    from pritunl_client import interface
+
 import urllib2
 import httplib
 import socket

@@ -91,7 +91,10 @@ setup(
     download_url='https://github.com/pritunl/pritunl-client/archive/' + \
         '%s.tar.gz' % pritunl_client.__version__,
     keywords='pritunl, openvpn, vpn, management, client',
-    packages=['pritunl_client'],
+    packages=[
+        'pritunl_client',
+        'pritunl_client.click',
+    ],
     license=open('LICENSE').read(),
     zip_safe=False,
     data_files=data_files,

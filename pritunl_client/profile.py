@@ -11,6 +11,7 @@ import time
 import uuid
 import subprocess
 import threading
+import httplib
 
 _connections = {}
 
@@ -388,9 +389,63 @@ class Profile(object):
         if PLATFORM == LINUX:
             from pritunl_client import profile_linux
             return profile_linux.ProfileLinux(id)
+        elif PLATFORM == SHELL:
+            from pritunl_client import profile_shell
+            return profile_shell.ProfileShell(id)
         elif PLATFORM == WIN:
             from pritunl_client import profile_win
             return profile_win.ProfileWin(id)
         elif PLATFORM == OSX:
             from pritunl_client import profile_osx
             return profile_osx.ProfileOsx(id)
+
+def import_file(profile_path):
+    if os.path.splitext(profile_path)[1] == '.tar':
+        tar = tarfile.open(profile_path)
+        for member in tar:
+            prfl = Profile.get_profile()
+            prfl.write_profile(tar.extractfile(member).read())
+    else:
+        with open(profile_path, 'r') as profile_file:
+            prfl = Profile.get_profile()
+            prfl.write_profile(profile_file.read())
+
+def import_uri(profile_uri):
+    if profile_uri.startswith('pritunl:'):
+        profile_uri = profile_uri.replace('pritunl', 'https', 1)
+    elif profile_uri.startswith('pts:'):
+        profile_uri = profile_uri.replace('pts', 'https', 1)
+    elif profile_uri.startswith('pt:'):
+        profile_uri = profile_uri.replace('pt', 'http', 1)
+    elif profile_uri.startswith('https:'):
+        pass
+    elif profile_uri.startswith('http:'):
+        pass
+    else:
+        profile_uri = 'https://' + profile_uri
+    profile_uri = profile_uri.replace('/k/', '/ku/', 1)
+
+    for i in xrange(2):
+        try:
+            response = utils.request.get(profile_uri)
+            if response.status_code != 400:
+                break
+        except httplib.HTTPException:
+            if i == 1:
+                raise
+        if profile_uri.startswith('https'):
+            profile_uri = profile_uri.replace('https', 'http', 1)
+        else:
+            profile_uri = profile_uri.replace('http', 'https', 1)
+    if response.status_code == 200:
+        pass
+    elif response.status_code == 404:
+        raise ValueError('Key link is not valid')
+    else:
+        raise ValueError('Pritunl server returned error code %s' % (
+            response.status_code))
+    data = response.json()
+
+    for key in data:
+        prfl = Profile.get_profile()
+        prfl.write_profile(data[key])

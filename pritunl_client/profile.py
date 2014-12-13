@@ -3,7 +3,9 @@ from pritunl_client.exceptions import *
 from pritunl_client import utils
 from pritunl_client import logger
 
-import interface
+if PLATFORM != SHELL:
+    from pritunl_client import interface
+
 import os
 import uuid
 import json

@@ -20,7 +20,8 @@ def client_gui():
         client_app = app.App()
         client_app.main()
 
-def client():
+def client_shell():
+    os.environ['LINUX_SHELL'] = 't'
     from pritunl_client import click
     from pritunl_client import utils
 

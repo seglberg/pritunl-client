@@ -1,0 +1,12 @@
+#!/bin/bash
+if which pycompile >/dev/null 2>&1; then
+    pycompile -p pritunl_client
+fi
+mkdir -p /etc/pritunl_client
+gtk-update-icon-cache -q -t -f /usr/share/icons/hicolor || true
+gtk-update-icon-cache -q -t -f /usr/share/icons/ubuntu-mono-dark || true
+gtk-update-icon-cache -q -t -f /usr/share/icons/ubuntu-mono-light || true
+xdg-icon-resource forceupdate --theme hicolor &> /dev/null || true
+xdg-icon-resource forceupdate --theme ubuntu-mono-dark &> /dev/null || true
+xdg-icon-resource forceupdate --theme ubuntu-mono-light &> /dev/null || true
+update-desktop-database -q || true

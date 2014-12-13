@@ -4,9 +4,7 @@ Priority: optional
 Maintainer: Pritunl <contact@pritunl.com>
 Build-Depends: debhelper (>= 8.0.0),
                python-all (>= 2.7),
-               python-setuptools (>= 0.6b3),
-               python-gtk2,
-               python-appindicator
+               python-setuptools (>= 0.6b3)
 Standards-Version: 3.9.4
 Homepage: http://pritunl.com/
 X-Python-Version: >= 2.7
@@ -14,6 +12,15 @@ X-Python-Version: >= 2.7
 #Vcs-Browser: https://github.com/pritunl/pritunl-client
 
 Package: pritunl-client
+Architecture: all
+Depends: openvpn,
+         iptables,
+         ${misc:Depends},
+         ${python:Depends}
+Description: Pritunl openvpn client
+ Pritunl client for the Pritunl vpn server (CLI version).
+
+Package: pritunl-client-gtk
 Architecture: all
 Depends: python-gtk2,
          python-appindicator,
@@ -23,4 +30,4 @@ Depends: python-gtk2,
          ${misc:Depends},
          ${python:Depends}
 Description: Pritunl openvpn client
- Pritunl client is a GUI interface to connect to a Pritunl vpn server.
+ Pritunl client for the Pritunl vpn server (GUI version).

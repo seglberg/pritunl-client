@@ -17,17 +17,5 @@ Depends: openvpn,
          iptables,
          ${misc:Depends},
          ${python:Depends}
-Description: Pritunl openvpn client
- Pritunl client for the Pritunl vpn server (CLI version).
-
-Package: pritunl-client-gtk
-Architecture: all
-Depends: python-gtk2,
-         python-appindicator,
-         policykit-1,
-         openvpn,
-         iptables,
-         ${misc:Depends},
-         ${python:Depends}
-Description: Pritunl openvpn client
- Pritunl client for the Pritunl vpn server (GUI version).
+Description: Pritunl VPN Client
+ Client for the Pritunl VPN server.

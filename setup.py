@@ -100,8 +100,15 @@ setup(
     data_files=data_files,
     entry_points={
         'console_scripts': [
-            'pritunl_client = pritunl_client.__main__:client',
-            'pritunl_client_pk = pritunl_client.__main__:pk',
+            'pritunl-client = pritunl_client.__main__:client',
+            'pritunl-client-pk-start = pritunl_client.__main__:pk_start',
+            'pritunl-client-pk-autostart = ' + \
+                'pritunl_client.__main__:pk_autostart',
+            'pritunl-client-pk-stop = pritunl_client.__main__:pk_stop',
+            'pritunl-client-pk-set-autostart = ' + \
+                'pritunl_client.__main__:pk_set_autostart',
+            'pritunl-client-pk-clear-autostart = ' + \
+                'pritunl_client.__main__:pk_clear_autostart',
         ],
     },
     platforms=[

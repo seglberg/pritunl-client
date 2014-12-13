@@ -47,7 +47,7 @@ if ONE_FILE:
         a.binaries,
         a.zipfiles,
         a.datas,
-        name='pritunl_client.exe',
+        name='pritunl-client.exe',
         debug=False,
         strip=None,
         upx=True,

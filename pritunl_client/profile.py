@@ -211,11 +211,17 @@ class Profile(object):
             callback = data.get('connect_callback')
             if callback:
                 data['connect_callback'] = None
-                interface.add_idle_call(callback)
+                if PLATFORM != SHELL:
+                    interface.add_idle_call(callback)
+                else:
+                    callback()
 
         callback = data.get('status_callback')
         if callback:
-            interface.add_idle_call(callback)
+            if PLATFORM != SHELL:
+                interface.add_idle_call(callback)
+            else:
+                callback()
 
     def start(self, status_callback, connect_callback=None, passwd=None):
         if self.status in ACTIVE_STATES:

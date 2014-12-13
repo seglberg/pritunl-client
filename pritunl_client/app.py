@@ -296,15 +296,7 @@ class App(object):
         dialog.destroy()
         if response:
             try:
-                if os.path.splitext(response)[1] == '.tar':
-                    tar = tarfile.open(response)
-                    for member in tar:
-                        prfl = profile.Profile.get_profile()
-                        prfl.write_profile(tar.extractfile(member).read())
-                else:
-                    with open(response, 'r') as profile_file:
-                        prfl = profile.Profile.get_profile()
-                        prfl.write_profile(profile_file.read())
+                profile.import_file(response)
             except Exception as exception:
                 self.show_import_profile_error(exception)
             self.update_menu()
@@ -320,35 +312,8 @@ class App(object):
         response = dialog.run()
         dialog.destroy()
         if response:
-            url = response
-            if url[:2] == 'pt':
-                url = url.replace('pt', 'http', 1)
-            if url[:4] != 'http':
-                url = 'http://' + url
             try:
-                for i in xrange(2):
-                    try:
-                        response = utils.request.get(url)
-                        if response.status_code != 400:
-                            break
-                    except httplib.HTTPException:
-                        if i == 1:
-                            raise
-                    if url[:5] == 'https':
-                        url = url.replace('https', 'http', 1)
-                    else:
-                        url = url.replace('http', 'https', 1)
-                if response.status_code == 200:
-                    pass
-                elif response.status_code == 404:
-                    raise Exception('Key link is not valid')
-                else:
-                    raise Exception('Pritunl server returned error code %s' % (response.status_code))
-                data = response.json()
-
-                for key in data:
-                    prfl = profile.Profile.get_profile()
-                    prfl.write_profile(data[key])
+                profile.import_uri(response)
             except Exception as exception:
                 self.show_import_profile_error(exception)
             self.update_menu()

@@ -9,9 +9,6 @@ import threading
 import hashlib
 
 class ProfileLinux(profile.Profile):
-    def __init__(self, *args, **kwargs):
-        profile.Profile.__init__(self, *args, **kwargs)
-
     def _get_profile_hash(self):
         if os.path.exists(self.path):
             with open(self.path, 'r') as profile_file:

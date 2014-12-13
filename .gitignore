@@ -13,3 +13,4 @@ __pycache__
 /dist
 /pritunl_client.egg-info
 /tools/private_key.asc
+/tools/build_keys.json

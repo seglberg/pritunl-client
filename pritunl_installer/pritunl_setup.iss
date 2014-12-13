@@ -2,7 +2,7 @@
 #define MyAppVersion "0.10.1"
 #define MyAppPublisher "Pritunl"
 #define MyAppURL "http://pritunl.com/"
-#define MyAppExeName "pritunl_client.exe"
+#define MyAppExeName "pritunl-client.exe"
 
 [Setup]
 AppId={{80EC2557-82C8-4ECB-9E02-B7DB1B8F6BC7}

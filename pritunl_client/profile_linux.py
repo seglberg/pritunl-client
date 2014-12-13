@@ -45,7 +45,7 @@ class ProfileLinux(profile.Profile):
                 if self.status in ACTIVE_STATES:
                     self._set_status(ERROR)
 
-        args = ['pkexec', '/usr/bin/pritunl_client_pk', mode, self.path]
+        args = ['pkexec', '/usr/bin/pritunl-client-pk-%s' % mode, self.path]
 
         if passwd:
             args.append(self.passwd_path)
@@ -64,7 +64,7 @@ class ProfileLinux(profile.Profile):
             data['process'] = None
             if process and not process.poll():
                 stop_process = subprocess.Popen(['pkexec',
-                    '/usr/bin/pritunl_client_pk', 'stop', str(process.pid)],
+                    '/usr/bin/pritunl-client-pk-stop', str(process.pid)],
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 stop_process.wait()
 
@@ -88,7 +88,7 @@ class ProfileLinux(profile.Profile):
     def _set_profile_autostart(self, retry=0):
         retry += 1
         process = subprocess.Popen(['pkexec',
-            '/usr/bin/pritunl_client_pk', 'set_autostart', self.path],
+            '/usr/bin/pritunl-client-pk-set-autostart', self.path],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         process.wait()
 
@@ -108,7 +108,7 @@ class ProfileLinux(profile.Profile):
     def _clear_profile_autostart(self, retry=0):
         retry += 1
         process = subprocess.Popen(['pkexec',
-            '/usr/bin/pritunl_client_pk', 'clear_autostart',
+            '/usr/bin/pritunl-client-pk-clear-autostart',
             self._get_profile_hash()], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         process.wait()
@@ -129,7 +129,7 @@ class ProfileLinux(profile.Profile):
     def _kill_pid(self, pid, retry=0):
         retry += 1
         process = subprocess.Popen(['pkexec',
-            '/usr/bin/pritunl_client_pk', 'stop', str(pid)],
+            '/usr/bin/pritunl-client-pk-stop', str(pid)],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         process.wait()
 

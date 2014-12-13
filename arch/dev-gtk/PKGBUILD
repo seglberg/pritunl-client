@@ -1,14 +1,17 @@
 # Maintainer: Pritunl <contact@pritunl.com>
 
-pkgname=pritunl-client
+pkgname=pritunl-client-gtk-dev
+_pkgname=pritunl-client
 pkgver=0.10.1
 pkgrel=1
-pkgdesc="Pritunl VPN Client"
+pkgdesc="Pritunl VPN Client (Development GUI Release)"
 arch=("any")
 license=("custom")
-url="https://github.com/pritunl/${pkgname}"
+url="https://github.com/pritunl/${_pkgname}"
 depends=(
     "python2"
+    "pygtk"
+    "polkit"
     "net-tools"
     "iproute2"
     "openvpn"
@@ -16,29 +19,29 @@ depends=(
 makedepends=(
     "python2-distribute"
 )
-provides=("${pkgname}")
+provides=("pritunl-client-gtk")
 conflicts=(
     "pritunl-client"
     "pritunl-client-dev"
     "pritunl-client-gtk"
     "pritunl-client-gtk-dev"
 )
-install=${pkgname}.install
+install=pritunl-client-gtk.install
 source=("${url}/archive/${pkgver}.tar.gz")
 sha256sums=("CHANGE_ME")
 options=("emptydirs")
 backup=(
-    "var/log/${pkgname}.log"
-    "var/log/${pkgname}.log.1"
+    "var/log/${_pkgname}.log"
+    "var/log/${_pkgname}.log.1"
 )
 
 build() {
-    cd "${srcdir}/${pkgname}-${pkgver}"
+    cd "${srcdir}/${_pkgname}-${pkgver}"
     python2 setup.py build
 }
 
 package() {
-    cd "${srcdir}/${pkgname}-${pkgver}"
+    cd "${srcdir}/${_pkgname}-${pkgver}"
     mkdir -p "${pkgdir}/etc/pritunl_client"
     python2 setup.py install --root="${pkgdir}" --prefix=/usr --no-upstart --no-gtk
 }

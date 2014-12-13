@@ -366,11 +366,11 @@ class Profile(object):
                 elif 'AUTH_FAILED' in line or 'auth-failure' in line:
                     self._set_status(AUTH_ERROR)
 
-            if passwd:
-                try:
+            try:
+                if os.path.exists(self.passwd_path):
                     os.remove(self.passwd_path)
-                except:
-                    pass
+            except:
+                pass
 
             on_exit(data, process.returncode)
 

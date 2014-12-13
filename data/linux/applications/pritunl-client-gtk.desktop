@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Pritunl Client
 Comment=Pritunl openvpn client
-Exec=pritunl_client
+Exec=pritunl-client-gtk
 Terminal=false
 Type=Application
 StartupNotify=false

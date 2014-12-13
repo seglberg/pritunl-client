@@ -12,8 +12,7 @@
       <allow_inactive>auth_admin_keep</allow_inactive>
       <allow_active>auth_admin_keep</allow_active>
     </defaults>
-    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/pritunl_client_pk</annotate>
-    <annotate key="org.freedesktop.policykit.exec.argv1">start</annotate>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/pritunl-client-pk-start</annotate>
     <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
   </action>
 
@@ -25,8 +24,7 @@
       <allow_inactive>yes</allow_inactive>
       <allow_active>yes</allow_active>
     </defaults>
-    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/pritunl_client_pk</annotate>
-    <annotate key="org.freedesktop.policykit.exec.argv1">autostart</annotate>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/pritunl-client-pk-autostart</annotate>
     <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
   </action>
 
@@ -38,8 +36,7 @@
       <allow_inactive>yes</allow_inactive>
       <allow_active>yes</allow_active>
     </defaults>
-    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/pritunl_client_pk</annotate>
-    <annotate key="org.freedesktop.policykit.exec.argv1">stop</annotate>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/pritunl-client-pk-stop</annotate>
     <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
   </action>
 
@@ -51,8 +48,7 @@
       <allow_inactive>auth_admin</allow_inactive>
       <allow_active>auth_admin</allow_active>
     </defaults>
-    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/pritunl_client_pk</annotate>
-    <annotate key="org.freedesktop.policykit.exec.argv1">set_autostart</annotate>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/pritunl-client-pk-set-autostart</annotate>
     <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
   </action>
 
@@ -64,8 +60,7 @@
       <allow_inactive>auth_admin</allow_inactive>
       <allow_active>auth_admin</allow_active>
     </defaults>
-    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/pritunl_client_pk</annotate>
-    <annotate key="org.freedesktop.policykit.exec.argv1">clear_autostart</annotate>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/bin/pritunl-client-pk-clear-autostart</annotate>
     <annotate key="org.freedesktop.policykit.exec.allow_gui">true</annotate>
   </action>
 </policyconfig>

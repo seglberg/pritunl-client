@@ -1,4 +1,5 @@
-from constants import *
+from pritunl_client.constants import *
+
 __title__ = 'pritunl_client'
 __version__ = '1.0.0'
 __author__ = 'Pritunl'

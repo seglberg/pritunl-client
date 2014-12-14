@@ -29,7 +29,37 @@ def client_shell():
     def cli():
         pass
 
-    @click.command(name='list')
+    @click.command('daemon',
+        help='Start client service daemon',
+    )
+    @click.option('--pidfile',
+        help='Path to create pid file',
+        default=None,
+    )
+    @click.option('--foreground',
+        help='Run daemon in foreground',
+        is_flag=True,
+    )
+    def daemon_cmd(pidfile, foreground):
+        if not foreground:
+            pid = os.fork()
+            if pid > 0:
+                if pidfile:
+                    with open(pidfile, 'w') as pid_file:
+                        pid_file.write('%s' % pid)
+                sys.exit(0)
+        else:
+            if pidfile:
+                with open(pidfile, 'w') as pid_file:
+                    pid_file.write(str(os.getpid()))
+
+        from pritunl_client import shell_app
+        shell_app.ShellApp()
+    cli.add_command(daemon_cmd)
+
+    @click.command('list',
+        help='List imported profiles and status',
+    )
     def list_cmd():
         response = utils.request.get(
             'http://localhost:9797/list',
@@ -42,29 +72,39 @@ def client_shell():
             sys.exit(1)
     cli.add_command(list_cmd)
 
-    @click.command(name='import')
-    @click.argument('profile_in')
-    def import_cmd(profile_in):
-        data = {}
-        if os.path.exists(profile_in):
-            data['profile_path'] = os.path.abspath(profile_in)
-        else:
-            data['profile_uri'] = profile_in
+    @click.command(name='import',
+        help='Import new profile archive, conf or uri. Can be ' + \
+            'path to profile conf or path to archive or profile uri',
+    )
+    @click.argument('profile_ins',
+        nargs=-1,
+    )
+    def import_cmd(profile_ins):
+        for profile_in in profile_ins:
+            data = {}
+            if os.path.exists(profile_in):
+                data['profile_path'] = os.path.abspath(profile_in)
+            else:
+                data['profile_uri'] = profile_in
 
-        response = utils.request.post(
-            'http://localhost:9797/import',
-            json_data=data,
-        )
+            response = utils.request.post(
+                'http://localhost:9797/import',
+                json_data=data,
+            )
 
-        if response.status_code == 200:
-            click.echo('Successfully imported profile')
-        else:
-            click.echo(response.content)
-            sys.exit(1)
+            if response.status_code == 200:
+                click.echo('Successfully imported profile')
+            else:
+                click.echo(response.content)
+                sys.exit(1)
     cli.add_command(import_cmd)
 
-    @click.command(name='remove')
-    @click.argument('profile_ids', nargs=-1)
+    @click.command('remove',
+        help='Remove a profile by profile ID or space separated list of IDs',
+    )
+    @click.argument('profile_ids',
+        nargs=-1,
+    )
     def remove_cmd(profile_ids):
         for profile_id in profile_ids:
             response = utils.request.delete(
@@ -78,9 +118,16 @@ def client_shell():
                 sys.exit(1)
     cli.add_command(remove_cmd)
 
-    @click.command(name='start')
-    @click.argument('profile_ids', nargs=-1)
-    @click.option('--password', default=None)
+    @click.command('start',
+        help='Start a profile by profile ID or space separated list of IDs',
+    )
+    @click.argument('profile_ids',
+        nargs=-1,
+    )
+    @click.option('--password',
+        help='Authenticator for profile if required',
+        default=None,
+    )
     def start_cmd(profile_ids, password):
         for profile_id in profile_ids:
             if password:
@@ -102,8 +149,12 @@ def client_shell():
                 sys.exit(1)
     cli.add_command(start_cmd)
 
-    @click.command(name='stop')
-    @click.argument('profile_ids', nargs=-1)
+    @click.command('stop',
+        help='Stop a profile by profile ID or space separated list of IDs',
+    )
+    @click.argument('profile_ids',
+        nargs=-1,
+    )
     def stop_cmd(profile_ids):
         for profile_id in profile_ids:
             response = utils.request.put(
@@ -117,8 +168,13 @@ def client_shell():
                 sys.exit(1)
     cli.add_command(stop_cmd)
 
-    @click.command(name='enable')
-    @click.argument('profile_ids', nargs=-1)
+    @click.command('enable',
+        help='Enable a profile to autostart by profile ID or space ' + \
+            'separated list of IDs',
+    )
+    @click.argument('profile_ids',
+        nargs=-1,
+    )
     def enable_cmd(profile_ids):
         for profile_id in profile_ids:
             response = utils.request.put(
@@ -132,8 +188,13 @@ def client_shell():
                 sys.exit(1)
     cli.add_command(enable_cmd)
 
-    @click.command(name='disable')
-    @click.argument('profile_ids', nargs=-1)
+    @click.command('disable',
+        help='Disable a profile to stop autostart by profile ID or space ' + \
+            'separated list of IDs',
+    )
+    @click.argument('profile_ids',
+        nargs=-1,
+    )
     def disable_cmd(profile_ids):
         for profile_id in profile_ids:
             response = utils.request.put(

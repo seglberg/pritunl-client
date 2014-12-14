@@ -127,6 +127,42 @@ elif PLATFORM == WIN:
         ]),
     ]
 
+console_scripts = [
+    'pritunl-client = pritunl_client.__main__:client_shell',
+]
+
+if install_gtk:
+    console_scripts += [
+        'pritunl-client-gtk = pritunl_client.__main__:client_gui',
+        'pritunl-client-pk-start = pritunl_client.__main__:pk_start',
+        'pritunl-client-pk-autostart = ' + \
+            'pritunl_client.__main__:pk_autostart',
+        'pritunl-client-pk-stop = pritunl_client.__main__:pk_stop',
+        'pritunl-client-pk-set-autostart = ' + \
+            'pritunl_client.__main__:pk_set_autostart',
+        'pritunl-client-pk-clear-autostart = ' + \
+            'pritunl_client.__main__:pk_clear_autostart',
+    ]
+
+patch_files = []
+if install_upstart:
+    patch_files.append('%s/pritunl-client.conf' % PATCH_DIR)
+    data_files.append(('/etc/init', ['%s/pritunl-client.conf' % PATCH_DIR]))
+    data_files.append(('/etc/init.d', ['data/init.d/pritunl-client.sh']))
+    shutil.copy('data/init/pritunl-client.conf',
+        '%s/pritunl-client.conf' % PATCH_DIR)
+if install_systemd:
+    patch_files.append('%s/pritunl-client.service' % PATCH_DIR)
+    data_files.append(('/etc/systemd/system',
+        ['%s/pritunl-client.service' % PATCH_DIR]))
+    shutil.copy('data/systemd/pritunl-client.service',
+        '%s/pritunl-client.service' % PATCH_DIR)
+
+for file_name in patch_files:
+    for line in fileinput.input(file_name, inplace=True):
+        line = line.replace('%PREFIX%', prefix)
+        print line.rstrip('\n')
+
 setup(
     name='pritunl_client',
     version=pritunl_client.__version__,

@@ -3,7 +3,13 @@
 
 VAGRANTFILE_API_VERSION = "2"
 
+@script = <<SCRIPT
+# Build requirements
+apt-get update
+apt-get install -y devscripts debhelper python-all python-setuptools python-gtk2 python-appindicator
+SCRIPT
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "ubuntu/trusty64"
-  config.vm.provision :shell, :path => "tools/vagrant_provision.sh"
+  config.vm.provision 'shell', inline: @script
 end

@@ -11,7 +11,7 @@ SHELL = 'shell'
 WIN = 'win'
 OSX = 'osx'
 
-if sys.platform == 'linux2':
+if sys.platform.startswith('linux'):
     if os.environ.get('LINUX_SHELL') == 't':
         PLATFORM = SHELL
     else:

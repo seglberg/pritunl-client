@@ -304,7 +304,8 @@ elif cmd == 'set-version':
     # Update arch package
     for pkgbuild_path in (
             ARCH_DEV_PKGBUILD_PATH if is_dev_release else ARCH_PKGBUILD_PATH,
-            ARCH_DEV_PKGBUILD_PATH if is_dev_release else ARCH_PKGBUILD_PATH,
+            ARCH_DEV_PKGBUILD_GTK_PATH if is_dev_release else \
+                ARCH_PKGBUILD_GTK_PATH,
             ):
         with open(pkgbuild_path, 'r') as pkgbuild_file:
             pkgbuild_data = re.sub(

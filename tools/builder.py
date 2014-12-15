@@ -586,35 +586,45 @@ elif cmd == 'upload':
 
 
     # Upload debian package
-    build_dir = 'build/%s/debian' % cur_version
+    for build_dir, pkg_name_ext in (
+                (
+                    'build/%s/debian' % cur_version,
+                    '',
+                ),
+                (
+                    'build/%s/debian-gtk' % cur_version,
+                    '-gtk',
+                )
+            ):
+        if options.test:
+            launchpad_ppa = '/%s-test' % (PPA_NAME, PPA_NAME)
+        elif is_dev_release:
+            launchpad_ppa = '%s/%s-dev' % (PPA_NAME, PPA_NAME)
+        else:
+            launchpad_ppa = '%s/ppa' % PPA_NAME
 
-    if options.test:
-        launchpad_ppa = '%s/%s-test' % (pkg_name, pkg_name)
-    elif is_dev_release:
-        launchpad_ppa = '%s/%s-dev' % (pkg_name, pkg_name)
-    else:
-        launchpad_ppa = '%s/ppa' % pkg_name
-
-    for ubuntu_release in UBUNTU_RELEASES:
-        deb_file_name = '%s_%s-%subuntu1~%s_all.deb' % (
-            pkg_name,
-            cur_version,
-            build_num,
-            ubuntu_release,
-        )
-        deb_file_path = os.path.join(build_dir, deb_file_name)
-        post_git_asset(release_id, deb_file_name, deb_file_path)
-
-        vagrant_check_call(
-            'sudo dput -f ppa:%s %s_%s-%subuntu1~%s_source.changes' % (
-                launchpad_ppa,
+        for ubuntu_release in UBUNTU_RELEASES:
+            deb_file_name = '%s%s_%s-%subuntu1~%s_all.deb' % (
                 pkg_name,
+                pkg_name_ext,
                 cur_version,
                 build_num,
                 ubuntu_release,
-            ),
-            cwd=build_dir,
-        )
+            )
+            deb_file_path = os.path.join(build_dir, deb_file_name)
+            post_git_asset(release_id, deb_file_name, deb_file_path)
+
+            vagrant_check_call(
+                'sudo dput -f ppa:%s %s%s_%s-%subuntu1~%s_source.changes' % (
+                    launchpad_ppa,
+                    pkg_name,
+                    pkg_name_ext,
+                    cur_version,
+                    build_num,
+                    ubuntu_release,
+                ),
+                cwd=build_dir,
+            )
 
     if options.test:
         sys.exit(0)

@@ -165,14 +165,14 @@ for file_name in patch_files:
 
 setup(
     name='pritunl_client',
-    version=pritunl_client.__version__,
-    description='Pritunl openvpn client',
+    version=VERSION,
+    description='Pritunl VPN Client',
     long_description=open('README.rst').read(),
     author='Pritunl',
     author_email='contact@pritunl.com',
     url='https://github.com/pritunl/pritunl-client',
     download_url='https://github.com/pritunl/pritunl-client/archive/' + \
-        '%s.tar.gz' % pritunl_client.__version__,
+        '%s.tar.gz' % VERSION,
     keywords='pritunl, openvpn, vpn, management, client',
     packages=[
         'pritunl_client',
@@ -182,17 +182,7 @@ setup(
     zip_safe=False,
     data_files=data_files,
     entry_points={
-        'console_scripts': [
-            'pritunl-client = pritunl_client.__main__:client',
-            'pritunl-client-pk-start = pritunl_client.__main__:pk_start',
-            'pritunl-client-pk-autostart = ' + \
-                'pritunl_client.__main__:pk_autostart',
-            'pritunl-client-pk-stop = pritunl_client.__main__:pk_stop',
-            'pritunl-client-pk-set-autostart = ' + \
-                'pritunl_client.__main__:pk_set_autostart',
-            'pritunl-client-pk-clear-autostart = ' + \
-                'pritunl_client.__main__:pk_clear_autostart',
-        ],
+        'console_scripts': console_scripts,
     },
     platforms=[
         'Linux',
@@ -203,7 +193,7 @@ setup(
         'Development Status :: 5 - Production/Stable',
         'Environment :: X11 Applications :: GTK',
         'Intended Audience :: End Users/Desktop',
-        'License :: OSI Approved',
+        'License :: Other/Proprietary License',
         'Natural Language :: English',
         'Operating System :: POSIX :: Linux',
         'Operating System :: Microsoft :: Windows',

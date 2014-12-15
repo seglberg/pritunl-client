@@ -2,7 +2,7 @@
 
 pkgname=pritunl-client-dev
 _pkgname=pritunl-client
-pkgver=1.0.459.2snapshot1
+pkgver=1.0.459.9snapshot1
 pkgrel=1
 pkgdesc="Pritunl VPN Client (Development Release)"
 arch=("any")

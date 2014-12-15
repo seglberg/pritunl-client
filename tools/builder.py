@@ -357,51 +357,38 @@ elif cmd == 'set-version':
     subprocess.check_call(['git', 'add', ARCH_DEV_PKGBUILD_PATH])
     subprocess.check_call(['git', 'add', ARCH_PKGBUILD_GTK_PATH])
     subprocess.check_call(['git', 'add', ARCH_DEV_PKGBUILD_GTK_PATH])
-    # subprocess.check_call(['git', 'commit', '-m', 'Create new release'])
-    # subprocess.check_call(['git', 'push'])
-    print '***************************************************'
-    print 'commit'
-    print '***************************************************'
+    subprocess.check_call(['git', 'commit', '-m', 'Create new release'])
+    subprocess.check_call(['git', 'push'])
 
 
     # Create branch
     if not is_dev_release:
-        print '***************************************************'
-        print 'branch:', new_version
-        print '***************************************************'
-        # subprocess.check_call(['git', 'branch', new_version])
-        # subprocess.check_call(['git', 'push', '-u', 'origin', new_version])
+        subprocess.check_call(['git', 'branch', new_version])
+        subprocess.check_call(['git', 'push', '-u', 'origin', new_version])
     time.sleep(8)
 
-    print '***************************************************'
-    print 'release:', 'https://api.github.com/repos/%s/%s/releases' % (
-        github_owner, pkg_name)
-    print 'tag_name:', new_version
-    print 'name:', '%s v%s' % (pkg_name, new_version)
-    print '***************************************************'
 
+    # Create release
+    response = requests.post(
+        'https://api.github.com/repos/%s/%s/releases' % (
+            github_owner, pkg_name),
+        headers={
+            'Authorization': 'token %s' % github_token,
+            'Content-type': 'application/json',
+        },
+        data=json.dumps({
+            'tag_name': new_version,
+            'name': '%s v%s' % (pkg_name, new_version),
+            'body': release_body,
+            'prerelease': is_dev_release,
+            'target_commitish': 'master' if is_dev_release else new_version,
+        }),
+    )
 
-    # # Create release
-    # response = requests.post(
-    #     'https://api.github.com/repos/%s/%s/releases' % (
-    #         github_owner, pkg_name),
-    #     headers={
-    #         'Authorization': 'token %s' % github_token,
-    #         'Content-type': 'application/json',
-    #     },
-    #     data=json.dumps({
-    #         'tag_name': new_version,
-    #         'name': '%s v%s' % (pkg_name, new_version),
-    #         'body': release_body,
-    #         'prerelease': is_dev_release,
-    #         'target_commitish': 'master' if is_dev_release else new_version,
-    #     }),
-    # )
-
-    # if response.status_code != 201:
-    #     print 'Failed to create release on github'
-    #     print response.json()
-    #     sys.exit(1)
+    if response.status_code != 201:
+        print 'Failed to create release on github'
+        print response.json()
+        sys.exit(1)
 
 
 elif cmd == 'build':

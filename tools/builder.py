@@ -486,11 +486,19 @@ elif cmd == 'build':
                     passphrase),
                 cwd=build_path,
             )
-            vagrant_check_call(
-                'sudo debuild -S -p"gpg --no-tty --passphrase %s"' % (
-                    passphrase),
-                cwd=build_path,
-            )
+
+            if 'gtk' in build_dir:
+                vagrant_check_call(
+                    'sudo debuild -S -sd -p"gpg --no-tty --passphrase %s"' % (
+                        passphrase),
+                    cwd=build_path,
+                )
+            else:
+                vagrant_check_call(
+                    'sudo debuild -S -p"gpg --no-tty --passphrase %s"' % (
+                        passphrase),
+                    cwd=build_path,
+                )
 
 
     # Create arch package

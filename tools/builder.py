@@ -31,6 +31,7 @@ Commands:
 INIT_PATH = 'pritunl_client/__init__.py'
 SETUP_PATH = 'setup.py'
 CHANGES_PATH = 'CHANGES'
+PPA_NAME = 'pritunl'
 DEBIAN_CHANGELOG_PATH = 'debian/changelog'
 DEBIAN_GTK_CHANGELOG_PATH = 'debian-gtk/changelog'
 BUILD_KEYS_PATH = 'tools/build_keys.json'

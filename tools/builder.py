@@ -537,21 +537,22 @@ elif cmd == 'build':
             ['sha256sum', archive_path]).split()[0]
 
 
-    # Generate pkgbuild
-    with open(pkgbuild_path, 'r') as pkgbuild_file:
-        pkgbuild_data = pkgbuild_file.read()
-    pkgbuild_data = pkgbuild_data.replace('CHANGE_ME', archive_sha256_sum)
+        # Generate pkgbuild
+        with open(pkgbuild_path, 'r') as pkgbuild_file:
+            pkgbuild_data = pkgbuild_file.read()
+        pkgbuild_data = pkgbuild_data.replace('CHANGE_ME', archive_sha256_sum)
+        pkgbuild_data = pkgbuild_data.replace('0.10.1', '1.0.459.9snapshot1')
 
-    pkgbuild_path = os.path.join(build_dir, 'PKGBUILD')
-    with open(pkgbuild_path, 'w') as pkgbuild_file:
-         pkgbuild_file.write(pkgbuild_data)
+        pkgbuild_path = os.path.join(build_dir, 'PKGBUILD')
+        with open(pkgbuild_path, 'w') as pkgbuild_file:
+             pkgbuild_file.write(pkgbuild_data)
 
-    subprocess.check_call(['cp', pkginstall_path, build_dir])
+        subprocess.check_call(['cp', pkginstall_path, build_dir])
 
 
-    # Build arch package
-    subprocess.check_call(['makepkg', '-f'], cwd=build_dir)
-    subprocess.check_call(['mkaurball', '-f'], cwd=build_dir)
+        # Build arch package
+        subprocess.check_call(['makepkg', '-f'], cwd=build_dir)
+        subprocess.check_call(['mkaurball', '-f'], cwd=build_dir)
 
 
 elif cmd == 'upload':

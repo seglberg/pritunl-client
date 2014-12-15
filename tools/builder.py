@@ -461,8 +461,9 @@ elif cmd == 'build':
 
         # Setup gtk build
         if 'gtk' in build_dir:
-            subprocess.check_call(['rm', '-rf', 'debian'])
-            subprocess.check_call(['mv', 'debian-gtk', 'debian'])
+            subprocess.check_call(['rm', '-rf', 'debian'], cwd=build_path)
+            subprocess.check_call(['mv', 'debian-gtk', 'debian'],
+                cwd=build_path)
 
 
         # Read changelog

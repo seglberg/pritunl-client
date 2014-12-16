@@ -128,6 +128,8 @@ class MessageDialog:
 
     def run(self):
         self._dialog.show_all()
+        self._dialog.set_keep_above(True)
+        self._dialog.set_keep_above(False)
         response = self._dialog.run()
         if response == gtk.RESPONSE_OK:
             return True
@@ -175,6 +177,8 @@ class InputDialog:
         hbox.pack_end(self._entry)
         self._dialog.vbox.pack_end(hbox, True, True, 0)
         self._dialog.show_all()
+        self._dialog.set_keep_above(True)
+        self._dialog.set_keep_above(False)
         response = self._dialog.run()
         if response == gtk.RESPONSE_OK:
             return self._entry.get_text()
@@ -209,6 +213,9 @@ class FileChooserDialog:
     def run(self):
         for file_filter in self._filters.values():
             self._dialog.add_filter(file_filter)
+        self._dialog.show_all()
+        self._dialog.set_keep_above(True)
+        self._dialog.set_keep_above(False)
         response = self._dialog.run()
         if response == gtk.RESPONSE_OK:
             response_path = self._dialog.get_filename()

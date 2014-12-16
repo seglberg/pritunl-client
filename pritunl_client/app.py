@@ -310,13 +310,13 @@ class App(object):
         dialog.set_input_label('Profile URI:')
         dialog.set_input_width(32)
         response = dialog.run()
-        dialog.destroy()
         if response:
             try:
                 profile.import_uri(response)
             except Exception as exception:
                 self.show_import_profile_error(exception)
             self.update_menu()
+        dialog.destroy()
 
     def autostart(self):
         time.sleep(0.3)

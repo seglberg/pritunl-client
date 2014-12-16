@@ -1,6 +1,12 @@
 Pritunl-Client Changelog
 ========================
 
+Version 1.0.460.45 2014-12-16
+-----------------------------
+
+Improve interface
+Added support for configuration sync
+
 Version 0.10.1 2014-07-24
 -------------------------
 

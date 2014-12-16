@@ -1,8 +1,9 @@
-pritunl-client-gtk (1.0.459.9snapshot1-0ubuntu1) unstable; urgency=low
+pritunl-client-gtk (1.0.460.45-0ubuntu1) unstable; urgency=low
 
-  * Snapshot release
+  * Improve interface
+  * Added support for configuration sync
 
- -- Pritunl <contact@pritunl.com>  Mon, 15 Dec 2014 00:00:00 -0400
+ -- Pritunl <contact@pritunl.com>  Tue, 16 Dec 2014 00:00:00 -0400
 
 pritunl-client-gtk (0.10.1-0ubuntu1) unstable; urgency=low
 

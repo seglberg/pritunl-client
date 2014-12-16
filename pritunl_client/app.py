@@ -225,10 +225,10 @@ class App(object):
         dialog.set_input_label('Profile Name:')
         dialog.set_input_width(32)
         response = dialog.run()
-        dialog.destroy()
         if response is not None:
             prfl.set_name(response[:32])
             self.update_menu()
+        dialog.destroy()
 
     def on_delete_profile(self, profile_id):
         prfl = profile.Profile.get_profile(profile_id)
@@ -241,10 +241,10 @@ class App(object):
         dialog.set_message_secondary(
             'Are you sure you want to delete the profile %s' % prfl.name)
         response = dialog.run()
-        dialog.destroy()
         if response:
             prfl.delete()
             self.update_menu()
+        dialog.destroy()
 
     def on_autostart_profile(self, profile_id):
         prfl = profile.Profile.get_profile(profile_id)
@@ -293,13 +293,13 @@ class App(object):
         dialog.add_filter('Pritunl Profile', '*.tar')
 
         response = dialog.run()
-        dialog.destroy()
         if response:
             try:
                 profile.import_file(response)
             except Exception as exception:
                 self.show_import_profile_error(exception)
             self.update_menu()
+        dialog.destroy()
 
     def show_import_profile_uri(self):
         dialog = interface.InputDialog()

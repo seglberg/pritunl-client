@@ -20,5 +20,6 @@ Depends: python-gtk2,
          iptables,
          ${misc:Depends},
          ${python:Depends}
+Conflicts: pritunl-client
 Description: Pritunl VPN Client (GUI Release)
  Client for the Pritunl VPN server with GTK interface.

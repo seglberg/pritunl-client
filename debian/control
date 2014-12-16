@@ -17,5 +17,6 @@ Depends: openvpn,
          iptables,
          ${misc:Depends},
          ${python:Depends}
+Conflicts: pritunl-client-gtk
 Description: Pritunl VPN Client
  Client for the Pritunl VPN server.

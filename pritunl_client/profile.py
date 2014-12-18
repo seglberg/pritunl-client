@@ -134,20 +134,27 @@ class Profile(object):
                 os.remove(temp_path)
 
     def _parse_profile(self, data):
-        conf_str = data.splitlines()[0].replace('#', '', 1).strip()
-        profile_data = data
+        json_data = ''
+
+        for line in data.splitlines():
+            if line.startswith('#'):
+                json_data += line[1:].strip()
+            else:
+                break
+
         try:
-            conf_data = json.loads(conf_str)
-            profile_data = '\n'.join(profile_data.splitlines()[1:])
+            conf_data = json.loads(json_data)
         except ValueError:
             conf_data = {}
-        return conf_data, profile_data
 
-    def write_profile(self, data):
-        conf_data, profile_data = self._parse_profile(data)
+        return conf_data
+
+    def write_profile(self, profile_data):
+        conf_data = self._parse_profile(profile_data)
         with open(self.path, 'w') as profile_file:
             os.chmod(self.path, 0600)
             profile_file.write(profile_data)
+
         self.user_name = conf_data.get('user')
         self.org_name = conf_data.get('organization')
         self.server_name = conf_data.get('server')
@@ -158,7 +165,7 @@ class Profile(object):
         self.sync_token = conf_data.get('sync_token')
         self.sync_secret = conf_data.get('sync_secret')
         self.sync_hosts = conf_data.get('sync_hosts', [])
-        self.auth_passwd = 'auth-user-pass' in data
+        self.auth_passwd = 'auth-user-pass' in profile_data
         self.commit()
 
     def update_profile(self, data):

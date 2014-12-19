@@ -631,48 +631,57 @@ elif cmd == 'upload':
 
 
     # Upload arch package
-    build_dir = 'build/%s/arch' % cur_version
-    aur_pkg_name = '%s-%s-%s-any.pkg.tar.xz' % (
-        pkg_name + '-dev' if is_dev_release else pkg_name,
-        cur_version,
-        build_num + 1,
-    )
-    aur_path = os.path.join(build_dir, aur_pkg_name)
-    aurball_pkg_name = '%s-%s-%s.src.tar.gz' % (
-        pkg_name + '-dev' if is_dev_release else pkg_name,
-        cur_version,
-        build_num + 1,
-    )
-    aurball_path = os.path.join(build_dir, aurball_pkg_name)
+    for build_dir, arch_pkg_name in (
+                (
+                    'build/%s/arch' % cur_version,
+                    pkg_name,
+                ),
+                (
+                    'build/%s/arch-gtk' % cur_version,
+                    pkg_name + '-gtk',
+                )
+            ):
+        aur_pkg_name = '%s-%s-%s%s-any.pkg.tar.xz' % (
+            arch_pkg_name + '-dev' if is_dev_release else arch_pkg_name,
+            cur_version,
+            build_num + 1,
+        )
+        aur_path = os.path.join(build_dir, aur_pkg_name)
+        aurball_pkg_name = '%s-%s-%s.src.tar.gz' % (
+            arch_pkg_name + '-dev' if is_dev_release else arch_pkg_name,
+            cur_version,
+            build_num + 1,
+        )
+        aurball_path = os.path.join(build_dir, aurball_pkg_name)
 
-    post_git_asset(release_id, aur_pkg_name, aur_path)
+        post_git_asset(release_id, aur_pkg_name, aur_path)
 
-    session = requests.Session()
+        session = requests.Session()
 
-    response = session.post('https://aur.archlinux.org/login',
-        data={
-            'user': aur_username,
-            'passwd': aur_password,
-            'remember_me': 'on',
-        },
-    )
+        response = session.post('https://aur.archlinux.org/login',
+            data={
+                'user': aur_username,
+                'passwd': aur_password,
+                'remember_me': 'on',
+            },
+        )
 
-    response = session.get('https://aur.archlinux.org/submit/')
-    token = re.findall(
-        '(name="token" value=)("?.*")',
-        response.text,
-    )[0][1].replace('"', '')
+        response = session.get('https://aur.archlinux.org/submit/')
+        token = re.findall(
+            '(name="token" value=)("?.*")',
+            response.text,
+        )[0][1].replace('"', '')
 
-    response = session.post('https://aur.archlinux.org/submit/',
-        files={
-            'pfile': open(aurball_path, 'rb'),
-        },
-        data={
-            'pkgsubmit': 1,
-            'token': token,
-            'category': AUR_CATEGORY,
-        }
-    )
+        response = session.post('https://aur.archlinux.org/submit/',
+            files={
+                'pfile': open(aurball_path, 'rb'),
+            },
+            data={
+                'pkgsubmit': 1,
+                'token': token,
+                'category': AUR_CATEGORY,
+            }
+        )
 
 
     # Upload centos package

@@ -101,6 +101,11 @@ def exception(log_msg, log_type=None, **kwargs):
     # Fix for python #15541
     _log('error', log_msg, log_type, exc_info=1, **kwargs)
 
+if not os.path.exists(LOG_PATH):
+    log_dir = os.path.dirname(LOG_PATH)
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+
 logger = logging.getLogger(APP_NAME)
 log_handler = LogHandler(LOG_PATH, backupCount=1, maxBytes=1000000)
 log_filter = LogFilter()

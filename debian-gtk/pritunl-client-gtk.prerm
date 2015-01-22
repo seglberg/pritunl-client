@@ -1,10 +1,10 @@
 #!/bin/bash
+killall pritunl-client-gtk || true
 if which pyclean >/dev/null 2>&1; then
-    pyclean -p pritunl_client
+    pyclean -p pritunl-client-gtk
 else
-    dpkg -L pritunl_client | grep \.py$ | while read file
+    dpkg -L pritunl-client-gtk | grep \.py$ | while read file
     do
         rm -f "${file}"[co] >/dev/null
     done
 fi
-killall pritunl_client || true

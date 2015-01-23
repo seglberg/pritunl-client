@@ -641,7 +641,7 @@ elif cmd == 'upload':
                     pkg_name + '-gtk',
                 )
             ):
-        aur_pkg_name = '%s-%s-%s%s-any.pkg.tar.xz' % (
+        aur_pkg_name = '%s-%s-%s-any.pkg.tar.xz' % (
             arch_pkg_name + '-dev' if is_dev_release else arch_pkg_name,
             cur_version,
             build_num + 1,

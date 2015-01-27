@@ -14,6 +14,7 @@ import uuid
 import subprocess
 import threading
 import httplib
+import tarfile
 
 _connections = {}
 

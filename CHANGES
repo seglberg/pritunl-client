@@ -1,6 +1,11 @@
 Pritunl-Client Changelog
 ========================
 
+Version 1.0.502.8 2015-01-27
+----------------------------
+
+Fix issue with importing profiles
+
 Version 1.0.498.25 2015-01-23
 -----------------------------
 

@@ -1,7 +1,7 @@
 # Maintainer: Pritunl <contact@pritunl.com>
 
 pkgname=pritunl-client
-pkgver=1.0.498.25
+pkgver=1.0.502.8
 pkgrel=1
 pkgdesc="Pritunl VPN Client"
 arch=("any")

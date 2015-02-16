@@ -1,8 +1,17 @@
 pritunl-client: pritunl vpn client
 ==================================
 
-.. image:: http://gitshields.com/v2/pypi/pritunl_client/version/7d0ce8.png
-    :target: https://pypi.python.org/pypi/pritunl_client
+.. image:: https://img.shields.io/badge/package-ubuntu-dd4814.svg?style=flat
+    :target: https://launchpad.net/~pritunl/+archive/ubuntu/ppa
+
+.. image:: https://img.shields.io/badge/package-arch%20linux-33aadd.svg?style=flat
+    :target: https://aur.archlinux.org/packages/?K=pritunl&SeB=m
+
+.. image:: https://img.shields.io/badge/github-pritunl-11bdc2.svg?style=flat
+    :target: https://github.com/pritunl
+
+.. image:: https://img.shields.io/badge/twitter-pritunl-55acee.svg?style=flat
+    :target: https://twitter.com/pritunl
 
 `Pritunl-Client <https://github.com/pritunl/pritunl-client>`_ is an open
 source vpn client for Pritunl. Documentation and more information can be

@@ -1,8 +1,7 @@
 Pritunl-Client Changelog
 ========================
 
-Version 1.0.552.81 2015-03-18
------------------------------
+<%= version %>
 
 Fix issues with python 2.7.9 ssl verification
 

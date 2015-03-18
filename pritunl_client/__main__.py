@@ -7,6 +7,7 @@ import signal
 import time
 import hashlib
 import json
+import requests
 
 def client_gui():
     from pritunl_client import app
@@ -61,7 +62,7 @@ def client_shell():
         help='List imported profiles and status',
     )
     def list_cmd():
-        response = utils.request.get(
+        response = requests.get(
             'http://localhost:9797/list',
         )
 
@@ -87,9 +88,12 @@ def client_shell():
             else:
                 data['profile_uri'] = profile_in
 
-            response = utils.request.post(
+            response = requests.post(
                 'http://localhost:9797/import',
-                json_data=data,
+                headers={
+                    'Content-type': 'application/json',
+                },
+                data=json.dumps(data),
             )
 
             if response.status_code == 200:
@@ -107,7 +111,7 @@ def client_shell():
     )
     def remove_cmd(profile_ids):
         for profile_id in profile_ids:
-            response = utils.request.delete(
+            response = requests.delete(
                 'http://localhost:9797/remove/%s' % profile_id,
             )
 
@@ -131,15 +135,20 @@ def client_shell():
     def start_cmd(profile_ids, password):
         for profile_id in profile_ids:
             if password:
-                data = {
-                    'passwd': password,
+                headers = {
+                    'Content-type': 'application/json',
                 }
+                data = json.dumps({
+                    'passwd': password,
+                })
             else:
+                headers = None
                 data = None
 
-            response = utils.request.put(
+            response = requests.put(
                 'http://localhost:9797/start/%s' % profile_id,
-                json_data=data,
+                headers=headers,
+                data=data,
             )
 
             if response.status_code == 200:
@@ -157,7 +166,7 @@ def client_shell():
     )
     def stop_cmd(profile_ids):
         for profile_id in profile_ids:
-            response = utils.request.put(
+            response = requests.put(
                 'http://localhost:9797/stop/%s' % profile_id,
             )
 
@@ -177,7 +186,7 @@ def client_shell():
     )
     def enable_cmd(profile_ids):
         for profile_id in profile_ids:
-            response = utils.request.put(
+            response = requests.put(
                 'http://localhost:9797/enable/%s' % profile_id,
             )
 
@@ -197,7 +206,7 @@ def client_shell():
     )
     def disable_cmd(profile_ids):
         for profile_id in profile_ids:
-            response = utils.request.put(
+            response = requests.put(
                 'http://localhost:9797/disable/%s' % profile_id,
             )
 

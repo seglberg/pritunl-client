@@ -447,7 +447,7 @@ def import_uri(profile_uri):
     for i in xrange(2):
         try:
             response = requests.get(profile_uri, verify=False,
-                timeout=CONNECT_TIMEOUT)
+                timeout=IMPORT_TIMEOUT)
             if response.status_code != 400:
                 break
         except:

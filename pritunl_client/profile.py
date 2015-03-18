@@ -15,6 +15,7 @@ import subprocess
 import threading
 import httplib
 import tarfile
+import requests
 
 _connections = {}
 
@@ -445,10 +446,11 @@ def import_uri(profile_uri):
 
     for i in xrange(2):
         try:
-            response = utils.request.get(profile_uri)
+            response = requests.get(profile_uri, verify=False,
+                timeout=CONNECT_TIMEOUT)
             if response.status_code != 400:
                 break
-        except httplib.HTTPException:
+        except:
             if i == 1:
                 raise
         if profile_uri.startswith('https'):

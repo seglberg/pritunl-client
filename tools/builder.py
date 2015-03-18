@@ -86,7 +86,7 @@ def post_git_asset(release_id, file_name, file_path):
     )
 
     if response.status_code != 201:
-        print 'Failed to create release on github'
+        print 'Failed to create asset on github'
         print response.json()
         sys.exit(1)
 

@@ -213,7 +213,7 @@ setup(
     }],
     options = {
         'py2exe': {
-            'packages':'encodings',
+            'packages': 'encodings',
             'includes': 'cairo, pango, pangocairo, atk, gobject, ' + \
                 'gio, gtk.keysyms, rsvg',
             'dll_excludes': ['w9xpopen.exe'],

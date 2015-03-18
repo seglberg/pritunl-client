@@ -9,6 +9,7 @@ license=("custom")
 url="https://github.com/pritunl/${pkgname}"
 depends=(
     "python2"
+    "python2-requests"
     "net-tools"
     "iproute2"
     "openvpn"

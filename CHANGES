@@ -1,6 +1,10 @@
 Pritunl-Client Changelog
 ========================
 
+<%= version %>
+
+Add support for ubuntu vivid
+
 Version 1.0.552.81 2015-03-18
 -----------------------------
 

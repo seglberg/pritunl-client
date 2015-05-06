@@ -1,3 +1,9 @@
+pritunl-client-gtk (1.0.601.3-0ubuntu1) unstable; urgency=low
+
+  * Add support for ubuntu vivid
+
+ -- Pritunl <contact@pritunl.com>  Wed, 06 May 2015 00:00:00 -0400
+
 pritunl-client-gtk (1.0.552.81-0ubuntu1) unstable; urgency=low
 
   * Fix issues with python 2.7.9 ssl verification

@@ -1,7 +1,7 @@
 from pritunl_client.constants import *
 
 __title__ = 'pritunl_client'
-__version__ = '1.0.552.81'
+__version__ = '1.0.601.3'
 __author__ = 'Pritunl'
 __email__ = 'contact@pritunl.com'
 __license__ = 'Custom'

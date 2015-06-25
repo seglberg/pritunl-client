@@ -5,10 +5,14 @@ from pritunl_client import utils
 from pritunl_client import logger
 
 import BaseHTTPServer
+import SocketServer
 import threading
 import json
 import httplib
-import time
+
+class ThreadingHTTPServer(SocketServer.ThreadingMixIn,
+        BaseHTTPServer.HTTPServer):
+    pass
 
 class Request(BaseHTTPServer.BaseHTTPRequestHandler):
     def send_text_response(self, text, status_code=200):
@@ -222,7 +226,7 @@ class ShellApp(object):
                 args=(status_callback, connect_callback)).start()
 
     def start_server(self):
-        server = BaseHTTPServer.HTTPServer(
+        server = ThreadingHTTPServer(
             ('127.0.0.1', 9797),
             Request,
         )

@@ -6,7 +6,6 @@ if PLATFORM == SHELL:
 
 import wx
 import collections
-import time
 import sys
 
 _mappings = {
@@ -325,8 +324,6 @@ class StatusIconApp:
         self._icon_path = None
         self._callback = None
         self._app = _App(False)
-        # TODO
-        # self._icon = _TaskBarIcon(iconType=wx.TBI_DOCK)
         self._icon = _TaskBarIcon()
         self._icon.Bind(wx.EVT_TASKBAR_LEFT_DOWN, self._on_activate)
 

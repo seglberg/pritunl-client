@@ -5,7 +5,6 @@ from pritunl_client import profile
 import os
 import time
 import subprocess
-import threading
 import hashlib
 
 class ProfileLinux(profile.Profile):

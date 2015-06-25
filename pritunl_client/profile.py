@@ -7,13 +7,11 @@ if PLATFORM != SHELL:
     from pritunl_client import interface
 
 import os
-import uuid
 import json
 import time
 import uuid
 import subprocess
 import threading
-import httplib
 import tarfile
 import requests
 

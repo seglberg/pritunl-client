@@ -135,13 +135,14 @@ class Request(BaseHTTPServer.BaseHTTPRequestHandler):
         prfl.sync_conf()
 
         if prfl.auth_passwd and not passwd:
-            self.send_text_response(
-                'Authenticator code required', 400)
+            self.send_text_response('Authenticator code required', 400)
             return
 
-        prfl.start(status_callback, connect_callback, passwd=passwd)
+        if not prfl.start(status_callback, connect_callback, passwd=passwd):
+            self.send_text_response('Profile has already been started', 500)
+            return
 
-        evt.wait()
+        evt.wait(CONNECT_TIMEOUT + 5)
 
         if prfl.status in ERROR_STATES:
             error_msg = {

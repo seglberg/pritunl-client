@@ -235,8 +235,9 @@ class Profile(object):
     def start(self, status_callback, connect_callback=None, passwd=None):
         if self.status in ACTIVE_STATES:
             self._set_status(self.status)
-            return
+            return False
         self._start(status_callback, connect_callback, passwd)
+        return True
 
     def start_autostart(self, status_callback, connect_callback=None):
         if self.status in ACTIVE_STATES:
@@ -409,12 +410,8 @@ class Profile(object):
         elif PLATFORM == SHELL:
             from pritunl_client import profile_shell
             return profile_shell.ProfileShell(id)
-        elif PLATFORM == WIN:
-            from pritunl_client import profile_win
-            return profile_win.ProfileWin(id)
-        elif PLATFORM == OSX:
-            from pritunl_client import profile_osx
-            return profile_osx.ProfileOsx(id)
+        else:
+            raise NotImplementedError('Platform %s not supported' % PLATFORM)
 
 def import_file(profile_path):
     if os.path.splitext(profile_path)[1] == '.tar':

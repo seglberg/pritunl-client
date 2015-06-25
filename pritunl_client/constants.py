@@ -1,7 +1,6 @@
 import os
 import uuid
 import sys
-import pkg_resources
 
 APP_NAME = 'pritunl_client'
 APP_NAME_FORMATED = 'Pritunl Client'
@@ -16,10 +15,6 @@ if sys.platform.startswith('linux'):
         PLATFORM = SHELL
     else:
         PLATFORM = LINUX
-elif sys.platform == 'win32':
-    PLATFORM = WIN
-elif sys.platform == 'darwin':
-    PLATFORM = OSX
 else:
     raise ValueError('Unknown platform %s' % sys.platform)
 
@@ -57,12 +52,6 @@ if PLATFORM == LINUX:
 elif PLATFORM == SHELL:
     _CONNECTED_LOGO_NAME = None
     _DISCONNECTED_LOGO_NAME = None
-elif PLATFORM == WIN:
-    _CONNECTED_LOGO_NAME = 'logo_connected_win.png'
-    _DISCONNECTED_LOGO_NAME = 'logo_disconnected_win.png'
-elif PLATFORM == OSX:
-    _CONNECTED_LOGO_NAME = 'logo_connected_osx.png'
-    _DISCONNECTED_LOGO_NAME = 'logo_disconnected_osx.png'
 else:
     raise NotImplementedError('Platform %s not supported' % PLATFORM)
 
@@ -77,31 +66,6 @@ if PLATFORM != SHELL:
         img_path = os.path.join(img_root, _DISCONNECTED_LOGO_NAME)
         if os.path.exists(img_path) and not DISCONNECTED_LOGO_DEFAULT_PATH:
             DISCONNECTED_LOGO_DEFAULT_PATH = img_path
-
-if PLATFORM == WIN:
-    WIN_OPENVPN_PATH = None
-    for path in (
-                os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])),
-                    'openvpn', 'openvpn.exe'),
-                os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])),
-                    'data', 'win', 'openvpn', 'openvpn.exe'),
-            ):
-        if os.path.isfile(path):
-            WIN_OPENVPN_PATH = path
-    if not WIN_OPENVPN_PATH:
-        raise ValueError('Failed to find openvpn executable')
-
-    WIN_TUNTAP_DIR = None
-    for path in (
-                os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])),
-                    'tuntap'),
-                os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])),
-                    'data', 'win', 'tuntap'),
-            ):
-        if os.path.exists(path):
-            WIN_TUNTAP_DIR = path
-    if not WIN_TUNTAP_DIR:
-        raise ValueError('Failed to find tuntap directory')
 
 CONNECTING = 'connecting'
 RECONNECTING = 'reconnecting'

@@ -4,4 +4,4 @@ from pritunl_client.exceptions import *
 if PLATFORM == LINUX:
     from interface_gtk import *
 else:
-    raise TypeError('Interface not available for platform')
+    raise NotImplementedError('Interface not available for platform')

@@ -15,8 +15,6 @@ data_files = []
 
 LINUX = 'linux'
 SHELL = 'shell'
-WIN = 'win'
-OSX = 'osx'
 
 if sys.platform.startswith('linux'):
     PLATFORM = LINUX

@@ -141,8 +141,6 @@ setup(
     },
     platforms=[
         'Linux',
-        'Windows',
-        'MacOS',
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
@@ -155,23 +153,5 @@ setup(
         'Operating System :: MacOS',
         'Programming Language :: Python :: 2.7',
         'Topic :: System :: Networking',
-    ],
-    windows=[{
-        'script': 'win_main.py',
-        'dest_base': 'pritunl_client',
-        'icon_resources': [(1, 'img/logo.ico')],
-    },
-    {
-        'script': 'win_main_clean.py',
-        'dest_base': 'pritunl_client_clean',
-        'icon_resources': [(1, 'img/logo.ico')],
-    }],
-    options = {
-        'py2exe': {
-            'packages': 'encodings',
-            'includes': 'cairo, pango, pangocairo, atk, gobject, ' + \
-                'gio, gtk.keysyms, rsvg',
-            'dll_excludes': ['w9xpopen.exe'],
-        },
-    },
+    ]
 )

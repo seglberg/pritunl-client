@@ -20,10 +20,8 @@ OSX = 'osx'
 
 if sys.platform.startswith('linux'):
     PLATFORM = LINUX
-elif sys.platform == 'win32':
-    PLATFORM = WIN
-elif sys.platform == 'darwin':
-    PLATFORM = OSX
+else:
+    raise NotImplementedError('Interface not available for platform')
 
 prefix = sys.prefix
 for arg in copy.copy(sys.argv):
@@ -42,90 +40,49 @@ for arg in copy.copy(sys.argv):
 if not os.path.exists('build'):
     os.mkdir('build')
 
-if PLATFORM == LINUX:
-    if install_gtk:
-        for img_size in os.listdir(os.path.join('img', 'hicolor')):
-            for img_name in os.listdir(os.path.join('img', 'hicolor',
+if install_gtk:
+    for img_size in os.listdir(os.path.join('img', 'hicolor')):
+        for img_name in os.listdir(os.path.join('img', 'hicolor',
+                img_size)):
+            data_files.append((os.path.join(os.path.abspath(os.sep), 'usr',
+                'share', 'icons', 'hicolor', img_size, 'apps'), [
+                    os.path.join('img', 'hicolor', img_size, img_name)]))
+
+    for img_theme in ('ubuntu-mono-dark', 'ubuntu-mono-light'):
+        for img_size in os.listdir(os.path.join('img', img_theme)):
+            for img_name in os.listdir(os.path.join('img', img_theme,
                     img_size)):
-                data_files.append((os.path.join(os.path.abspath(os.sep), 'usr',
-                    'share', 'icons', 'hicolor', img_size, 'apps'), [
-                        os.path.join('img', 'hicolor', img_size, img_name)]))
-
-        for img_theme in ('ubuntu-mono-dark', 'ubuntu-mono-light'):
-            for img_size in os.listdir(os.path.join('img', img_theme)):
-                for img_name in os.listdir(os.path.join('img', img_theme,
-                        img_size)):
-                    data_files.append((os.path.join(os.path.abspath(os.sep),
-                        'usr', 'share', 'icons', img_theme, 'apps', img_size),
-                        [os.path.join('img', img_theme, img_size, img_name)]))
-
-        data_files += [
-            (os.path.join(os.path.abspath(os.sep), 'usr', 'share',
-                    'pritunl_client'), [
-                os.path.join('img', 'logo.png'),
-                os.path.join('img', 'logo_connected_dark.svg'),
-                os.path.join('img', 'logo_disconnected_dark.svg'),
-                os.path.join('img', 'logo_connected_light.svg'),
-                os.path.join('img', 'logo_disconnected_light.svg'),
-            ]),
-            (os.path.join(os.path.abspath(os.sep), 'usr', 'share',
-                'applications'), [os.path.join(
-                    'data', 'linux', 'applications',
-                    'pritunl-client-gtk.desktop')]),
-            (os.path.join(os.path.abspath(os.sep), 'etc', 'xdg', 'autostart'),
-                [os.path.join('data', 'linux', 'applications',
-                    'pritunl-client-gtk.desktop')]),
-            (os.path.join(os.path.abspath(os.sep), 'usr', 'share', 'polkit-1',
-                'actions'), [os.path.join('data', 'linux', 'polkit',
-                'com.pritunl.client.policy')]),
-        ]
+                data_files.append((os.path.join(os.path.abspath(os.sep),
+                    'usr', 'share', 'icons', img_theme, 'apps', img_size),
+                    [os.path.join('img', img_theme, img_size, img_name)]))
 
     data_files += [
-        (os.path.join(os.path.abspath(os.sep), 'var', 'log'), [
-            os.path.join('data', 'var', 'pritunl-client.log'),
-            os.path.join('data', 'var', 'pritunl-client.log.1'),
-        ]),
-    ]
-
-elif PLATFORM == WIN:
-    try:
-        try:
-            import py2exe.mf as modulefinder
-        except ImportError:
-            import modulefinder
-        import sys
-        import win32com
-        for path in win32com.__path__[1:]:
-            modulefinder.AddPackagePath('win32com', path)
-        __import__('win32com.shell')
-        module = sys.modules['win32com.shell']
-        for path in module.__path__[1:]:
-            modulefinder.AddPackagePath('win32com.shell', path)
-    except ImportError:
-        pass
-
-    import wx
-    import py2exe
-    data_files += [
-        ('img', [
+        (os.path.join(os.path.abspath(os.sep), 'usr', 'share',
+                'pritunl_client'), [
             os.path.join('img', 'logo.png'),
-            os.path.join('img', 'logo_connected_win.png'),
-            os.path.join('img', 'logo_disconnected_win.png'),
+            os.path.join('img', 'logo_connected_dark.svg'),
+            os.path.join('img', 'logo_disconnected_dark.svg'),
+            os.path.join('img', 'logo_connected_light.svg'),
+            os.path.join('img', 'logo_disconnected_light.svg'),
         ]),
-        ('tuntap', [
-            os.path.join('data', 'win', 'tuntap', 'devcon.exe'),
-            os.path.join('data', 'win', 'tuntap', 'OemWin2k.inf'),
-            os.path.join('data', 'win', 'tuntap', 'tap0901.cat'),
-            os.path.join('data', 'win', 'tuntap', 'tap0901.sys'),
-        ]),
-        ('openvpn', [
-            os.path.join('data', 'win', 'openvpn', 'libeay32.dll'),
-            os.path.join('data', 'win', 'openvpn', 'liblzo2-2.dll'),
-            os.path.join('data', 'win', 'openvpn', 'libpkcs11-helper-1.dll'),
-            os.path.join('data', 'win', 'openvpn', 'openvpn.exe'),
-            os.path.join('data', 'win', 'openvpn', 'ssleay32.dll'),
-        ]),
+        (os.path.join(os.path.abspath(os.sep), 'usr', 'share',
+            'applications'), [os.path.join(
+                'data', 'linux', 'applications',
+                'pritunl-client-gtk.desktop')]),
+        (os.path.join(os.path.abspath(os.sep), 'etc', 'xdg', 'autostart'),
+            [os.path.join('data', 'linux', 'applications',
+                'pritunl-client-gtk.desktop')]),
+        (os.path.join(os.path.abspath(os.sep), 'usr', 'share', 'polkit-1',
+            'actions'), [os.path.join('data', 'linux', 'polkit',
+            'com.pritunl.client.policy')]),
     ]
+
+data_files += [
+    (os.path.join(os.path.abspath(os.sep), 'var', 'log'), [
+        os.path.join('data', 'var', 'pritunl-client.log'),
+        os.path.join('data', 'var', 'pritunl-client.log.1'),
+    ]),
+]
 
 console_scripts = [
     'pritunl-client = pritunl_client.__main__:client_shell',

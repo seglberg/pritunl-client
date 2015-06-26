@@ -173,11 +173,12 @@ class Profile(object):
             profile_data = profile_file.read()
 
         tls_auth = ''
+        if 'key-direction' in profile_data and 'key-direction' not in data:
+            tls_auth +=  'key-direction 1\n'
+
         s_index = profile_data.find('<tls-auth>')
         e_index = profile_data.find('</tls-auth>')
         if s_index >= 0 and e_index >= 0:
-            if 'key-direction' not in data:
-                tls_auth +=  'key-direction 1\n'
             tls_auth += profile_data[s_index:e_index + 11] + '\n'
 
         s_index = profile_data.find('<cert>')

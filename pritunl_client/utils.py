@@ -4,9 +4,6 @@ from pritunl_client.exceptions import *
 if PLATFORM != SHELL:
     from pritunl_client import interface
 
-import urllib2
-import httplib
-import socket
 import json
 import time
 import uuid

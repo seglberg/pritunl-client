@@ -22,10 +22,9 @@ def client_gui():
         client_app.main()
 
 def client_shell():
-    os.environ['LINUX_SHELL'] = 't'
-    from pritunl_client import click
     from pritunl_client import constants
     constants.PLATFORM = constants.SHELL
+    from pritunl_client import click
 
     @click.group()
     def cli():

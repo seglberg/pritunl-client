@@ -11,10 +11,7 @@ WIN = 'win'
 OSX = 'osx'
 
 if sys.platform.startswith('linux'):
-    if os.environ.get('LINUX_SHELL') == 't':
-        PLATFORM = SHELL
-    else:
-        PLATFORM = LINUX
+    PLATFORM = LINUX
 else:
     raise ValueError('Unknown platform %s' % sys.platform)
 

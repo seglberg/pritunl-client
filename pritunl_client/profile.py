@@ -304,7 +304,6 @@ class Profile(object):
                 )
                 return
             elif status_code == 200 and response.content:
-                print response.content
                 self.update_profile(response.content)
                 return
 

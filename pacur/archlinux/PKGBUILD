@@ -20,9 +20,6 @@ depends=(
 )
 makedepends=(
     "python2-distribute"
-    "python2-flask"
-    "python2-pyopenssl"
-    "python2-pymongo"
 )
 provides=("${pkgname}")
 conflicts=(

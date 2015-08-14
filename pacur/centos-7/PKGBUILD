@@ -48,11 +48,13 @@ package() {
 }
 
 postinst() {
+    systemctl daemon-reload || true
     systemctl start pritunl-client || true
     systemctl enable pritunl-client || true
 }
 
 prerm() {
+    systemctl daemon-reload || true
     systemctl stop pritunl-client || true
     systemctl disable pritunl-client || true
 }

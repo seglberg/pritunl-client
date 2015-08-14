@@ -352,7 +352,7 @@ class Profile(object):
 
         def poll_thread():
             started = False
-            with open(self.log_path, 'w') as log_file:
+            with open(self.log_path, 'w') as _:
                 pass
             while True:
                 line = process.stdout.readline()

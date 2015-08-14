@@ -15,13 +15,8 @@ if sys.platform.startswith('linux'):
 else:
     raise ValueError('Unknown platform %s' % sys.platform)
 
-if PLATFORM == SHELL:
-    CONF_DIR = os.path.join(os.path.abspath(os.sep), 'etc', APP_NAME)
-    LOG_PATH = os.path.join(os.path.abspath(os.sep), 'var', 'log',
-        '%s.log' % APP_NAME)
-else:
-    CONF_DIR = os.path.expanduser(os.path.join('~', '.config', APP_NAME))
-    LOG_PATH = os.path.join(CONF_DIR, '%s.log' % APP_NAME)
+CONF_DIR = os.path.expanduser(os.path.join('~', '.config', APP_NAME))
+LOG_PATH = os.path.join(CONF_DIR, '%s.log' % APP_NAME)
 PROFILES_DIR = os.path.join(CONF_DIR, 'profiles')
 LINUX_ETC_DIR = os.path.join(os.path.abspath(os.sep), 'etc', APP_NAME)
 TMP_DIR = os.path.join(os.path.abspath(os.sep), 'tmp')
@@ -52,17 +47,16 @@ elif PLATFORM == SHELL:
 else:
     raise NotImplementedError('Platform %s not supported' % PLATFORM)
 
-if PLATFORM != SHELL:
-    for img_root in IMG_ROOTS:
-        img_path = os.path.join(img_root, 'logo.png')
-        if os.path.exists(img_path) and not LOGO_DEFAULT_PATH:
-            LOGO_DEFAULT_PATH = img_path
-        img_path = os.path.join(img_root, _CONNECTED_LOGO_NAME)
-        if os.path.exists(img_path) and not CONNECTED_LOGO_DEFAULT_PATH:
-            CONNECTED_LOGO_DEFAULT_PATH = img_path
-        img_path = os.path.join(img_root, _DISCONNECTED_LOGO_NAME)
-        if os.path.exists(img_path) and not DISCONNECTED_LOGO_DEFAULT_PATH:
-            DISCONNECTED_LOGO_DEFAULT_PATH = img_path
+for img_root in IMG_ROOTS:
+    img_path = os.path.join(img_root, 'logo.png')
+    if os.path.exists(img_path) and not LOGO_DEFAULT_PATH:
+        LOGO_DEFAULT_PATH = img_path
+    img_path = os.path.join(img_root, _CONNECTED_LOGO_NAME)
+    if os.path.exists(img_path) and not CONNECTED_LOGO_DEFAULT_PATH:
+        CONNECTED_LOGO_DEFAULT_PATH = img_path
+    img_path = os.path.join(img_root, _DISCONNECTED_LOGO_NAME)
+    if os.path.exists(img_path) and not DISCONNECTED_LOGO_DEFAULT_PATH:
+        DISCONNECTED_LOGO_DEFAULT_PATH = img_path
 
 CONNECTING = 'connecting'
 RECONNECTING = 'reconnecting'
@@ -86,3 +80,18 @@ MESSAGE_INFO = 'message_info'
 MESSAGE_QUESTION = 'message_question'
 MESSAGE_ERROR = 'message_error'
 MESSAGE_LOADING = 'message_loading'
+
+def set_shell():
+    global PLATFORM
+    PLATFORM = SHELL
+    global CONF_DIR
+    CONF_DIR = os.path.join(os.path.abspath(os.sep), 'etc', APP_NAME)
+    global LOG_PATH
+    LOG_PATH = os.path.join(os.path.abspath(os.sep), 'var', 'log',
+        '%s.log' % APP_NAME)
+    global LOGO_DEFAULT_PATH
+    LOGO_DEFAULT_PATH = None
+    global CONNECTED_LOGO_DEFAULT_PATH
+    CONNECTED_LOGO_DEFAULT_PATH = None
+    global DISCONNECTED_LOGO_DEFAULT_PATH
+    DISCONNECTED_LOGO_DEFAULT_PATH = None

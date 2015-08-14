@@ -23,7 +23,7 @@ def client_gui():
 
 def client_shell():
     from pritunl_client import constants
-    constants.PLATFORM = constants.SHELL
+    constants.set_shell()
     from pritunl_client import click
 
     @click.group()

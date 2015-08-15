@@ -8,6 +8,7 @@ ehthumbs.db
 Thumbs.db
 *.pyc
 __pycache__
+sign.key
 /.vagrant
 /build
 /dist

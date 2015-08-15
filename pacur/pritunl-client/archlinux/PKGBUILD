@@ -1,5 +1,5 @@
 pkgname="pritunl-client"
-pkgver="1.0.601.3"
+pkgver="1.0.601.4"
 pkgrel="1"
 pkgdesc="Pritunl OpenVPN Client"
 pkgdesclong=(

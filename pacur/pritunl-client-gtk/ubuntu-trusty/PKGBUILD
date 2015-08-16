@@ -49,7 +49,7 @@ build() {
 package() {
     cd "${srcdir}/pritunl-client-${pkgver}"
     mkdir -p "${pkgdir}/etc/pritunl_client"
-    python2 setup.py install --root="${pkgdir}" --prefix=/usr --no-upstart
+    python2 setup.py install --root="${pkgdir}" --prefix=/usr --no-systemd
 }
 
 postinst() {

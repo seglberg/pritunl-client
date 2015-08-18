@@ -1,6 +1,10 @@
 Pritunl-Client Changelog
 ========================
 
+<%= version %>
+
+Update packaging
+
 Version 1.0.601.3 2015-05-06
 ----------------------------
 

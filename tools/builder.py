@@ -58,15 +58,6 @@ def post_git_asset(release_id, file_name, file_path):
         print response.json()
         sys.exit(1)
 
-def rm_tree(path):
-    subprocess.check_call(['rm', '-rf', path])
-
-def tar_extract(archive_path, cwd=None):
-    subprocess.check_call(['tar', 'xfz', archive_path], cwd=cwd)
-
-def tar_compress(archive_path, in_path, cwd=None):
-    subprocess.check_call(['tar', 'cfz', archive_path, in_path], cwd=cwd)
-
 def get_ver(version):
     day_num = (cur_date - datetime.datetime(2013, 9, 12)).days
     min_num = int(math.floor(((cur_date.hour * 60) + cur_date.minute) / 14.4))
@@ -94,19 +85,6 @@ def get_int_ver(version):
         ver[-1] = str(int(ver[-1]) + 4000)
 
     return int(''.join([x.zfill(4) for x in ver]))
-
-def generate_last_modifited_etag(file_path):
-    file_name = os.path.basename(file_path).encode(sys.getfilesystemencoding())
-    file_mtime = datetime.datetime.utcfromtimestamp(
-        os.path.getmtime(file_path))
-    file_size = int(os.path.getsize(file_path))
-    last_modified = werkzeug.http.http_date(file_mtime)
-
-    return (last_modified, 'wzsdm-%d-%s-%s' % (
-        time.mktime(file_mtime.timetuple()),
-        file_size,
-        zlib.adler32(file_name) & 0xffffffff,
-    ))
 
 
 # Load build keys

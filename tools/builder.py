@@ -6,17 +6,10 @@ import json
 import os
 import subprocess
 import time
-import getpass
 import zlib
 import math
 import requests
 import werkzeug.http
-
-UBUNTU_RELEASES = [
-    'trusty', # 14.04
-    'precise', # 12.04
-    'vivid', # 15.04
-]
 
 USAGE = """Usage: builder [command] [options]
 Command Help: builder [command] --help
@@ -30,35 +23,11 @@ Commands:
 INIT_PATH = 'pritunl_client/__init__.py'
 SETUP_PATH = 'setup.py'
 CHANGES_PATH = 'CHANGES'
-PPA_NAME = 'pritunl'
-DEBIAN_CHANGELOG_PATH = 'debian/changelog'
-DEBIAN_GTK_CHANGELOG_PATH = 'debian-gtk/changelog'
 BUILD_KEYS_PATH = 'tools/build_keys.json'
-ARCH_PKGBUILD_PATH = 'arch/production/PKGBUILD'
-ARCH_DEV_PKGBUILD_PATH = 'arch/dev/PKGBUILD'
-ARCH_PKGINSTALL = 'arch/production/pritunl-client.install'
-ARCH_DEV_PKGINSTALL = 'arch/dev/pritunl-client.install'
-ARCH_PKGBUILD_GTK_PATH = 'arch/production-gtk/PKGBUILD'
-ARCH_DEV_PKGBUILD_GTK_PATH = 'arch/dev-gtk/PKGBUILD'
-ARCH_PKGINSTALL_GTK = 'arch/production-gtk/pritunl-client-gtk.install'
-ARCH_DEV_PKGINSTALL_GTK = 'arch/dev-gtk/pritunl-client-gtk.install'
-PRIVATE_KEY_NAME = 'private_key.asc'
-AUR_CATEGORY = 13
+PACUR_PATH = '../pritunl-pacur'
 
 os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 cur_date = datetime.datetime.utcnow()
-
-def vagrant_popen(cmd, cwd=None, name=''):
-    if cwd:
-        cmd = 'cd /vagrant/%s; %s' % (cwd, cmd)
-    return subprocess.Popen("vagrant ssh --command='%s' %s" % (cmd, name),
-        shell=True, stdin=subprocess.PIPE)
-
-def vagrant_check_call(cmd, cwd=None, name=''):
-    if cwd:
-        cmd = 'cd /vagrant/%s; %s' % (cwd, cmd)
-    return subprocess.check_call("vagrant ssh --command='%s' %s" % (cmd, name),
-        shell=True, stdin=subprocess.PIPE)
 
 def wget(url, cwd=None, output=None):
     if output:
@@ -145,9 +114,8 @@ with open(BUILD_KEYS_PATH, 'r') as build_keys_file:
     build_keys = json.loads(build_keys_file.read().strip())
     github_owner = build_keys['github_owner']
     github_token = build_keys['github_token']
-    aur_username = build_keys['aur_username']
-    aur_password = build_keys['aur_password']
-    private_key = build_keys['private_key']
+    mirror_url = build_keys['mirror_url']
+
 
 # Get package info
 with open(INIT_PATH, 'r') as init_file:
@@ -168,6 +136,7 @@ with open(INIT_PATH, 'r') as init_file:
             key, val = line.split('=')
             cur_version = line.split('=')[1].replace("'", '').strip()
 
+
 # Parse args
 if len(sys.argv) > 1:
     cmd = sys.argv[1]
@@ -183,6 +152,8 @@ parser.add_option('--test', action='store_true',
 
 build_num = 0
 
+
+# Run cmd
 if cmd == 'version':
     print '%s v%s' % (app_name, cur_version)
     sys.exit(0)
@@ -191,14 +162,7 @@ if cmd == 'version':
 elif cmd == 'set-version':
     new_version_orig = args[1]
     new_version = get_ver(new_version_orig)
-
     is_snapshot = 'snapshot' in new_version
-    is_dev_release = any((
-        'snapshot' in new_version,
-        'alpha' in new_version,
-        'beta' in new_version,
-        'rc' in new_version,
-    ))
 
 
     # Update changes
@@ -236,91 +200,33 @@ elif cmd == 'set-version':
 
 
     # Generate changelog
-    debian_changelog = ''
-    changelog_version = None
+    version = None
     release_body = ''
-    snapshot_lines = []
-    if is_snapshot:
-        snapshot_lines.append('Version %s %s' % (
-            new_version, datetime.datetime.utcnow().strftime('%Y-%m-%d')))
-        snapshot_lines.append('Snapshot release')
+    if not is_snapshot:
+        with open(CHANGES_PATH, 'r') as changelog_file:
+            for line in changelog_file.readlines()[2:]:
+                line = line.strip()
 
-    with open(CHANGES_PATH, 'r') as changelog_file:
-        for line in snapshot_lines + changelog_file.readlines()[2:]:
-            line = line.strip()
+                if not line or line[0] == '-':
+                    continue
 
-            if not line or line[0] == '-':
-                continue
-
-            if line[:7] == 'Version':
-                if debian_changelog:
-                    debian_changelog += '\n -- %s <%s>  %s -0400\n\n' % (
-                        maintainer,
-                        maintainer_email,
-                        date.strftime('%a, %d %b %Y %H:%M:%S'),
-                    )
-
-                _, version, date = line.split(' ')
-                date = datetime.datetime.strptime(date, '%Y-%m-%d')
-
-                if not changelog_version:
-                    changelog_version = version
-
-                debian_changelog += \
-                    '%s (%s-%subuntu1) unstable; urgency=low\n\n' % (
-                    pkg_name, version, build_num)
-
-            elif debian_changelog:
-                debian_changelog += '  * %s\n' % line
-
-                if not is_snapshot and version == new_version:
+                if line[:7] == 'Version':
+                    if version:
+                        break
+                    version = line.split(' ')[1]
+                elif version:
                     release_body += '* %s\n' % line
 
-        debian_changelog += '\n -- %s <%s>  %s -0400\n' % (
-            maintainer,
-            maintainer_email,
-            date.strftime('%a, %d %b %Y %H:%M:%S'),
-        )
-
-    if not is_snapshot and changelog_version != new_version:
+    if not is_snapshot and version != new_version:
         print 'New version does not exist in changes'
         sys.exit(1)
 
-    with open(DEBIAN_CHANGELOG_PATH, 'w') as changelog_file:
-        changelog_file.write(debian_changelog)
-
-    with open(DEBIAN_GTK_CHANGELOG_PATH, 'w') as changelog_file:
-        changelog_file.write(debian_changelog.replace(
-            pkg_name, pkg_name + '-gtk'))
-
-    if not is_snapshot and not release_body:
+    if is_snapshot:
+        release_body = '* Snapshot release'
+    elif not release_body:
         print 'Failed to generate github release body'
         sys.exit(1)
-    elif is_snapshot:
-        release_body = '* Snapshot release'
     release_body = release_body.rstrip('\n')
-
-
-    # Update arch package
-    for pkgbuild_path in (
-            ARCH_DEV_PKGBUILD_PATH if is_dev_release else ARCH_PKGBUILD_PATH,
-            ARCH_DEV_PKGBUILD_GTK_PATH if is_dev_release else \
-                ARCH_PKGBUILD_GTK_PATH,
-            ):
-        with open(pkgbuild_path, 'r') as pkgbuild_file:
-            pkgbuild_data = re.sub(
-                'pkgver=(.*)',
-                'pkgver=%s' % new_version,
-                pkgbuild_file.read(),
-            )
-            pkgbuild_data = re.sub(
-                'pkgrel=(.*)',
-                'pkgrel=%s' % (build_num + 1),
-                pkgbuild_data,
-            )
-
-        with open(pkgbuild_path, 'w') as pkgbuild_file:
-            pkgbuild_file.write(pkgbuild_data)
 
 
     # Update init
@@ -352,18 +258,12 @@ elif cmd == 'set-version':
     subprocess.check_call(['git', 'add', CHANGES_PATH])
     subprocess.check_call(['git', 'add', INIT_PATH])
     subprocess.check_call(['git', 'add', SETUP_PATH])
-    subprocess.check_call(['git', 'add', DEBIAN_CHANGELOG_PATH])
-    subprocess.check_call(['git', 'add', DEBIAN_GTK_CHANGELOG_PATH])
-    subprocess.check_call(['git', 'add', ARCH_PKGBUILD_PATH])
-    subprocess.check_call(['git', 'add', ARCH_DEV_PKGBUILD_PATH])
-    subprocess.check_call(['git', 'add', ARCH_PKGBUILD_GTK_PATH])
-    subprocess.check_call(['git', 'add', ARCH_DEV_PKGBUILD_GTK_PATH])
     subprocess.check_call(['git', 'commit', '-m', 'Create new release'])
     subprocess.check_call(['git', 'push'])
 
 
     # Create branch
-    if not is_dev_release:
+    if not is_snapshot:
         subprocess.check_call(['git', 'branch', new_version])
         subprocess.check_call(['git', 'push', '-u', 'origin', new_version])
     time.sleep(8)
@@ -381,8 +281,8 @@ elif cmd == 'set-version':
             'tag_name': new_version,
             'name': '%s v%s' % (pkg_name, new_version),
             'body': release_body,
-            'prerelease': is_dev_release,
-            'target_commitish': 'master' if is_dev_release else new_version,
+            'prerelease': is_snapshot,
+            'target_commitish': 'master' if is_snapshot else new_version,
         }),
     )
 
@@ -391,297 +291,67 @@ elif cmd == 'set-version':
         print response.json()
         sys.exit(1)
 
-
 elif cmd == 'build':
-    is_dev_release = any((
-        'snapshot' in cur_version,
-        'alpha' in cur_version,
-        'beta' in cur_version,
-        'rc' in cur_version,
-    ))
-
-    # Get password
-    passphrase = getpass.getpass('Enter GPG passphrase: ')
-    passphrase_retype = getpass.getpass('Retype GPG passphrase: ')
-
-    if passphrase != passphrase_retype:
-        print 'Passwords do not match'
-        sys.exit(1)
-
-
-    # Start vagrant boxes
-    subprocess.check_call(['vagrant', 'up'])
+    # Get sha256 sum
+    archive_name = '%s.tar.gz' % cur_version
+    archive_path = os.path.join(os.path.sep, 'tmp', archive_name)
+    if os.path.isfile(archive_path):
+        os.remove(archive_path)
+    wget('https://github.com/%s/%s/archive/%s' % (
+        github_owner, pkg_name, archive_name),
+        output=archive_name,
+        cwd=os.path.join(os.path.sep, 'tmp'),
+    )
+    archive_sha256_sum = subprocess.check_output(
+        ['sha256sum', archive_path]).split()[0]
+    os.remove(archive_path)
 
 
-    # Create debian package
-    for build_dir in (
-                'build/%s/debian' % cur_version,
-                'build/%s/debian-gtk' % cur_version,
-            ):
-        if not os.path.isdir(build_dir):
-            os.makedirs(build_dir)
+    # Update sha256 sum and pkgver in PKGBUILD
+    for dir in ('pritunl-client', 'pritunl-client-gtk'):
+        for name in os.listdir(os.path.join(PACUR_PATH, dir)):
+            pkgbuild_path = os.path.join(PACUR_PATH, dir, name, 'PKGBUILD')
 
-
-        # Import gpg key
-        private_key_path = os.path.join(build_dir, PRIVATE_KEY_NAME)
-        with open(private_key_path, 'w') as private_key_file:
-            private_key_file.write(private_key)
-
-        vagrant_check_call('sudo gpg --import private_key.asc || true',
-            cwd=build_dir)
-
-        os.remove(private_key_path)
-
-
-        # Download archive
-        archive_name = '%s.tar.gz' % cur_version
-        archive_path = os.path.join(build_dir, archive_name)
-        if not os.path.isfile(archive_path):
-            wget('https://github.com/%s/%s/archive/%s' % (
-                    github_owner, pkg_name, archive_name),
-                output=archive_name,
-                cwd=build_dir,
-            )
-
-
-        # Create orig archive
-        orig_name = '%s_%s.orig.tar.gz' % (pkg_name, cur_version)
-        orig_path = os.path.join(build_dir, orig_name)
-        if not os.path.isfile(orig_path):
-            subprocess.check_call(['cp', archive_name, orig_name],
-                cwd=build_dir)
-
-
-        # Create build path
-        build_name = '%s-%s' % (pkg_name, cur_version)
-        build_path = os.path.join(build_dir, build_name)
-        if not os.path.isdir(build_path):
-            tar_extract(archive_name, cwd=build_dir)
-
-
-        # Setup gtk build
-        if 'gtk' in build_dir:
-            subprocess.check_call(['rm', '-rf', 'debian'], cwd=build_path)
-            subprocess.check_call(['mv', 'debian-gtk', 'debian'],
-                cwd=build_path)
-
-
-        # Read changelog
-        changelog_path = os.path.join(build_path, DEBIAN_CHANGELOG_PATH)
-        with open(changelog_path, 'r') as changelog_file:
-            changelog_data = changelog_file.read()
-
-
-        # Build debian packages
-        for ubuntu_release in UBUNTU_RELEASES:
-            with open(changelog_path, 'w') as changelog_file:
-                changelog_file.write(re.sub(
-                    'ubuntu1(.*);',
-                    'ubuntu1~%s) %s;' % (ubuntu_release, ubuntu_release),
-                    changelog_data,
-                ))
-
-            vagrant_check_call(
-                'sudo debuild -p"gpg --no-tty --passphrase %s"' % (
-                    passphrase),
-                cwd=build_path,
-            )
-
-            if 'gtk' in build_dir:
-                vagrant_check_call(
-                    'sudo debuild -S -sd -p"gpg --no-tty --passphrase %s"' % (
-                        passphrase),
-                    cwd=build_path,
+            with open(pkgbuild_path, 'r') as pkgbuild_file:
+                pkgbuild_data = re.sub(
+                    'pkgver="(.*)"',
+                    'pkgver="%s"' % cur_version,
+                    pkgbuild_file.read(),
                 )
-            else:
-                vagrant_check_call(
-                    'sudo debuild -S -p"gpg --no-tty --passphrase %s"' % (
-                        passphrase),
-                    cwd=build_path,
+                pkgbuild_data = re.sub(
+                    '"[a-f0-9]{64}"',
+                    '"%s"' % archive_sha256_sum,
+                    pkgbuild_data,
                 )
 
-
-    # Create arch package
-    for build_dir, pkgbuild_path, pkginstall_path in (
-                (
-                    'build/%s/arch' % cur_version,
-                    ARCH_DEV_PKGBUILD_PATH if is_dev_release else \
-                        ARCH_PKGBUILD_PATH,
-                    ARCH_DEV_PKGINSTALL if is_dev_release else \
-                        ARCH_PKGINSTALL,
-                ),
-                (
-                    'build/%s/arch-gtk' % cur_version,
-                    ARCH_DEV_PKGBUILD_GTK_PATH if is_dev_release else \
-                        ARCH_PKGBUILD_GTK_PATH,
-                    ARCH_DEV_PKGINSTALL_GTK if is_dev_release else \
-                        ARCH_PKGINSTALL_GTK,
-                ),
-            ):
-        if not os.path.isdir(build_dir):
-            os.makedirs(build_dir)
-
-        # Download archive
-        archive_name = '%s.tar.gz' % cur_version
-        archive_path = os.path.join(build_dir, archive_name)
-        if not os.path.isfile(archive_path):
-            wget('https://github.com/%s/%s/archive/%s' % (
-                    github_owner, pkg_name, archive_name),
-                output=archive_name,
-                cwd=build_dir,
-            )
+            with open(pkgbuild_path, 'w') as pkgbuild_file:
+                pkgbuild_file.write(pkgbuild_data)
 
 
-        # Get sha256 sum
-        archive_sha256_sum = subprocess.check_output(
-            ['sha256sum', archive_path]).split()[0]
-
-
-        # Generate pkgbuild
-        with open(pkgbuild_path, 'r') as pkgbuild_file:
-            pkgbuild_data = pkgbuild_file.read()
-        pkgbuild_data = pkgbuild_data.replace('CHANGE_ME', archive_sha256_sum)
-        pkgbuild_data = pkgbuild_data.replace('0.10.1', '1.0.459.9snapshot1')
-
-        pkgbuild_path = os.path.join(build_dir, 'PKGBUILD')
-        with open(pkgbuild_path, 'w') as pkgbuild_file:
-             pkgbuild_file.write(pkgbuild_data)
-
-        subprocess.check_call(['cp', pkginstall_path, build_dir])
-
-
-        # Build arch package
-        subprocess.check_call(['makepkg', '-f'], cwd=build_dir)
-        subprocess.check_call(['mkaurball', '-f'], cwd=build_dir)
+    # Run pacur project build
+    subprocess.check_call(['pacur', 'project', 'build', 'pritunl-client'],
+        cwd=PACUR_PATH)
+    subprocess.check_call(['pacur', 'project', 'build', 'pritunl-client-gtk'],
+        cwd=PACUR_PATH)
 
 
 elif cmd == 'upload':
-    is_dev_release = any((
-        'snapshot' in cur_version,
-        'alpha' in cur_version,
-        'beta' in cur_version,
-        'rc' in cur_version,
-    ))
+    is_snapshot = 'snapshot' in cur_version
+
+    # Run pacur project build
+    subprocess.check_call(['pacur', 'project', 'repo'], cwd=PACUR_PATH)
 
 
-    # Get release id
-    release_id = None
-    response = requests.get(
-        'https://api.github.com/repos/%s/%s/releases' % (
-            github_owner, pkg_name),
-        headers={
-            'Authorization': 'token %s' % github_token,
-            'Content-type': 'application/json',
-        },
-    )
-
-    for release in response.json():
-        if release['tag_name'] == cur_version:
-            release_id = release['id']
-
-    if not release_id:
-        print 'Version does not exists in github'
-        sys.exit(1)
-
-
-    # Upload debian package
-    for build_dir, pkg_name_ext in (
-                (
-                    'build/%s/debian' % cur_version,
-                    '',
-                ),
-                (
-                    'build/%s/debian-gtk' % cur_version,
-                    '-gtk',
-                )
-            ):
-        if options.test:
-            launchpad_ppa = '/%s-test' % (PPA_NAME, PPA_NAME)
-        elif is_dev_release:
-            launchpad_ppa = '%s/%s-dev' % (PPA_NAME, PPA_NAME)
-        else:
-            launchpad_ppa = '%s/ppa' % PPA_NAME
-
-        for ubuntu_release in UBUNTU_RELEASES:
-            deb_file_name = '%s%s_%s-%subuntu1~%s_all.deb' % (
-                pkg_name,
-                pkg_name_ext,
-                cur_version,
-                build_num,
-                ubuntu_release,
-            )
-            deb_file_path = os.path.join(build_dir, deb_file_name)
-            post_git_asset(release_id, deb_file_name, deb_file_path)
-
-            vagrant_check_call(
-                'sudo dput -f ppa:%s %s%s_%s-%subuntu1~%s_source.changes' % (
-                    launchpad_ppa,
-                    pkg_name,
-                    pkg_name_ext,
-                    cur_version,
-                    build_num,
-                    ubuntu_release,
-                ),
-                cwd=build_dir,
-            )
-
-    if options.test:
-        sys.exit(0)
-
-
-    # Upload arch package
-    for build_dir, arch_pkg_name in (
-                (
-                    'build/%s/arch' % cur_version,
-                    pkg_name,
-                ),
-                (
-                    'build/%s/arch-gtk' % cur_version,
-                    pkg_name + '-gtk',
-                )
-            ):
-        aur_pkg_name = '%s-%s-%s-any.pkg.tar.xz' % (
-            arch_pkg_name + '-dev' if is_dev_release else arch_pkg_name,
-            cur_version,
-            build_num + 1,
-        )
-        aur_path = os.path.join(build_dir, aur_pkg_name)
-        aurball_pkg_name = '%s-%s-%s.src.tar.gz' % (
-            arch_pkg_name + '-dev' if is_dev_release else arch_pkg_name,
-            cur_version,
-            build_num + 1,
-        )
-        aurball_path = os.path.join(build_dir, aurball_pkg_name)
-
-        post_git_asset(release_id, aur_pkg_name, aur_path)
-
-        session = requests.Session()
-
-        response = session.post('https://aur.archlinux.org/login',
-            data={
-                'user': aur_username,
-                'passwd': aur_password,
-                'remember_me': 'on',
-            },
-        )
-
-        response = session.get('https://aur.archlinux.org/submit/')
-        token = re.findall(
-            '(name="token" value=)("?.*")',
-            response.text,
-        )[0][1].replace('"', '')
-
-        response = session.post('https://aur.archlinux.org/submit/',
-            files={
-                'pfile': open(aurball_path, 'rb'),
-            },
-            data={
-                'pkgsubmit': 1,
-                'token': token,
-                'category': AUR_CATEGORY,
-            }
-        )
-
+    # Sync mirror
+    subprocess.check_call(['rsync',
+        '--human-readable',
+        '--archive',
+        '--progress',
+        '--delete',
+        '--acls',
+        'mirror/',
+        mirror_url,
+    ],cwd=PACUR_PATH)
 
 else:
     print 'Unknown command'

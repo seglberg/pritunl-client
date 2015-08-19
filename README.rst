@@ -15,7 +15,7 @@ pritunl-client: pritunl vpn client
 
 `Pritunl-Client <https://github.com/pritunl/pritunl-client>`_ is an open
 source vpn client for Pritunl. Documentation and more information can be
-found at the home page `pritunl.com <http://pritunl.com>`_
+found at the home page `client.pritunl.com <http://client.pritunl.com>`_
 
 Export Requirements
 -------------------

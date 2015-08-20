@@ -23,6 +23,7 @@ SETUP_PATH = 'setup.py'
 CHANGES_PATH = 'CHANGES'
 BUILD_KEYS_PATH = 'tools/build_keys.json'
 PACUR_PATH = '../pritunl-pacur'
+BUILD_TARGETS = ('pritunl-client', 'pritunl-client-gtk')
 
 os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 cur_date = datetime.datetime.utcnow()
@@ -284,7 +285,7 @@ elif cmd == 'build':
 
 
     # Update sha256 sum and pkgver in PKGBUILD
-    for dir in ('pritunl-client', 'pritunl-client-gtk'):
+    for dir in BUILD_TARGETS:
         for name in os.listdir(os.path.join(PACUR_PATH, dir)):
             pkgbuild_path = os.path.join(PACUR_PATH, dir, name, 'PKGBUILD')
 

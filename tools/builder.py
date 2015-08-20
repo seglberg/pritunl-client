@@ -86,6 +86,26 @@ def get_int_ver(version):
     return int(''.join([x.zfill(4) for x in ver]))
 
 
+def iter_packages():
+    for target in BUILD_TARGETS:
+        target_path = os.path.join(PACUR_PATH, target)
+        for release in os.listdir(target_path):
+            release_path = os.path.join(target_path, release)
+            for name in os.listdir(release_path):
+                if name.endswith(".pkg.tar.xz"):
+                    pass
+                elif name.endswith(".rpm"):
+                    pass
+                elif name.endswith(".deb"):
+                    pass
+                else:
+                    continue
+
+                path = os.path.join(release_path, name)
+
+                yield name, path
+
+
 # Load build keys
 with open(BUILD_KEYS_PATH, 'r') as build_keys_file:
     build_keys = json.loads(build_keys_file.read().strip())
@@ -315,6 +335,26 @@ elif cmd == 'build':
 elif cmd == 'upload':
     is_snapshot = 'snapshot' in cur_version
 
+    # Get release id
+    release_id = None
+    response = requests.get(
+        'https://api.github.com/repos/%s/%s/releases' % (
+            github_owner, pkg_name),
+        headers={
+            'Authorization': 'token %s' % github_token,
+            'Content-type': 'application/json',
+        },
+    )
+
+    for release in response.json():
+        if release['tag_name'] == cur_version:
+            release_id = release['id']
+
+    if not release_id:
+        print 'Version does not exists in github'
+        sys.exit(1)
+
+
     # Run pacur project build
     subprocess.check_call(['pacur', 'project', 'repo'], cwd=PACUR_PATH)
 
@@ -329,6 +369,13 @@ elif cmd == 'upload':
         'mirror/',
         mirror_url,
     ],cwd=PACUR_PATH)
+
+
+    # Add to github
+    for name, path in iter_packages():
+        print path
+
+        post_git_asset(release_id, name, path)
 
 else:
     print 'Unknown command'

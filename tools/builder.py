@@ -6,10 +6,8 @@ import json
 import os
 import subprocess
 import time
-import zlib
 import math
 import requests
-import werkzeug.http
 
 USAGE = """Usage: builder [command] [options]
 Command Help: builder [command] --help

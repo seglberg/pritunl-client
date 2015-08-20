@@ -289,6 +289,14 @@ elif cmd == 'set-version':
         sys.exit(1)
 
 elif cmd == 'build':
+    # Remove previous build
+    for name, path in iter_packages():
+        try:
+            os.remove(path)
+        except:
+            pass
+
+
     # Get sha256 sum
     archive_name = '%s.tar.gz' % cur_version
     archive_path = os.path.join(os.path.sep, 'tmp', archive_name)

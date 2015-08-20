@@ -373,8 +373,6 @@ elif cmd == 'upload':
 
     # Add to github
     for name, path in iter_packages():
-        print path
-
         post_git_asset(release_id, name, path)
 
 else:

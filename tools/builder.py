@@ -111,6 +111,7 @@ with open(BUILD_KEYS_PATH, 'r') as build_keys_file:
     github_owner = build_keys['github_owner']
     github_token = build_keys['github_token']
     mirror_url = build_keys['mirror_url']
+    test_mirror_url = build_keys['test_mirror_url']
 
 
 # Get package info
@@ -287,6 +288,7 @@ elif cmd == 'set-version':
         print response.json()
         sys.exit(1)
 
+
 elif cmd == 'build':
     # Remove previous build
     for name, path in iter_packages():
@@ -373,7 +375,7 @@ elif cmd == 'upload':
         '--delete',
         '--acls',
         'mirror/',
-        mirror_url,
+        test_mirror_url if is_snapshot else mirror_url,
     ],cwd=PACUR_PATH)
 
 

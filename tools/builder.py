@@ -334,10 +334,9 @@ elif cmd == 'build':
 
 
     # Run pacur project build
-    subprocess.check_call(['pacur', 'project', 'build', 'pritunl-client'],
-        cwd=PACUR_PATH)
-    subprocess.check_call(['pacur', 'project', 'build', 'pritunl-client-gtk'],
-        cwd=PACUR_PATH)
+    for build_target in BUILD_TARGETS:
+        subprocess.check_call(['pacur', 'project', 'build', build_target],
+            cwd=PACUR_PATH)
 
 
 elif cmd == 'upload':

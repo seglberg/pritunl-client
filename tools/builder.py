@@ -14,7 +14,6 @@ Command Help: builder [command] --help
 
 Commands:
   version               Print the version and exit
-  sync-db               Sync database
   set-version           Set current version
   build                 Build and release"""
 

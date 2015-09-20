@@ -1,12 +1,6 @@
 pritunl-client: pritunl vpn client
 ==================================
 
-.. image:: https://img.shields.io/badge/package-ubuntu-dd4814.svg?style=flat
-    :target: https://launchpad.net/~pritunl/+archive/ubuntu/ppa
-
-.. image:: https://img.shields.io/badge/package-arch%20linux-33aadd.svg?style=flat
-    :target: https://aur.archlinux.org/packages/?K=pritunl&SeB=m
-
 .. image:: https://img.shields.io/badge/github-pritunl-11bdc2.svg?style=flat
     :target: https://github.com/pritunl
 

@@ -1,7 +1,8 @@
 pritunl-client changelog
 ========================
 
-<%= version %>
+Version 1.0.738.83 2015-09-20
+-----------------------------
 
 Fix issues with upstart script
 

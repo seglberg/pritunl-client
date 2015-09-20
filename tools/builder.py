@@ -21,8 +21,8 @@ INIT_PATH = 'pritunl_client/__init__.py'
 SETUP_PATH = 'setup.py'
 CHANGES_PATH = 'CHANGES'
 BUILD_KEYS_PATH = 'tools/build_keys.json'
-STABLE_pacur_path = '../pritunl-pacur'
-TEST_pacur_path = '../pritunl-pacur-test'
+STABLE_PACUR_PATH = '../pritunl-pacur'
+TEST_PACUR_PATH = '../pritunl-pacur-test'
 BUILD_TARGETS = ('pritunl-client', 'pritunl-client-gtk')
 
 os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))

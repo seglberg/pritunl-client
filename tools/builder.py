@@ -288,14 +288,6 @@ elif cmd == 'build':
     pacur_path = TEST_PACUR_PATH if is_snapshot else STABLE_PACUR_PATH
 
 
-    # Remove previous build
-    for name, path in iter_packages():
-        try:
-            os.remove(path)
-        except:
-            pass
-
-
     # Get sha256 sum
     archive_name = '%s.tar.gz' % cur_version
     archive_path = os.path.join(os.path.sep, 'tmp', archive_name)

@@ -86,21 +86,19 @@ def get_int_ver(version):
 def iter_packages():
     for target in BUILD_TARGETS:
         target_path = os.path.join(pacur_path, target)
-        for release in os.listdir(target_path):
-            release_path = os.path.join(target_path, release)
-            for name in os.listdir(release_path):
-                if name.endswith(".pkg.tar.xz"):
-                    pass
-                elif name.endswith(".rpm"):
-                    pass
-                elif name.endswith(".deb"):
-                    pass
-                else:
-                    continue
+        for name in os.listdir(target_path):
+            if name.endswith(".pkg.tar.xz"):
+                pass
+            elif name.endswith(".rpm"):
+                pass
+            elif name.endswith(".deb"):
+                pass
+            else:
+                continue
 
-                path = os.path.join(release_path, name)
+            path = os.path.join(target_path, name)
 
-                yield name, path
+            yield name, path
 
 
 # Load build keys
@@ -314,24 +312,23 @@ elif cmd == 'build':
 
 
     # Update sha256 sum and pkgver in PKGBUILD
-    for dir in BUILD_TARGETS:
-        for name in os.listdir(os.path.join(pacur_path, dir)):
-            pkgbuild_path = os.path.join(pacur_path, dir, name, 'PKGBUILD')
+    for target in BUILD_TARGETS:
+        pkgbuild_path = os.path.join(pacur_path, target, 'PKGBUILD')
 
-            with open(pkgbuild_path, 'r') as pkgbuild_file:
-                pkgbuild_data = re.sub(
-                    'pkgver="(.*)"',
-                    'pkgver="%s"' % cur_version,
-                    pkgbuild_file.read(),
-                )
-                pkgbuild_data = re.sub(
-                    '"[a-f0-9]{64}"',
-                    '"%s"' % archive_sha256_sum,
-                    pkgbuild_data,
-                )
+        with open(pkgbuild_path, 'r') as pkgbuild_file:
+            pkgbuild_data = re.sub(
+                'pkgver="(.*)"',
+                'pkgver="%s"' % cur_version,
+                pkgbuild_file.read(),
+            )
+            pkgbuild_data = re.sub(
+                '"[a-f0-9]{64}"',
+                '"%s"' % archive_sha256_sum,
+                pkgbuild_data,
+            )
 
-            with open(pkgbuild_path, 'w') as pkgbuild_file:
-                pkgbuild_file.write(pkgbuild_data)
+        with open(pkgbuild_path, 'w') as pkgbuild_file:
+            pkgbuild_file.write(pkgbuild_data)
 
 
     # Run pacur project build

@@ -146,7 +146,7 @@ setup(
         'Development Status :: 5 - Production/Stable',
         'Environment :: X11 Applications :: GTK',
         'Intended Audience :: End Users/Desktop',
-        'License :: Other/Proprietary License',
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Natural Language :: English',
         'Operating System :: POSIX :: Linux',
         'Operating System :: Microsoft :: Windows',

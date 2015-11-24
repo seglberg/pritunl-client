@@ -14,3 +14,4 @@ sign.key
 /dist
 /pritunl_client.egg-info
 /tools/build_keys.json
+.idea/

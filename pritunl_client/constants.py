@@ -18,6 +18,7 @@ else:
 CONF_DIR = os.path.expanduser(os.path.join('~', '.config', APP_NAME))
 LOG_PATH = os.path.join(CONF_DIR, '%s.log' % APP_NAME)
 PROFILES_DIR = os.path.join(CONF_DIR, 'profiles')
+SHARE_DIR = os.path.join(os.path.abspath(os.sep), 'usr', 'share', APP_NAME)
 LINUX_ETC_DIR = os.path.join(os.path.abspath(os.sep), 'etc', APP_NAME)
 TMP_DIR = os.path.join(os.path.abspath(os.sep), 'tmp')
 SOCK_PATH = os.path.join(TMP_DIR, 'pritunl_%s.sock' % uuid.uuid4().hex)
@@ -33,7 +34,7 @@ LOGO_DEFAULT_PATH = None
 CONNECTED_LOGO_DEFAULT_PATH = None
 DISCONNECTED_LOGO_DEFAULT_PATH = None
 IMG_ROOTS = [
-    os.path.join(os.path.abspath(os.sep), 'usr', 'share', APP_NAME),
+    SHARE_DIR,
     os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), 'img'),
 ]
 

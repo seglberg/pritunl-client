@@ -80,6 +80,9 @@ data_files += [
         os.path.join('data', 'var', 'pritunl-client.log'),
         os.path.join('data', 'var', 'pritunl-client.log.1'),
     ]),
+    (os.path.join(os.path.abspath(os.sep), 'etc', 'pritunl_client'), [
+        os.path.join('data', 'scripts', 'update-resolv-conf.sh'),
+    ])
 ]
 
 console_scripts = [

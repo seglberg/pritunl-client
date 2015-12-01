@@ -1,3 +1,5 @@
+from pritunl_client.constants import *
+
 import optparse
 import sys
 import os
@@ -220,7 +222,6 @@ def client_shell():
     cli()
 
 def _pk_start(autostart=False):
-    from .constants import LINUX_ETC_DIR
     regex = r'(?:/pritunl_client/profiles/[a-z0-9]+\.ovpn)$'
     if not re.search(regex, sys.argv[1]):
         raise ValueError('Profile must be in home directory')
@@ -239,11 +240,11 @@ def _pk_start(autostart=False):
         args.append('--auth-user-pass')
         args.append(sys.argv[2])
 
-    # Handle DNS on Linux
-    # Currently only supports resolvconf / openresolv
+    script_path = os.path.join(SHARE_DIR, 'update-resolv-conf.sh')
+
     args.extend(['--script-security', '2'])
-    args.extend(['--up', LINUX_ETC_DIR + '/update-resolv-conf.sh'])
-    args.extend(['--down', LINUX_ETC_DIR + '/update-resolv-conf.sh'])
+    args.extend(['--up', script_path])
+    args.extend(['--down', script_path])
 
     try:
         process = subprocess.Popen(args)

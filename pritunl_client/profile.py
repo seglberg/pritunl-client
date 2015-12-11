@@ -174,7 +174,7 @@ class Profile(object):
 
         tls_auth = ''
         if 'key-direction' in profile_data and 'key-direction' not in data:
-            tls_auth +=  'key-direction 1\n'
+            tls_auth += 'key-direction 1\n'
 
         s_index = profile_data.find('<tls-auth>')
         e_index = profile_data.find('</tls-auth>')

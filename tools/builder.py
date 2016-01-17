@@ -325,8 +325,10 @@ elif cmd == 'build':
 
     # Run pacur project build
     for build_target in BUILD_TARGETS:
-        subprocess.check_call(['pacur', 'project', 'build', build_target],
-            cwd=pacur_path)
+        subprocess.check_call(
+            ['sudo', 'pacur', 'project', 'build', build_target],
+            cwd=pacur_path,
+        )
 
 
 elif cmd == 'upload':
@@ -355,7 +357,10 @@ elif cmd == 'upload':
 
 
     # Run pacur project build
-    subprocess.check_call(['pacur', 'project', 'repo'], cwd=pacur_path)
+    subprocess.check_call(
+        ['sudo', 'pacur', 'project', 'repo'],
+        cwd=pacur_path,
+    )
 
 
     # Sync mirror

@@ -21,6 +21,12 @@ class ProfileShell(profile.Profile):
             args.append('--auth-user-pass')
             args.append(self.passwd_path)
 
+        script_path = os.path.join(SHARE_DIR, 'update-resolv-conf.sh')
+
+        args.extend(['--script-security', '2'])
+        args.extend(['--up', script_path])
+        args.extend(['--down', script_path])
+
         self._run_ovpn(status_callback, connect_callback, passwd,
             args, on_exit)
 
